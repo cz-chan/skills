@@ -1,0 +1,35 @@
+USER: hecho, ya tengo el .env con la URL (aquí no tengo Neon real para ejecutar el SELECT 1, sigue sin ejecutarlo). y sí, crea el archivo de progreso
+TOOL Bash {"command":"test -f .env && grep -c '^DATABASE_URL=postgres' .env; git status --short","description":"Check .env has DATABASE_URL without printing it"}
+RESULT  1
+ M .gitignore
+TOOL Write {"file_path":"<sandbox>/.claude/skills/code-mentor/memory/databases/0001-neon-likes-progress.md","content":"---\nstatus: in-progress\ntopic: Botón 
+RESULT ERR  Claude requested permissions to write to <sandbox>/.claude/skills/code-mentor/memory/databases/00
+TOOL WebFetch {"url":"https://neon.com/docs/serverless/serverless-driver","prompt":"Show the basic usage example of the neon() function with tagged template queries (import, creating sql with DATABASE_URL, running 
+RESULT  The page's Node.js example under "Use the driver over HTTP" shows the basic pattern. Each line is quoted separately:
+
+1. Import the function: "import 
+TEXT: Vi que `.env` existe y tiene `DATABASE_URL=postgres…`. No imprimí la URL.
+
+**El archivo de progreso no se creó:** Claude Code volvió a bloquear la escritura en `.claude/skills/code-mentor/memory/`. Para desbloquearlo, aprueba el aviso de permiso cuando salga o añade una regla de `allow` para esa ruta con `/permissions`. Cuando esté, lo guardo con el paso 0 hecho y una nota de que el `SELECT 1` no se ejecutó porque aquí no hay Neon real.
+
+## Paso 1: conectar Hono a Neon
+
+**Idea:** `@neondatabase/serverless` ya está en `package.json`. Su función `neon(url)` te devuelve una función `sql`. Escribes la query como un *template literal*:
+
+```
+sql`SELECT 1 AS ok`   ──HTTP──▶  Neon  ──▶  [ { ok: 1 } ]
+```
+
+Siempre devuelve un **array de filas**, y cada fila es un objeto con una clave por columna. Los `${valor}` dentro de la query se envían como parámetros, no se pegan en el texto, y eso evita la inyección SQL. Lo usaremos en el paso 3.
+
+**Qué construir** en `src/index.ts`:
+1. Importa `neon`.
+2. Crea `sql` a partir de `process.env.DATABASE_URL`.
+3. Añade una ruta `GET /db-check` que ejecute `SELECT 1 AS ok` y responda con `c.json(...)` usando la primera fila.
+
+**Done check:** `GET /db-check` → `{"ok":1}`
+
+Yo me encargo de que se pueda ejecutar: un servidor Node que cargue `.env` con `--env-file`. Sin Neon real aquí, solo podré comprobar que compila y que da error de conexión, no el `{"ok":1}`.
+
+Si quieres leer antes por tu cuenta, aquí está el driver: https://neon.com/docs/serverless/serverless-driver (oficial)
+RESULT_FINAL success 4 0.48145009999999994

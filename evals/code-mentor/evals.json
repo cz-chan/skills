@@ -1,0 +1,89 @@
+{
+	"skill_name": "code-mentor",
+	"sandbox": "Local git repo built by scripts/setup.sh: Hono + Neon app with an empty /api/likes TODO. No remote, nothing installed.",
+	"evals": [
+		{
+			"id": "T1",
+			"name": "guided-feature-first-turn",
+			"state": "clean",
+			"prompt": "quiero hacer un botón de likes con Neon para aprender bases de datos",
+			"checks": [
+				"Loads the skill",
+				"Checks .code-mentor/memory/, git status, git log before answering",
+				"Picks mode A (guided feature)",
+				"Asks multiple-choice questions, including who writes each part",
+				"Writes no code",
+				"Does not claim dependencies are installed without checking node_modules"
+			]
+		},
+		{
+			"id": "T2",
+			"name": "explain-first-turn",
+			"state": "clean",
+			"prompt": "explícame cómo funcionan los websockets",
+			"checks": [
+				"Loads the skill",
+				"Picks mode B: no agreement, no progress file",
+				"Asks 2–3 multiple-choice level questions"
+			]
+		},
+		{
+			"id": "T3",
+			"name": "resume-progress-file",
+			"state": "fixtures/neon-likes-progress.md committed at .code-mentor/memory/databases/",
+			"prompt": "seguimos",
+			"checks": [
+				"Loads the skill from a one-word prompt",
+				"Finds the -progress.md file and names topic, current step and date",
+				"Compares the file with the repo and reports differences"
+			]
+		},
+		{
+			"id": "T4",
+			"name": "stale-progress-file",
+			"state": "fixtures/neon-likes-progress-stale.md (updated 2026-10-10) + a later commit adding src/schema.sql",
+			"prompt": "seguimos",
+			"checks": [
+				"Detects that the later commit completed the current step",
+				"Says the progress file is behind and asks before updating it"
+			]
+		},
+		{
+			"id": "T5",
+			"name": "topic-already-taught",
+			"state": "fixtures/websockets-basics-done.md at .code-mentor/memory/realtime/",
+			"prompt": "explícame websockets",
+			"checks": [
+				"Cites the previous memory file by path",
+				"Resumes from what was taught and where the learner got stuck"
+			]
+		},
+		{
+			"id": "T6",
+			"name": "should-not-trigger",
+			"state": "clean",
+			"prompt": "arregla el error de tipos en src/index.ts",
+			"checks": ["Does NOT load the skill"]
+		},
+		{
+			"id": "T7",
+			"name": "multi-turn-guided-feature",
+			"state": "clean; learner simulated by hand following persona-T7.md (scripts/turn.sh)",
+			"prompt": "quiero hacer un botón de likes con Neon para aprender bases de datos",
+			"checks": [
+				"Says memory goes to .code-mentor/ (not .claude/) and asks about .gitignore before creating it",
+				"Writes the agreement with an ASCII flow marking who writes each piece",
+				"Creates the progress file following references/memory-example.md",
+				"Asks before installing anything; exact versions only",
+				"Reads the learner's code from disk before reviewing it",
+				"Shows the first problem first and does not give core code before hint 5",
+				"On 'no lo pillo', moves to hint 3 with a traced example",
+				"At each finished step: ticks the plan, adds a Log entry with a self-contained Lesson",
+				"On a mid-step stop, updates Current step",
+				"In a new session, 'seguimos' resumes from the progress file",
+				"At the end: recap, status done, Summary, final multiple-choice quiz",
+				"On a wrong quiz answer: explains and logs it under Stuck on"
+			]
+		}
+	]
+}

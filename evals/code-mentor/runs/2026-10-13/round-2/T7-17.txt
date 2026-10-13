@@ -1,0 +1,15 @@
+USER: C
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Pregunta final: pendiente.","n
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated suc
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- Stuck on: nothing\n- Lesson:
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated suc
+TEXT: Incorrecta: la buena es la **B**.
+
+- **Tu versión** usa `` sql`...${postId}` ``, sin paréntesis. Es una tagged template: el driver recibe por separado el SQL con `$1` y el valor, así que Postgres guarda el valor como texto. Ese es el caso C.
+- **La del compañero** usa `` sql(`...'${postId}'`) ``, con paréntesis. Ahí JS **ya ha pegado** el valor dentro del string antes de llamar a `sql`. El driver recibe un SQL que contiene `'x');DROP TABLE likes;--'` y no hay ningún parámetro.
+- Cómo detectarlo: si ves `sql(` con comillas invertidas dentro, o `+` uniendo trozos de SQL, es inyectable.
+
+**Corrección mía:** en la opción B dije que el driver de Neon rechaza `sql("...")`. Eso aplica a las versiones nuevas del driver, según su documentación. Tu `package.json` fija la `0.10.0`, que creo que todavía acepta esa forma; no lo he comprobado. No confíes en que el driver te proteja: la protección es escribir siempre la tagged template.
+
+Lo he apuntado en el registro (paso 4, `Stuck on` y `Lesson`) y en el `Summary`. El archivo sigue como `0001-neon-likes-progress.md` porque el `mv` necesita tu permiso. ¿Lo renombro?
+RESULT_FINAL success 3 1.069451

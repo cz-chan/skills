@@ -1,0 +1,29 @@
+USER: lo de la línea 6 ya lo entiendo, pero lo de la promesa no lo pillo
+TEXT: Va con un ejemplo paso a paso.
+
+**Qué es una promesa.** Pedirle algo a Neon tarda (unos ms por red). JS no se queda parado esperando: `sql\`...\`` devuelve **al instante** un objeto `Promise`, un "recibo" que dice "las filas llegarán". En ese momento las filas todavía no existen.
+
+**Tu código, línea a línea:**
+
+```
+t=0ms   const rows = sql`SELECT 1 AS ok`
+        rows = Promise { <pending> }    ← recibo, sin filas
+t=0ms   return c.json(rows)
+        JSON de un Promise → {}         ← se envía esto
+t=40ms  llega [ { ok: 1 } ] de Neon     ← demasiado tarde, ya respondiste
+```
+
+Resultado del `curl`: `{}`, no `[{"ok":1}]`.
+
+**Cómo esperar.** `await` delante de la promesa pausa *esa función* hasta que llega el valor, y te da el valor en vez del recibo:
+
+```
+t=0ms   rows = await (promesa)  ← la función espera aquí
+t=40ms  rows = [ { ok: 1 } ]    ← ahora sí, las filas
+t=40ms  return c.json(rows)     → [{"ok":1}]
+```
+
+Regla: solo se puede usar `await` dentro de una función marcada `async`. Forma: `async (c) => { ... }`.
+
+Tu tarea: aplica eso a tu handler (2 cambios), guarda y pégame el `curl`.
+RESULT_FINAL success 1 0.6535764999999998

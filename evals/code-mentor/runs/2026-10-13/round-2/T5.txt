@@ -1,0 +1,47 @@
+USER: explícame websockets
+TOOL Skill {"skill":"code-mentor","args":"explícame websockets"}
+RESULT  Launching skill: code-mentor
+TOOL Bash {"command":"ls -R .code-mentor 2>/dev/null; git status --short; git log -5 --oneline; ls; cat PLAN.md 2>/dev/null | head -50; grep -rl -i websocket . --include=*.ts --include=*.md 2>/dev/null | grep -
+RESULT  memory
+
+.code-mentor/memory:
+realtime
+
+.code-mentor/memory/realtime:
+0001-websockets-basics-2026-10-12.md
+c594d7a notes
+9fc6c37 fixture: skill round 2
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/realtime/0001-websockets-basics-2026-10-12.md"}
+RESULT  1	---
+2	status: done
+3	topic: Qué son los WebSockets
+4	concepts: [websockets, http, handshake, full-duplex]
+5	level: trainee
+6	mode: explain
+7	updated
+TOOL Bash {"command":"cat package.json; ls -R src","description":"Show package.json and src files"}
+RESULT  {
+  "name": "c12z-demo",
+  "type": "module",
+  "dependencies": {
+    "hono": "4.6.0",
+    "@neondatabase/serverless": "0.10.0"
+  }
+}
+index.ts
+TEXT: Ya vimos lo básico ayer: `.code-mentor/memory/realtime/0001-websockets-basics-2026-10-12.md`.
+- Visto: HTTP vs WebSocket, handshake, canal en los dos sentidos, práctica con `websocat` contra un servidor echo.
+- Te costó: pensabas que el servidor solo podía responder. Lo resolvimos con un servidor que manda la hora cada segundo.
+
+Para seguir desde ahí, ¿qué quieres entender ahora?
+
+1. **Handshake por dentro**: cabeceras `Upgrade`, `Sec-WebSocket-Key` y el código 101.
+2. **Servidor propio en Hono**: escribes tú la parte WebSocket de un mini servidor en `src/index.ts`.
+3. **Broadcast**: un mensaje de un cliente llega a todos (la base de un chat).
+4. **Cómo funciona por debajo**: frames, ping/pong, cierre y reconexión.
+
+Y cómo prefieres practicar:
+
+- **a)** Un archivo temporal que creo yo y borro al final.
+- **b)** Directo en la consola.
+RESULT_FINAL success 6 0.22763480000000003

@@ -1,0 +1,59 @@
+USER: quiero hacer un botón de likes con Neon para aprender bases de datos
+TOOL Skill {"skill":"code-mentor","args":"quiero hacer un botón de likes con Neon para aprender bases de datos"}
+RESULT  Launching skill: code-mentor
+TOOL Bash {"command":"ls -a .claude/skills/code-mentor/memory 2>/dev/null; find .claude/skills/code-mentor/memory -name \"*.md\" 2>/dev/null; git status --short; git log -5 --oneline; ls; cat PLAN.md package.js
+RESULT  af18af7 fixture: ignore runs
+e89d62d fixture: initial state
+AGENTS.md
+package.json
+reset.sh
+runs
+src
+{
+  "name": "c12z-demo",
+  "type": "module",
+  "d
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TEXT: Sin progreso previo en `memory/`. Repo: Hono + `@neondatabase/serverless` instalado, `src/index.ts` tiene un `// TODO: /api/likes`. Empezamos de cero.
+
+Unas preguntas rápidas (responde tipo `1b 2a 3c…`):
+
+**1. Qué es "hecho"?**
+- a) Contador global: clic → +1, sobrevive reload
+- b) Like por usuario/IP (no repetir)
+- c) Likes por página/post (varios contadores)
+- d) Otro
+
+**2. Tu nivel en bases de datos / SQL:**
+- a) Nunca usé SQL
+- b) Sé `SELECT`/`INSERT` básico
+- c) Uso SQL normal (joins, índices)
+- d) Avanzado (transacciones, concurrencia)
+
+**3. Quién hace cada parte?** (T = tú, G = tú con guía, Y = yo)
+- Setup Neon (cuenta, proyecto, `DATABASE_URL`) → propuesta: **T**
+- Conexión desde Hono → **G**
+- Schema (`CREATE TABLE`) → **T**
+- Queries (sumar like, leer contador) → **T**
+- Ruta API `/api/likes` → **Y**
+- Botón UI (HTML) → **Y**
+- Tests → **Y**
+
+  Responde `ok` o cambia las que quieras.
+
+**4. Ya tienes cuenta en Neon?**
+- a) Sí, con proyecto
+- b) Sí, sin proyecto
+- c) No
+- d) No sé qué es Neon exactamente
+RESULT_FINAL success 5 0.23355140000000002

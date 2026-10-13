@@ -1,0 +1,58 @@
+USER: quiero hacer un botón de likes con Neon para aprender bases de datos
+TOOL Skill {"skill":"code-mentor","args":"quiero hacer un botón de likes con Neon para aprender bases de datos"}
+RESULT  Launching skill: code-mentor
+TOOL Bash {"command":"ls -la .code-mentor/memory 2>/dev/null; find .code-mentor -type f 2>/dev/null; git status --short; git log -5 --oneline; ls -la; cat package.json 2>/dev/null; ls PLAN.md 2>/dev/null","desc
+RESULT ERR  Exit code 1
+9fc6c37 fixture: skill round 2
+af18af7 fixture: ignore runs
+e89d62d fixture: initial state
+total 32
+drwxr-xr-x@ 10 user  staff  320 Oct 
+TOOL Bash {"command":"find src -type f | xargs -I{} sh -c 'echo \"== {}\"; cat {}'; cat .gitignore; ls node_modules 2>/dev/null | head; ls .env* 2>/dev/null","description":"Read source files and config"}
+RESULT ERR  This Bash command contains multiple operations. The following part requires approval: xargs -I{} sh -c 'echo "== {}"; cat {}'; cat .gitignore; ls node
+TOOL Glob {"pattern":"src/**/*"}
+RESULT  src/index.ts
+TOOL Read {"file_path":"<sandbox>/.gitignore"}
+RESULT  1	runs/
+2	
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TEXT: Ya revisé el repo: no hay progreso previo. Hay una app Hono mínima (`src/index.ts` con `// TODO: /api/likes`) y `@neondatabase/serverless@0.10.0` ya está en `package.json`. No existe `.env`, así que todavía no hay conexión a Neon.
+
+Modo: **feature guiada**. Objetivo: aprender bases de datos. Antes de empezar, contesta unas preguntas rápidas (ej: `1b 2a 3c…`):
+
+**1. ¿Qué experiencia tienes con SQL / bases de datos?**
+- a) Nunca he escrito SQL
+- b) He hecho `SELECT` e `INSERT` sueltos
+- c) Sé hacer tablas, claves primarias y algún `JOIN`
+- d) Lo uso a diario y quiero aprender Neon o Postgres en concreto
+
+**2. ¿Qué es un "like"?**
+- a) Un contador global: cada clic suma 1
+- b) Un like por usuario o visitante, sin duplicados (más modelado de datos)
+- c) Recomiéndame tú
+
+**3. ¿Quién hace cada parte?** (Y = tú solo, G = tú con mi guía, M = yo)
+- Crear el proyecto en Neon y la `DATABASE_URL`
+- Conexión desde Hono (driver `@neondatabase/serverless`)
+- Esquema (`CREATE TABLE`)
+- Queries (insertar like y contar)
+- Ruta API `/api/likes` (GET y POST)
+- Botón UI (HTML + fetch)
+- Tests
+
+Mi propuesta: Neon, conexión, esquema y queries → **G**; ruta, UI y tests → **M**.
+
+**4. ¿Tienes ya cuenta en Neon?** a) sí  b) no
+
+Con tus respuestas te escribo el acuerdo y el diagrama del flujo.
+RESULT_FINAL success 8 0.2443956

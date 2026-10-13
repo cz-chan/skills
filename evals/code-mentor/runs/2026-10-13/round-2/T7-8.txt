@@ -1,0 +1,60 @@
+USER: no hagas commit. sigamos con el paso 3
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-basics.html","prompt":"Does this page explain CREATE TABLE basics (columns, data types)? Reply yes/no + title."}
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-default.html","prompt":"Does this page explain DEFAULT values for columns, including now() or serial/identity? Reply yes/no + title + short quote."}
+RESULT  **Yes.**
+
+**Title:** 5.1. Table Basics (PostgreSQL 18 Documentation, Chapter 5: Data Definition)
+
+The page covers:
+
+- **Columns and rows:** A table "c
+RESULT  **Yes.** The page is "5.2. Default Values" from the PostgreSQL 18 documentation.
+
+It covers column defaults in general and gives examples of a time-ba
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- Neon — Serverless driver: ht
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated suc
+TEXT: Ok, no hago commit.
+
+**Paso 3: la tabla de likes**
+
+Una **tabla** es como una hoja de cálculo con columnas fijas. Cada columna tiene nombre y **tipo**, y Postgres rechaza los valores que no encajan con el tipo. Cada **fila** es un registro.
+
+Hay dos formas de guardar likes por post:
+
+```
+A) Una fila por like                 B) Un contador por post
+likes                                post_likes
+id | post_id    | created_at         post_id    | count
+1  | hola-mundo | 10:01              hola-mundo | 2
+2  | hola-mundo | 10:05              otro-post  | 1
+3  | otro-post  | 10:07
+contar = COUNT(*) WHERE post_id=…    contar = leer count
+dar like = INSERT                    dar like = INSERT o sumar 1 (upsert)
+```
+
+**Recomiendo A**: dar like es un `INSERT` simple y contar es un `COUNT`, que es justo lo que acordamos. Además guardas cuándo pasó cada like, y más adelante podrías limitarlo a un like por usuario. B lee más rápido, pero exige un "upsert" y pensar en dos clics a la vez. Eso lo vemos en "Going further" si quieres.
+
+**Qué construir (opción A):** tabla `likes` con 3 columnas:
+
+| columna      | qué guarda                         | pista de tipo / reglas                                |
+| ------------ | ---------------------------------- | ----------------------------------------------------- |
+| `id`         | número único de cada like          | `SERIAL` (se numera solo) + `PRIMARY KEY` (único, identifica la fila) |
+| `post_id`    | a qué post va el like (`'hola-mundo'`) | `TEXT`, obligatorio → `NOT NULL`                      |
+| `created_at` | cuándo                             | `TIMESTAMPTZ`, se rellena solo → `DEFAULT now()`      |
+
+Uso `TEXT` para `post_id` porque aún no hay tabla de posts y un slug se lee fácil.
+
+Pasos:
+1. Crea `db/schema.sql` con tu `CREATE TABLE likes (...)`. Así el schema queda guardado en el repo.
+2. Pégalo en el SQL editor de Neon y ejecútalo.
+3. Done check en el editor:
+   ```sql
+   INSERT INTO likes (post_id) VALUES ('hola-mundo');
+   SELECT * FROM likes;
+   ```
+   Esperado: 1 fila con `id = 1`, `post_id = hola-mundo` y `created_at` con la hora de ahora. Solo pasaste `post_id`: las otras dos columnas se rellenaron solas.
+
+Pégame el resultado del `SELECT` cuando lo tengas.
+
+Si quieres leer primero: [PostgreSQL — Table Basics](https://www.postgresql.org/docs/current/ddl-basics.html) y [PostgreSQL — Default Values](https://www.postgresql.org/docs/current/ddl-default.html) (oficiales). La segunda usa `CURRENT_TIMESTAMP`, que es lo mismo que `now()`.
+RESULT_FINAL success 4 0.8675976999999999

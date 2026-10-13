@@ -1,0 +1,29 @@
+USER: hecho. el curl devuelve {"count":"2"}, con comillas. ¿está bien?
+TOOL Read {"file_path":"<sandbox>/src/index.ts","offset":24}
+RESULT  24	
+25	// Contar likes: GET /api/likes/hola-mundo → { count: 2 }
+26	// El botón (paso 6) llama aquí al cargar y tras cada like.
+27	app.get('/api/likes
+TEXT: Todavía no: tiene que salir `2`, no `"2"`. Con `"2"`, el contador del botón haría `"2" + 1` y mostraría `"21"`.
+
+La query de la línea 31 está bien y el conteo también (2). El problema es el **tipo** del valor que llega a la línea 32.
+
+**Por qué pasa:**
+- `COUNT(*)` en Postgres devuelve `bigint`, un entero de 64 bits.
+- Un `number` de JS solo guarda enteros exactos hasta unos 9 mil billones (`2^53`). Un `bigint` puede pasar de ahí.
+- Para no perder precisión, el driver de Neon te entrega los `bigint` como **string**.
+
+```
+Postgres:  COUNT(*) = 2      (tipo bigint)
+   ↓ driver
+JS:        rows[0].count = "2"   (string)
+```
+
+**Qué hacer:** convertir ese valor a número. Hay dos sitios donde hacerlo:
+1. **En JS**, en la línea 32, antes de devolverlo.
+2. **En SQL**, pidiendo a Postgres que devuelva `COUNT(*)` como `int` (un "cast"). Busca la sintaxis `::` en Postgres.
+
+Te recomiendo la 2: así la BD ya entrega el tipo correcto y el JS no tiene que arreglarlo. Un `int` llega a unos 2.100 millones de likes por post, de sobra aquí.
+
+Cuando lo cambies, repite el curl. Tiene que salir `{"count":2}`, sin comillas.
+RESULT_FINAL success 2 0.6520792

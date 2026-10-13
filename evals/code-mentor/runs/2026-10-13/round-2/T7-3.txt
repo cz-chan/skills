@@ -1,0 +1,59 @@
+USER: hecho, tengo el .env con la URL. en el SQL editor de Neon el SELECT 1 me devolvió 1
+TOOL Bash {"command":"ls -la .env && sed -E 's#(://[^:]+:)[^@]+@#\\1****@#' .env && git check-ignore .env","description":"Verify .env format with password masked"}
+RESULT ERR  This Bash command contains multiple operations. The following parts require approval: sed -E 's#(://[^:]+:)[^@]+@#\1****@#' .env, git check-ignore .en
+TOOL Bash {"command":"ls -la .env","description":"Check .env exists"}
+RESULT  -rw-r--r--@ 1 user  staff  108 Oct 13 11:03 .env
+TOOL Grep {"pattern":"^DATABASE_URL=postgres(ql)?://[^:]+:[^@]+@[^/]+\\.neon\\.tech/[^?]+\\?.*sslmode=require","path":"<sandbox>/.env","output_mode":"count"}
+RESULT  .env:1
+
+Found 1 total occurrence across 1 file.
+TOOL WebFetch {"url":"https://neon.com/docs/serverless/serverless-driver","prompt":"Does this page show using neon() from @neondatabase/serverless with a tagged template query like sql`SELECT ...`? Reply yes/no + p
+RESULT  **Yes.**
+
+**Page title:** Neon serverless driver
+
+**Quote:** "const rows = await sql`SELECT * FROM posts WHERE id = ${id}`;"
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- [ ] 1. Proyecto en Neon + `D
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated suc
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Paso 1: crear proyecto en Neon
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated suc
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"(official)\n","new_string":"(o
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated suc
+TEXT: ✅ **Paso 1 hecho.** Revisé `.env` sin mostrar la contraseña: tiene `DATABASE_URL` con host `*.neon.tech` y `sslmode=require`. Tu `SELECT 1` en el editor de Neon confirma que la BD responde. Progreso guardado.
+
+---
+
+**Paso 2: conectar desde Hono**
+
+Antes respondiste "SELECT 1 → 1" desde el editor de Neon. Ahora tiene que hacerlo **tu app**:
+
+```
+navegador ──GET /api/db-check──▶ Hono ──sql`SELECT 1`──▶ Neon
+                                  │                        │
+                                  ◀────── [{ ok: 1 }] ─────┘
+```
+
+El driver `@neondatabase/serverless` (ya está en `package.json`) te da `neon(url)`, que devuelve una función `sql`. Se usa como **tagged template**: escribes SQL entre backticks y `sql` lo envía a Neon. Devuelve un array de filas, cada fila es un objeto:
+
+```ts
+await sql`SELECT 1 AS ok`   // → [ { ok: 1 } ]
+```
+
+Qué escribir en `src/index.ts`:
+1. Importa `neon` desde `@neondatabase/serverless`.
+2. Crea `sql` con `neon(...)`, pasándole la URL de `process.env.DATABASE_URL`.
+3. Añade la ruta `GET /api/db-check` que ejecute la query y devuelva las filas con `c.json(...)`.
+4. Ojo: la query es asíncrona (va por red). ¿Qué necesita el handler para esperar su resultado?
+
+Done check: `curl localhost:3000/api/db-check` → `[{"ok":1}]`
+
+---
+
+**Antes de que lo pruebes, necesito tu OK:**
+- Runtime: **bun** (recomendado; carga `.env` solo y ejecuta TS directo) o node.
+- Si es bun: ejecuto `bun install` (instala `hono@4.6.0` y `@neondatabase/serverless@0.10.0`, versiones ya fijadas) y añado el script `"dev": "bun --hot src/index.ts"` a `package.json`.
+
+¿Lo hago?
+
+Si quieres leer primero: [Neon — Serverless driver](https://neon.com/docs/serverless/serverless-driver) (oficial).
+RESULT_FINAL success 8 0.5292936999999999

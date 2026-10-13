@@ -1,0 +1,81 @@
+USER: 1c, 2 tu sugerencia, 3b, 4a, 5 sí
+TOOL Read {"file_path":"<sandbox>/.claude/skills/code-mentor/references/memory-example.md"}
+RESULT  1	# Memory file examples
+2	
+3	Examples of how to write files in `.code-mentor/memory/` (see section 7 of `SKILL.md`).
+4	This file is a reference only 
+TOOL Bash {"command":"which node bun npm psql 2>&1; node -v 2>&1; bun -v 2>&1","description":"Check available runtimes and tools"}
+RESULT ERR  This Bash command contains multiple operations. The following part requires approval: bun -v
+TOOL Bash {"command":"which node npm bun psql; node -v","description":"Check available runtimes"}
+RESULT  ~/.nvm/versions/node/v24.12.0/bin/node
+~/.nvm/versions/node/v24.12.0/bin/npm
+~/.bun/bin/bun
+psql not found
+v24.12.
+TOOL ToolSearch {"query":"select:WebFetch","max_results":1}
+RESULT  [{"type":"tool_reference","tool_name":"WebFetch"}]
+TOOL WebFetch {"url":"https://neon.com/docs/connect/connect-from-any-app","prompt":"Does this page explain how to get a Neon connection string and its parts (user, password, host, db, sslmode)? Reply briefly yes/no
+TOOL WebFetch {"url":"https://neon.com/docs/get-started/signing-up","prompt":"Does this page explain signing up and creating a first Neon project? Reply briefly yes/no + page title."}
+RESULT  **No.** The page is "Tour the Neon Console." It states that it "assumes you've already signed up and created a project," so it covers using a project,
+RESULT  **Yes.** The page is **"Connect from any application"** (Neon docs). It explains how to get a connection string from the Neon Console's Connect modal 
+TOOL Write {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","content":"---\nstatus: in-progress\ntopic: Botón de likes por p
+RESULT  File created successfully at: <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md
+TOOL Bash {"command":"printf '.code-mentor/\\n.env\\n' >> .gitignore && cat .gitignore","description":"Add .code-mentor and .env to gitignore"}
+RESULT  runs/
+.code-mentor/
+.env
+TEXT: Listo el acuerdo y la memoria. Arrancamos.
+
+**Acuerdo**
+```
+Goal: botón de likes por post en c12z, para aprender BD.
+Tú: setup Neon, conexión, schema, queries (dar like + contar).
+Yo: rutas /api/likes, UI del botón, tests.
+Done: click → contador de ese post sube, sobrevive recarga.
+
+[Botón] ──click──▶ [Hono /api/likes/:postId] ──query──▶ [Neon DB]
+   yo                      yo                          TÚ
+```
+
+**Plan**
+1. Proyecto Neon + `DATABASE_URL` en `.env` ← ahora
+2. Conectar desde Hono (`SELECT 1`)
+3. Schema: tabla de likes
+4. Dar like (escritura)
+5. Contar likes de un post (lectura)
+6. Botón → API → DB + done check
+
+Nivel: **junior** (SQL básico, nunca una BD real).
+
+Hecho:
+- Progreso guardado en `.code-mentor/memory/databases/0001-neon-likes-progress.md`
+- `.gitignore` ya tiene `.code-mentor/` y también `.env`. Ese no lo pediste: lo añadí porque `.env` va a llevar la contraseña de la BD.
+
+---
+
+**Paso 1: Neon + connection string**
+
+Neon es Postgres en la nube: una BD que vive en un servidor suyo. Tu app no la tiene dentro, se conecta a ella por red. Para eso necesita una **connection string**, una URL con todo lo que hace falta para conectarse:
+
+```
+postgresql://alex:s3cr3t@ep-cool-123.eu-central-1.aws.neon.tech/neondb?sslmode=require
+            └─user─┘└pass┘└──────────────host──────────────────┘└─db──┘└─cifrado obligatorio─┘
+```
+
+Pasos:
+1. Crea una cuenta en neon.com y un proyecto (región cerca de ti).
+2. En el dashboard → **Connect** → copia la connection string.
+3. Crea `.env` en la raíz del proyecto con:
+   `DATABASE_URL=<tu string>`
+4. No borres `?sslmode=require`: Neon rechaza las conexiones sin cifrar.
+
+Done check: me dices "listo" y compruebo que `.env` existe y tiene el formato correcto (sin mostrar la contraseña).
+
+Mientras tanto, una pregunta para el paso 2: para ejecutar la app hay que instalar dependencias. Tienes **bun** y **node 24**. ¿Cuál usamos?
+- a) `bun` (ejecuta `src/index.ts` directamente, sin añadir nada)
+- b) `node` + `npm i -E @hono/node-server@<versión exacta>` + `tsx`
+
+Yo recomiendo **a**: menos piezas.
+
+Si quieres leer por tu cuenta primero, esto explica lo que estás haciendo: [Neon — Connect from any application](https://neon.com/docs/connect/connect-from-any-app) (oficial).
+RESULT_FINAL success 9 0.39065649999999996

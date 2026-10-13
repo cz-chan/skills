@@ -1,0 +1,58 @@
+USER: quiero hacer un botón de likes con Neon para aprender bases de datos
+TOOL Skill {"skill":"code-mentor","args":"quiero hacer un botón de likes con Neon para aprender bases de datos"}
+RESULT  Launching skill: code-mentor
+TOOL Bash {"command":"ls -la && ls -R .code-mentor 2>/dev/null; git status --short; git log -5 --oneline; cat PLAN.md 2>/dev/null; cat package.json 2>/dev/null; git ls-files | grep -v '^.claude/' | head -50","d
+RESULT  total 32
+drwxr-xr-x@ 10 user  staff  320 Oct 13 11:01 .
+drwxr-xr-x@  3 user  staff   96 Oct 13 10:07 ..
+drwxr-xr-x@  3 user  staff   96 Oct 13 1
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Bash {"command":"cat .gitignore; ls node_modules 2>/dev/null | head; ls .env* 2>/dev/null","description":"Check gitignore, deps, env files"}
+RESULT ERR  Exit code 1
+runs/
+(eval):1: no matches found: .env*
+TEXT: Sin progreso previo en `.code-mentor/`. Repo: Hono app mínima (`src/index.ts`, solo `GET /` + `TODO: /api/likes`), `@neondatabase/serverless` en `package.json` pero sin `node_modules` ni `.env`.
+
+Modo: **feature guiada**. Antes de empezar, unas preguntas rápidas (responde tipo `1b 2a 3c…`):
+
+**1. ¿Qué es "hecho"?**
+- a) Click → contador sube y sobrevive recarga (un contador global)
+- b) Igual, pero un like por usuario/navegador (sin repetir)
+- c) Likes por post/página (varios contadores)
+- d) Otro: …
+
+**2. ¿Quién hace cada parte?** (tú / tú con guía / yo)
+- Setup Neon (cuenta, proyecto, `DATABASE_URL`)
+- Conexión desde Hono (`neon()` driver)
+- Schema (`CREATE TABLE`)
+- Queries (insert/update + leer count)
+- Rutas API `/api/likes` (GET/POST)
+- UI del botón (HTML + fetch)
+- Tests
+
+Sugerencia por "aprender BD": **tú** → setup Neon, conexión, schema, queries · **yo** → rutas, UI, tests. ¿Ok o cambias algo?
+
+**3. Nivel en SQL:**
+- a) Nunca escribí SQL
+- b) Sé `SELECT`/`INSERT` básicos
+- c) Uso `JOIN`, `UPDATE`, índices sin problema
+- d) Diseño schemas, sé de transacciones/concurrencia
+
+**4. ¿Postgres/Neon antes?**
+- a) Nunca usé una BD real
+- b) Usé otra (SQLite, MySQL, Mongo…)
+- c) Postgres sí, Neon no
+- d) Ya usé Neon
+
+**5. Memoria:** guardaré el progreso en `.code-mentor/memory/databases/0001-neon-likes-progress.md` (raíz del proyecto, no en `.claude/` porque ahí se bloquean escrituras). ¿Añado `.code-mentor/` a `.gitignore`? (sí/no)
+RESULT_FINAL success 6 0.2288858

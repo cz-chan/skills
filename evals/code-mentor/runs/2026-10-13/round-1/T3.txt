@@ -1,0 +1,62 @@
+USER: seguimos
+TOOL Skill {"skill":"code-mentor","args":"seguimos"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".claude/skills/code-mentor/memory/**/*-progress.md"}
+RESULT  .claude/skills/code-mentor/memory/databases/0001-neon-likes-progress.md
+TOOL Bash {"command":"git status && git log -5 --stat --format='%h %ad %s' --date=short; ls; cat PLAN.md 2>/dev/null","description":"Show git status, recent commits, files, plan"}
+RESULT ERR  Exit code 1
+On branch main
+nothing to commit, working tree clean
+56e61bb 2026-10-13 wip likes
+
+ .../memory/databases/0001-neon-likes-progress.md   | 6
+TOOL Read {"file_path":"<sandbox>/.claude/skills/code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Botón de likes con Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: junior
+6	mode:
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Bash {"command":"ls -a src; ls -a; cat package.json .gitignore","description":"Check src files, env, package.json"}
+RESULT  .
+..
+index.ts
+.
+..
+.claude
+.git
+.gitignore
+AGENTS.md
+package.json
+reset.sh
+runs
+src
+{
+  "name": "c12z-demo",
+  "type": "module",
+  "dependencies": {
+ 
+TEXT: Archivo de progreso encontrado: `databases/0001-neon-likes-progress.md` — Botón de likes con Neon, paso 3 (tabla `likes`), actualizado 2026-10-13.
+
+Pero el repo no coincide con el archivo:
+- El archivo marca los pasos 1–2 como hechos (`.env` y `SELECT 1` en `src/pages/api/likes.ts`).
+- En el repo no hay `.env` ni `src/pages/api/likes.ts`. `src/index.ts` solo tiene `// TODO: /api/likes`.
+- El último commit (`wip likes`) solo añadió el archivo de progreso. No hay cambios sin commitear.
+
+¿Qué hacemos?
+1. El código está en otra rama o en otra máquina: tráelo y seguimos con el paso 3.
+2. Rehacemos el paso 2 (conexión en `src/index.ts`, rápido) y luego vamos al paso 3. Corrijo el archivo.
+3. Seguimos con el paso 3 tal cual y dejamos la conexión para después.
+4. Empezamos algo nuevo.
+RESULT_FINAL success 8 0.2509802

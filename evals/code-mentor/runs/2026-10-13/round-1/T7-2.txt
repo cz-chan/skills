@@ -1,0 +1,28 @@
+USER: 1c (sé SELECT e INSERT básicos, pero nunca he conectado una app a una BD), 2 tu sugerencia, 3b, 4a
+TEXT: Nivel: **junior** en BD (SQL básico, nunca conectado una app). Ajusto si hace falta.
+
+**Acuerdo**
+```
+Objetivo: botón de likes por página en c12z, para aprender BD.
+Tú: setup Neon + DATABASE_URL, conexión desde Hono, esquema (CREATE TABLE), queries (sumar like, leer contador).
+Yo: ruta /api/likes, UI del botón, tests.
+Hecho: click → contador de esa página sube y sobrevive a la recarga.
+```
+
+```
+[Botón en página X] ──POST /api/likes/X──▶ [Ruta Hono] ──conexión──▶ [Neon]
+                    ◀──── { count } ──────                ◀──query───  tabla likes
+       yo                                     yo           TÚ (conexión, esquema, queries)
+```
+
+**Plan**
+0. Neon: crear proyecto, copiar `DATABASE_URL` a `.env` (tú)
+1. Conexión: Hono habla con Neon, prueba `SELECT 1` (tú)
+2. Esquema: diseñar y crear tabla `likes` (tú)
+3. Queries: sumar like + leer contador de una página (tú)
+4. Ruta + UI + test (yo) → done check
+
+Crearé `memory/databases/0001-neon-likes-progress.md` para guardar tu progreso entre sesiones.
+
+¿Ok?
+RESULT_FINAL success 1 0.23194879999999998

@@ -1,0 +1,50 @@
+USER: sin commit. seguimos con el paso 4
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	import { neon } from '@neondatabase/serverless'
+3	
+4	const app = new Hono()
+5	
+6	const sql = neon(process.env.DATABASE
+TOOL ToolSearch {"query":"select:WebFetch","max_results":1}
+RESULT  [{"type":"tool_reference","tool_name":"WebFetch"}]
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/dml-insert.html","prompt":"Is this the PostgreSQL docs page on inserting data (INSERT INTO ... VALUES, specifying column names, omitted columns get defa
+TOOL WebFetch {"url":"https://neon.com/docs/serverless/serverless-driver","prompt":"Does this page explain that interpolated values in the sql tagged template are sent as query parameters (safe from SQL injection)?
+RESULT  Yes. This is the PostgreSQL 18 documentation page "6.1. Inserting Data" (Chapter 6, Data Manipulation). It covers:
+
+- **Basic insert:** the column val
+RESULT  The page doesn't state this explicitly. It says the `neon()` query function is restricted to tagged templates for safety:
+
+"can only be used as a temp
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/src/index.ts","old_string":"// TODO: /api/likes\n","new_string":"// Dar like: POST /api/likes/hola-mund
+RESULT  The file <sandbox>/src/index.ts has been updated successfully. (file state is current in your con
+TEXT: He creado la ruta en `src/index.ts:16`. Toma el `postId` de la URL y responde `{ ok: true }`. El hueco `// TU PARTE` es lo único que te toca.
+
+**Idea nueva: poner un valor de JS dentro del SQL**
+
+Con `sql` puedes meter una variable en la query escribiendo `${postId}` dentro de las comillas invertidas. No se pega como texto: el driver la envía aparte, como **parámetro**.
+
+```
+Tú escribes:  sql`... VALUES (${postId})`        con postId = "hola-mundo"
+Se envía:     query  = "... VALUES ($1)"
+              params = ["hola-mundo"]
+```
+
+Ejemplo con un valor malicioso: `postId = "x'); DROP TABLE likes; --"`. Se guarda como texto en `post_id` y la tabla sigue intacta. Por eso nunca construyas la query uniendo strings (`"..." + postId`).
+
+**Qué escribir:**
+1. En el hueco, un `INSERT INTO likes` con solo la columna `post_id`, porque `id` y `created_at` los pone la BD.
+2. El valor es `${postId}`.
+3. Lleva `await`, como en `/api/db-check`.
+
+**Comprobación final** (con `bun src/index.ts` corriendo):
+```
+curl -X POST localhost:3000/api/likes/hola-mundo
+→ {"ok":true}
+```
+Después, en Neon: `SELECT * FROM likes WHERE post_id = 'hola-mundo';` debe devolver **2 filas**: id=1 (la de prueba) e id=2.
+
+Si quieres leerlo por tu cuenta: PostgreSQL — Inserting Data (oficial), https://www.postgresql.org/docs/current/dml-insert.html
+
+Cuando lo tengas, dime y reviso el código.
+RESULT_FINAL success 6 0.45634360000000007

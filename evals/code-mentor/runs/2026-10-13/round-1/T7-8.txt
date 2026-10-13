@@ -1,0 +1,13 @@
+USER: no instales nada. paramos por hoy
+TEXT: Vale, paramos aquí. No he instalado nada.
+
+**Estado:**
+- Paso 0 (Neon + `.env`): hecho. El `SELECT 1` no se comprobó porque aquí no hay Neon real.
+- Paso 1 (conexión): tu código en `src/index.ts` es correcto, pero no se ha ejecutado. Queda pendiente el done check `GET /db-check` → `{"ok":1}`.
+- Sin commitear: `src/index.ts`, `.gitignore` (`.env`), `package.json` (script `dev`) y `src/server.ts`.
+- `src/server.ts` necesita `@hono/node-server`, que no está instalado ni en `dependencies`. Hasta instalarlo, `npm run dev` falla.
+
+**El progreso no está guardado:** la escritura en `memory/` sigue bloqueada. La próxima sesión no lo verá en el archivo, pero sí en `git status`. Si apruebas ese permiso, lo guardo al retomar.
+
+Para retomar, dime "seguimos".
+RESULT_FINAL success 1 0.6717209

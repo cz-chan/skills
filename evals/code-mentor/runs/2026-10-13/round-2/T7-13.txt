@@ -1,0 +1,55 @@
+USER: hecho. curl -X POST devolvió {"ok":true} y en Neon el SELECT da 2 filas (id 1 y 2). siguiente
+TOOL Bash {"command":"git diff src/index.ts | sed -n '1,60p'","description":"Show current route code diff"}
+RESULT  diff --git a/src/index.ts b/src/index.ts
+index 69b8b68..d55c1c2 100644
+--- a/src/index.ts
++++ b/src/index.ts
+@@ -1,9 +1,25 @@
+ import { Hono } from 'h
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- [ ] 4. Dar like a un post (q
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated suc
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Paso 4: dar like a un post. Aú
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated suc
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"## Where it lives in the repo"
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated suc
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- PostgreSQL — Default Values:
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated suc
+TEXT: Now the GET route with the gap.
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/src/index.ts","old_string":"  return c.json({ ok: true })\n})\n","new_string":"  return c.json({ ok: tr
+RESULT  The file <sandbox>/src/index.ts has been updated successfully.
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/tutorial-agg.html","prompt":"Is this the PostgreSQL tutorial page on aggregate functions (count, WHERE with aggregates)? Answer briefly."}
+RESULT  Yes. This is the PostgreSQL 18 documentation page "2.7. Aggregate Functions" from the SQL Language chapter of the tutorial.
+
+It covers:
+
+- **Aggregate
+TEXT: El paso 4 está bien. En `src/index.ts:21` el `INSERT` es parametrizado y lleva `await`, y el curl junto con las 2 filas en Neon lo confirman. Progreso guardado.
+
+**Paso 5: contar likes**
+
+He creado `GET /api/likes/:postId` en `src/index.ts:26`. En el paso 6 el botón llamará aquí al cargar la página y después de cada like. Tu parte es sustituir `const count = 0` por la query.
+
+**Idea: `COUNT(*)`** es una función de agregado: convierte muchas filas en un solo valor. El `WHERE` actúa antes y decide qué filas entran en la cuenta:
+
+```
+likes:  id=1 hola-mundo │
+        id=2 hola-mundo │  WHERE post_id = 'hola-mundo'  →  2 filas  →  COUNT(*) = 2
+        id=3 otro-post  ✗ (no entra)
+```
+
+**Qué escribir:**
+1. Un `SELECT COUNT(*) ... FROM likes WHERE post_id = ${postId}`, con `await`.
+2. Ponle nombre a la columna con `AS count`, como hiciste con `AS ok` en `/api/db-check`.
+3. `sql` siempre devuelve un **array de filas**, aunque haya una sola. Saca el valor de la primera fila y asígnalo a `count`.
+
+**Comprobación final:**
+```
+curl localhost:3000/api/likes/hola-mundo
+→ {"count":2}
+```
+Fíjate en si sale `2` o `"2"`. Tiene que ser número.
+
+Si quieres leerlo por tu cuenta: PostgreSQL — Aggregate Functions (oficial), https://www.postgresql.org/docs/current/tutorial-agg.html
+
+Avísame cuando lo tengas.
+RESULT_FINAL success 8 0.6030212

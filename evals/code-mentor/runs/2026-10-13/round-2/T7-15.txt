@@ -1,0 +1,67 @@
+USER: cambiado a COUNT(*)::int. ahora sale {"count":2}. vamos al paso 6
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	import { neon } from '@neondatabase/serverless'
+3	
+4	const app = new Hono()
+5	
+6	const sql = neon(process.env.DATABASE
+TOOL Bash {"command":"cat package.json; ls src","description":"Check package.json and src files"}
+RESULT  {
+  "name": "c12z-demo",
+  "type": "module",
+  "dependencies": {
+    "hono": "4.6.0",
+    "@neondatabase/serverless": "0.10.0"
+  }
+}
+index.ts
+TOOL Bash {"command":"which bun node; ls node_modules 2>&1 | head; ls -a","description":"Check runtime and deps availability"}
+RESULT  ~/.bun/bin/bun
+~/.nvm/versions/node/v24.12.0/bin/node
+ls: node_modules: No such file or directory
+.
+..
+.claude
+.code-mentor
+.e
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","offset":20,"limit":20}
+RESULT  20	## Plan
+21	
+22	- [x] 1. Proyecto en Neon + `DATABASE_URL` en `.env`
+23	- [x] 2. Conectar desde Hono (`SELECT 1`)
+24	- [x] 3. Esquema: tabla de like
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- [ ] 5. Contar likes de un po
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated suc
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"## Where it lives in the repo"
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated suc
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- PostgreSQL — Inserting Data:
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated suc
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/src/index.ts","old_string":"  return c.json({ count })\n})\n","new_string":"  return c.json({ count })\
+RESULT  The file <sandbox>/src/index.ts has been updated successfully. (file state is current in your con
+TEXT: He terminado la página del paso 6 y estoy comprobando la sintaxis (sin instalar nada).
+TOOL Bash {"command":"bun build src/index.ts --no-install --external hono --external @neondatabase/serverless --outdir /tmp/c12z-check >/dev/null && echo SYNTAX_OK","description":"Syntax-check index.ts without 
+RESULT ERR  This Bash command contains multiple operations. The following part requires approval: bun build src/index.ts --no-install --external hono --external @
+TEXT: El paso 5 está bien y el progreso está guardado. `COUNT(*)::int` hace que salga `{"count":2}`, como número.
+
+**Paso 6: esta parte la hago yo**
+
+He añadido `GET /posts` en `src/index.ts:37`. Es una página con 2 posts, `hola-mundo` y `otro-post`, cada uno con su botón ♥.
+
+```
+[Botón ♥] ──al cargar──▶ GET  /api/likes/:id ──▶ tu COUNT  ──▶ muestra el número
+          ──click──────▶ POST /api/likes/:id ──▶ tu INSERT
+                       ▶ GET  /api/likes/:id ──▶ tu COUNT  ──▶ número nuevo
+```
+
+El JS del navegador usa tus dos rutas sin cambiarlas. Primero hace el POST y, cuando termina, vuelve a pedir el contador.
+
+No lo he ejecutado: el comando para comprobar la sintaxis necesitaba tu permiso y no instalo nada desde aquí. Tampoco hay test para este paso, porque sin las dependencias no puedo ejecutarlo. La prueba de que funciona es la comprobación final que haces tú.
+
+**Comprobación final** (con `bun src/index.ts` corriendo), abre http://localhost:3000/posts:
+1. Al cargar: `hola-mundo` muestra **2** y `otro-post` muestra **0**.
+2. Haz click en el ♥ de `hola-mundo`: pasa a **3** y `otro-post` sigue en 0.
+3. Recarga la página: `hola-mundo` sigue en **3**.
+
+Dime qué números ves en cada punto. Si los tres salen bien, cerramos la tarea con un resumen y una pregunta final.
+RESULT_FINAL success 10 0.8536277999999999

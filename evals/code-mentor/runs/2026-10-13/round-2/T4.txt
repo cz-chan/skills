@@ -1,0 +1,28 @@
+USER: seguimos
+TOOL Skill {"skill":"code-mentor","args":"seguimos"}
+RESULT  Launching skill: code-mentor
+TOOL Bash {"command":"find .code-mentor -name \"*.md\" 2>/dev/null; git status --short; git log -5 --stat --format='%h %ad %s' --date=short; ls; cat PLAN.md 2>/dev/null","description":"Find progress files, git 
+RESULT ERR  Exit code 1
+.code-mentor/memory/databases/0001-neon-likes-progress.md
+af1c984 2026-10-13 add likes table
+
+ src/schema.sql | 5 +++++
+ 1 file changed, 5
+TOOL Bash {"command":"cat .code-mentor/memory/databases/0001-neon-likes-progress.md; echo ----; cat src/schema.sql; echo ----; cat src/index.ts package.json","description":"Read progress file and source"}
+RESULT  ---
+status: in-progress
+topic: Botón de likes con Neon
+concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+level: junior
+mode: guided-feat
+TEXT: Trabajo pendiente: `databases/0001-neon-likes-progress.md` — botón de likes con Neon, paso 3 (tabla `likes`), actualizado 2026-10-10.
+
+El archivo de progreso está desactualizado:
+- El commit `af1c984 add likes table` añadió `src/schema.sql` con `id`, `post_id` y `created_at`, sin `user_id`. Así que el paso 3 parece hecho.
+- El archivo dice que la ruta vive en `src/pages/api/likes.ts`, pero ese archivo no existe. `src/index.ts` solo tiene `// TODO: /api/likes`, así que el código del paso 2 (`SELECT 1`) no está en el repo.
+
+Preguntas:
+1. ¿Ejecutaste `schema.sql` en Neon? a) sí, la tabla existe · b) no, solo está el archivo · c) no sé
+2. ¿Dónde está la conexión del paso 2? a) en otro sitio sin commitear · b) se perdió, la rehago yo (es parte tuya, la rehaces tú) · c) otra
+3. ¿Marco el paso 3 como hecho y paso al 4 (insertar un like)? sí/no
+RESULT_FINAL success 5 0.22963199999999998

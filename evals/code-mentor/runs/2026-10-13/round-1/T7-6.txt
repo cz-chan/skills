@@ -1,0 +1,25 @@
+USER: no lo pillo, ¿cómo leo lo del .env desde el código?
+TEXT: Vale, te explico la idea.
+
+**Variables de entorno:** cuando un programa arranca, el sistema le pasa una lista de pares `NOMBRE=valor`. En Node están todas en el objeto `process.env`. Cada nombre es una clave y su valor siempre es un string, o `undefined` si no existe.
+
+El archivo `.env` no se lee solo. Hay que decirle a Node que lo cargue al arrancar: `node --env-file=.env ...`. Esa parte la monto yo.
+
+**Traza** con un `.env` que tuviera `PORT=3000` y `MODE=dev`:
+
+```
+.env                  node --env-file=.env        en tu código
+──────────            ───────────────────▶        ─────────────────────────
+PORT=3000                                         process.env.PORT   → "3000"
+MODE=dev                                          process.env.MODE   → "dev"
+                                                  process.env.OTRA   → undefined
+```
+
+1. Node lee `.env` línea a línea.
+2. Por cada `NOMBRE=valor` crea `process.env.NOMBRE = "valor"`.
+3. Tu código lee `process.env.NOMBRE` como cualquier propiedad de un objeto.
+
+Lo que está a la izquierda del `=` en tu `.env` es el nombre que debes leer.
+
+→ Con esto, ¿cómo quedaría la línea 6?
+RESULT_FINAL success 1 0.5517247

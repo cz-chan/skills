@@ -1,0 +1,36 @@
+USER: 1: hola-mundo 2, otro-post 0. 2: click → 3, otro-post 0. 3: recargo y sigue en 3. funciona!
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Botón de likes por post con Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-schema, sql-insert, sq
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- [ ] 6. Conectar botón → API 
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated suc
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"## Where it lives in the repo\
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated suc
+TOOL Bash {"command":"cd <sandbox>/.code-mentor/memory/databases && sed -i '' 's/^status: in-progress$/status: done/' 0001-neon-likes-progress.md && mv 0001-
+RESULT ERR  This Bash command contains multiple operations. The following parts require approval: sed -i '' 's/^status: in-progress$/status: done/' 0001-neon-like
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"status: in-progress","new_stri
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated suc
+TOOL Bash {"command":"mv <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md <sandbox>/.
+RESULT ERR  This command requires approval
+TEXT: Funciona: `hola-mundo` pasó de 2 a 3 y siguió en 3 al recargar, y `otro-post` se quedó en 0. **Tarea terminada.** 🎉
+
+**Lo que has aprendido:**
+1. Conectar Hono con Neon guardando el secreto en `.env`, y usar `await` porque cada query va por la red.
+2. Diseñar la tabla con una fila por like y dejar que la BD rellene `id` y `created_at`.
+3. Hacer un `INSERT` parametrizado con `${postId}`, que protege de inyección SQL, y un `COUNT(*)::int`, porque `COUNT` devuelve `bigint` y el driver lo convierte en string.
+
+**Archivo de progreso:** he marcado el paso 6, he añadido su entrada al registro, he puesto `status: done` y he cambiado `Current step` por `Summary`. Me falta renombrarlo a `0001-neon-likes-2026-10-13.md`: el `mv` necesitaba tu permiso. Apruébalo y lo hago, o renómbralo tú. Los cambios siguen sin commit, como pediste.
+
+**Pregunta final.** Un compañero cambia tu INSERT por esto:
+```ts
+await sql(`INSERT INTO likes (post_id) VALUES ('${postId}')`)
+```
+y alguien hace POST a `/api/likes/x');DROP TABLE likes;--`. ¿Qué pasa?
+
+- **A)** Nada: Neon escapa las comillas automáticamente en cualquier string.
+- **B)** El texto se pega dentro del SQL y Postgres podría ejecutar el `DROP TABLE`. Además, el driver de Neon rechaza esta forma de llamarlo precisamente para evitarlo.
+- **C)** Se guarda una fila con `post_id = "x');DROP TABLE likes;--"`, igual que con tu versión.
+- **D)** Falla solo porque falta el `await`.
+RESULT_FINAL success 7 0.9980819999999999

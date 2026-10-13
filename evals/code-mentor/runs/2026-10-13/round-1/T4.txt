@@ -1,0 +1,53 @@
+USER: seguimos
+TOOL Skill {"skill":"code-mentor","args":"seguimos"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".claude/skills/code-mentor/memory/**/*-progress.md"}
+RESULT  .claude/skills/code-mentor/memory/databases/0001-neon-likes-progress.md
+TOOL Bash {"command":"git status && git log -5 --stat && ls","description":"Show git status, recent commits, files"}
+RESULT  On branch main
+nothing to commit, working tree clean
+commit ecdc7aa7203a3c8923f5834d5f496e4712dfe932
+Author: fixture <fixture@local>
+Date:   Tue Oct 1
+TOOL Read {"file_path":"<sandbox>/.claude/skills/code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Botón de likes con Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: junior
+6	mode:
+TOOL Read {"file_path":"<sandbox>/src/schema.sql"}
+RESULT  1	CREATE TABLE likes (
+2	  id serial PRIMARY KEY,
+3	  post_id text NOT NULL,
+4	  created_at timestamptz NOT NULL DEFAULT now()
+5	);
+6	
+TOOL Bash {"command":"ls -R src && cat src/index.ts package.json; ls -a | grep env","description":"List src files and show index and package.json"}
+RESULT  index.ts
+schema.sql
+import { Hono } from 'hono'
+
+const app = new Hono()
+
+app.get('/', (c) => c.text('c12z'))
+
+// TODO: /api/likes
+
+export default app
+
+TEXT: Tarea abierta: **Botón de likes con Neon** (`memory/databases/0001-neon-likes-progress.md`), paso 3 (tabla `likes`), actualizado 2026-10-10. ¿La seguimos o empiezas algo nuevo?
+
+El archivo de progreso no coincide con el repo:
+- **Paso 3 parece hecho:** el commit `ecdc7aa add likes table` añadió `src/schema.sql` con `id serial`, `post_id text`, `created_at timestamptz DEFAULT now()`, sin `user_id`. El archivo todavía lo marca como pendiente.
+- **Pasos 1–2 marcados hechos, pero no veo rastro:** no existen `.env` ni `src/pages/api/likes.ts`, y `src/index.ts` solo tiene `// TODO: /api/likes`. Puede que estén fuera de git o en otra rama.
+- La fecha `updated: 2026-10-10` es anterior a la entrada del log del paso 2 (2026-10-13).
+
+Siguiente paso: marcar el 3 como hecho y empezar el 4, insertar un like.
+
+Antes, dos preguntas:
+1. ¿Dónde está la conexión del paso 2?
+   a) en local, sin commitear · b) se perdió, hay que rehacerla · c) otra ruta o rama · d) no sé
+2. ¿Pasaste `schema.sql` a Neon, es decir, existe la tabla allí?
+   a) sí · b) no · c) no sé
+RESULT_FINAL success 8 0.24928700000000004

@@ -1,0 +1,54 @@
+USER: explícame cómo funcionan los websockets
+TOOL Skill {"skill":"code-mentor","args":"explícame cómo funcionan los websockets"}
+RESULT  Launching skill: code-mentor
+TOOL Bash {"command":"cd <sandbox>; ls -R .claude/skills/code-mentor/memory 2>/dev/null; git status -s; git log -5 --oneline; ls; cat PLAN.md 2>/dev/null | h
+RESULT  af18af7 fixture: ignore runs
+e89d62d fixture: initial state
+AGENTS.md
+package.json
+reset.sh
+runs
+src
+TOOL Bash {"command":"cd <sandbox>; cat package.json; find src -type f | head; ","description":"Inspect package and source files"}
+RESULT  {
+  "name": "c12z-demo",
+  "type": "module",
+  "dependencies": {
+    "hono": "4.6.0",
+    "@neondatabase/serverless": "0.10.0"
+  }
+}
+src/index.ts
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TEXT: Sin trabajo previo en `memory/`; repo limpio (Hono mínimo, sin websockets aún). Modo: explicación.
+
+Antes de explicar, 3 preguntas rápidas para ajustar nivel (responde ej. "1b 2c 3a"):
+
+**1. ¿Qué pasa en una petición HTTP normal?**
+- a) No lo tengo claro
+- b) Cliente pide, servidor responde, se acaba
+- c) Eso + headers, status codes, keep-alive
+- d) Eso + HTTP/2, multiplexing, SSE
+
+**2. ¿Has usado websockets?**
+- a) Nunca
+- b) Copié un ejemplo (ej. chat) sin entenderlo bien
+- c) Sí, con librería (socket.io, ws…)
+- d) Sí, y sé qué es el handshake `Upgrade` y los frames
+
+**3. ¿Qué quieres entender sobre todo?**
+- a) La idea: por qué existen y en qué se diferencian de HTTP
+- b) El protocolo por dentro (handshake, frames, ping/pong)
+- c) Cómo usarlos en código (cliente navegador + servidor Hono)
+- d) Temas de producción (escalar, reconexión, varios servidores)
+RESULT_FINAL success 6 0.2196978

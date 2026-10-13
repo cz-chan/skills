@@ -1,0 +1,42 @@
+USER: (new session) seguimos
+TOOL Skill {"skill":"code-mentor","args":"seguimos"}
+RESULT  Launching skill: code-mentor
+TOOL Bash {"command":"find .code-mentor -name \"*.md\" 2>/dev/null; git status --short; git log -5 --format='%h %ad %s' --date=iso; ls; git diff","description":"Find progress files and git state"}
+RESULT  .code-mentor/memory/databases/0001-neon-likes-progress.md
+ M .gitignore
+ M src/index.ts
+9fc6c37 2026-10-13 10:59:31 +0200 fixture: skill round 2
+af18a
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Botón de likes por post con Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-schema, sql-insert, sq
+TOOL Glob {"pattern":"PLAN.md"}
+RESULT  No files found
+TOOL Bash {"command":"ls db 2>&1","description":"Check if schema file exists"}
+RESULT ERR  Exit code 1
+ls: db: No such file or directory
+TEXT: Hay una tarea en curso:
+
+- `databases/0001-neon-likes-progress.md`: likes con Neon, **paso 3/6 (tabla de likes)**, actualizado 2026-10-13.
+
+El archivo de progreso coincide con el repo: `db/schema.sql` aún no existe y los cambios del paso 2 en `src/index.ts` y `.gitignore` siguen sin commit, como dice el archivo. Si prefieres empezar otra cosa, dímelo.
+
+**Paso 3: escribir la tabla `likes`**
+
+1. Crea `db/schema.sql`.
+2. Escribe `CREATE TABLE likes (...)` con estas 3 columnas:
+   - `id SERIAL PRIMARY KEY`
+   - `post_id TEXT NOT NULL`
+   - `created_at TIMESTAMPTZ DEFAULT now()`
+3. Ejecútalo en el SQL editor de Neon.
+4. Comprobación final, también en Neon:
+   ```sql
+   INSERT INTO likes (post_id) VALUES ('hola-mundo');
+   SELECT * FROM likes;
+   ```
+   Debe salir 1 fila con `id=1`, `post_id='hola-mundo'` y `created_at` con la hora actual.
+
+Cuando lo tengas, pégame el resultado del `SELECT` (o dime que el archivo ya está) y lo reviso.
+RESULT_FINAL success 7 0.2431894

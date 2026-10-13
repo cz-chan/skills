@@ -1,0 +1,22 @@
+USER: arreglado y guardado. lo ejecuté en mi máquina con bun src/index.ts y el curl devolvió [{"ok":1}]
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	import { neon } from '@neondatabase/serverless'
+3	
+4	const app = new Hono()
+5	
+6	const sql = neon(process.env.DATABASE
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- [ ] 2. Conectar desde Hono (
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated suc
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Paso 2: conectar desde Hono co
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated suc
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"## Where it lives in the repo"
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated suc
+TEXT: ✅ **Paso 2 hecho.** Tu app ya habla con Neon: el `curl` que ejecutaste devolvió `[{"ok":1}]`. Revisé `src/index.ts` y está correcto: la URL sale de `process.env.DATABASE_URL`, el handler es `async` y la query lleva `await`. Yo no lo ejecuté: el resultado es el tuyo.
+
+Progreso guardado. El log del paso apunta los dos atascos (la URL escrita en el código y el `await`) para que puedas repasarlos.
+
+¿Hago commit de `src/index.ts` y `.gitignore`? `.env` no entra porque está ignorado.
+
+¿Seguimos con el **paso 3 (diseñar la tabla de likes)** o lo dejamos aquí?
+RESULT_FINAL success 5 0.7356446999999998

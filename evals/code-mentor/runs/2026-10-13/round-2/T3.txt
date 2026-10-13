@@ -1,0 +1,60 @@
+USER: seguimos
+TOOL Skill {"skill":"code-mentor","args":"seguimos"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*.md"}
+RESULT  .code-mentor/memory/databases/0001-neon-likes-progress.md
+TOOL Bash {"command":"git status && git log -5 --stat --format='%h %ad %s' --date=iso; ls","description":"Show git status and recent commits"}
+RESULT  On branch main
+nothing to commit, working tree clean
+1c96138 2026-10-13 11:00:56 +0200 wip likes
+
+ .../memory/databases/0001-neon-likes-progress.md   
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Botón de likes con Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: junior
+6	mode:
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Bash {"command":"ls -la src src/pages 2>&1; ls -a; cat .gitignore; test -f .env && echo ENV_EXISTS || echo NO_ENV; ls node_modules 2>&1 | head","description":"Check repo files, .env and node_modules"}
+RESULT  ls: src/pages: No such file or directory
+src:
+total 8
+drwxr-xr-x@  3 user  staff   96 Oct 13 10:59 .
+drwxr-xr-x@ 11 user  staff  352 Oct 13 11:00 
+TEXT: Hay una tarea abierta:
+
+- **Botón de likes con Neon** (`.code-mentor/memory/databases/0001-neon-likes-progress.md`). Va por el paso 3/6, diseñar la tabla `likes`. Actualizado el 2026-10-13.
+
+El progreso dice más de lo que hay en el repo:
+- Los pasos 1 y 2 están marcados como hechos, pero no hay `.env`.
+- No existe `src/pages/api/likes.ts`. En `src/index.ts` solo está `// TODO: /api/likes`.
+- No hay `node_modules`, así que las dependencias no están instaladas.
+- El último commit (`wip likes`) solo añadió el archivo de progreso. El working tree está limpio, así que ningún cambio sin commitear explica la diferencia.
+
+¿Cómo seguimos?
+1. ¿El `.env` y la ruta están en otro sitio, por ejemplo otra rama, otra carpeta o sin guardar? Si es así, los traemos y seguimos con el paso 3.
+2. Rehacer rápido los pasos 1 y 2: tú pones el `.env` y el `SELECT 1`, yo hago el cableado. Luego vamos al paso 3.
+3. Empezar algo nuevo.
+RESULT_FINAL success 9 0.2481872

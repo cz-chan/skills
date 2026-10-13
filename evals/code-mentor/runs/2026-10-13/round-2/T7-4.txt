@@ -1,0 +1,41 @@
+USER: no instales nada, lo ejecuto yo en mi máquina. ya lo escribí en src/index.ts, míralo  [file not saved yet]
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Bash {"command":"git diff; git status --short","description":"Show diff of user's changes"}
+RESULT  diff --git a/.gitignore b/.gitignore
+index a1e0396..c5119dd 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1 +1,3 @@
+ runs/
++.code-mentor/
++.env
+ M .git
+TOOL Bash {"command":"ls -la src; git status --short --untracked-files=all | grep -v '^?? runs/'","description":"Look for other changed or new files"}
+RESULT  total 8
+drwxr-xr-x@  3 user  staff   96 Oct 13 11:01 .
+drwxr-xr-x@ 12 user  staff  384 Oct 13 11:03 ..
+-rw-r--r--@  1 user  staff  130 Oct 13 10
+TEXT: Entendido, no instalo nada.
+
+Pero en disco `src/index.ts` sigue **sin cambios**:
+- Contenido: solo `GET /` y `// TODO: /api/likes`, igual que el commit inicial
+- Última modificación: 10:59, antes de que empezáramos
+- `git diff`: único cambio es mi `.gitignore`
+- No hay archivos nuevos en `src/` ni en otro sitio del repo
+
+Posibles causas:
+- El editor no guardó (¿pestaña con punto/asterisco?)
+- Lo escribiste en otra copia del proyecto. Esta es `~/Desktop/projects/test/testing-skills/code-mentor/src/index.ts`
+
+Guarda y avísame; lo reviso. Cuando lo ejecutes, pégame la salida de `curl localhost:3000/api/db-check` (esperado: `[{"ok":1}]`).
+RESULT_FINAL success 4 0.5847866999999999

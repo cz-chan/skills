@@ -1,0 +1,20 @@
+USER: perdona, no lo había guardado. ya está guardado
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	import { neon } from '@neondatabase/serverless'
+3	
+4	const app = new Hono()
+5	
+6	const sql = neon('postgresql://fake_u
+TEXT: Leído. Dos problemas, por orden:
+
+**1. Línea 6: la URL está escrita en el código.**
+- `fake_user:<redacted>@ep-fake-123` no es tu BD → la conexión fallará siempre.
+- Aunque pegaras la URL real ahí, sería un error: este archivo va a git, así que la contraseña quedaría en el historial (y en GitHub si haces push). Por eso la URL vive en `.env`, que está en `.gitignore`.
+
+→ Usa `process.env.DATABASE_URL` como dijo el punto 2 del paso.
+
+**2. Líneas 10–13: al handler le falta algo.** Es el punto 4 que te pregunté: `sql\`...\`` va por red y no devuelve las filas, devuelve una *promesa* de filas. Pregunta: ¿qué valor tiene `rows` en la línea 12, y qué crees que saldrá en el `curl`?
+
+Arregla las dos, guarda y ejecútalo con `bun src/index.ts` (bun carga `.env` solo). Pégame la salida de `curl localhost:3000/api/db-check`.
+RESULT_FINAL success 2 0.6258602999999998

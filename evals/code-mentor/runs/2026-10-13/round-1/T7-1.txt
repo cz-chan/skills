@@ -1,0 +1,62 @@
+USER: quiero hacer un botón de likes con Neon para aprender bases de datos
+TOOL Skill {"skill":"code-mentor","args":"quiero hacer un botón de likes con Neon para aprender bases de datos"}
+RESULT  Launching skill: code-mentor
+TOOL Bash {"command":"ls -R .claude/skills/code-mentor/memory 2>/dev/null; git status --short; git log -5 --oneline; ls -a; cat PLAN.md 2>/dev/null; cat package.json 2>/dev/null; git ls-files | head -50","descr
+RESULT  af18af7 fixture: ignore runs
+e89d62d fixture: initial state
+.
+..
+.claude
+.git
+.gitignore
+AGENTS.md
+package.json
+reset.sh
+runs
+src
+{
+  "name": "c12z-de
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TEXT: Sin trabajo previo en `memory/`, repo limpio. Hono mínimo, `@neondatabase/serverless` instalado pero sin usar, `TODO: /api/likes` en `src/index.ts:7`.
+
+Modo: feature guiada. Objetivo ya claro (aprender BD). Faltan unas preguntas rápidas:
+
+**1. Nivel en bases de datos**
+- a) Nunca usé una BD
+- b) Sé qué es una tabla, poco SQL
+- c) Escribo SELECT/INSERT/UPDATE sin problema
+- d) Uso BD en producción (índices, transacciones…)
+
+**2. Quién hace cada parte** (tú / tú con guía / yo):
+- Setup Neon (cuenta, proyecto, `DATABASE_URL`)
+- Conexión desde Hono
+- Esquema (`CREATE TABLE`)
+- Queries (sumar like, leer contador)
+- Ruta API `/api/likes`
+- UI del botón
+- Tests
+
+Sugerencia: tú → Neon, conexión, esquema, queries · yo → ruta, UI, tests.
+
+**3. Tipo de like**
+- a) Contador global simple (cualquiera suma +1)
+- b) Contador por página/post
+- c) Un like por usuario (evitar duplicados, toggle)
+- d) No sé, recomiéndame
+
+**4. "Hecho" =**
+- a) Click → contador sube y sobrevive recarga
+- b) a) + otra cosa (dime)
+
+Responde tipo `1b 2-sugerencia 3a 4a`.
+RESULT_FINAL success 5 0.2055986
