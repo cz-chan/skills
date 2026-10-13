@@ -1,0 +1,50 @@
+---
+import type { SkillTests } from "@domain/entities/TestReport";
+import { formatDate } from "@presentation/format/date";
+import styles from "./TestBadge.module.css";
+
+interface Props {
+	tests: SkillTests;
+	/** Enlace a la página de pruebas; sin él se muestra como texto. */
+	href?: string;
+	/** Página de pruebas abierta. */
+	current?: boolean;
+	/** Sin fecha, para listados estrechos. */
+	compact?: boolean;
+}
+
+const { tests, href, current, compact } = Astro.props;
+const { report, status } = tests;
+const allPassed = report.passed === report.total;
+const note = {
+	current: undefined,
+	outdated: "older version",
+	unpinned: "version not pinned",
+}[status];
+const Tag = href ? "a" : "span";
+---
+
+<Tag
+	class={styles.badge}
+	data-status={status}
+	data-passed={allPassed ? "all" : "some"}
+	href={href}
+	aria-current={current ? "page" : undefined}
+	title={`${report.model} · ${report.harness}`}
+>
+	<span class={styles.mark}
+		>{allPassed && status === "current" ? "✓" : "!"}</span
+	>
+	tested {report.passed}/{report.total}
+	{
+		!compact && (
+			<span class={styles.date}>
+				·{" "}
+				<time datetime={report.date.toISOString()}>
+					{formatDate(report.date)}
+				</time>
+			</span>
+		)
+	}
+	{note && <span class={styles.note}>· {note}</span>}
+</Tag>

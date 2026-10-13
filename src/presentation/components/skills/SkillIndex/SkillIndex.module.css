@@ -1,0 +1,137 @@
+.index {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	border-top: 1px solid var(--fg);
+}
+
+/* Móvil: enlace (nombre + descripción) a la izquierda, meta a la derecha. */
+.item {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	gap: 0 clamp(1rem, 4vw, 2rem);
+	padding: 1.25rem 0 1.5rem;
+	border-bottom: 1px solid var(--line);
+}
+
+/* Se ajusta al contenido para que el hueco vacío de la fila no sea clicable. */
+.link {
+	grid-column: 1;
+	justify-self: start;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	min-width: 0;
+}
+
+.category {
+	font-family: var(--mono);
+	font-size: 0.75rem;
+	color: var(--muted);
+	overflow-wrap: anywhere;
+}
+
+.name {
+	font-size: clamp(1.5rem, 4vw, 2.75rem);
+	font-weight: 700;
+	letter-spacing: -0.045em;
+	line-height: 1;
+	overflow-wrap: anywhere;
+}
+
+.meta {
+	grid-column: 2;
+	text-align: right;
+	font-family: var(--mono);
+	font-size: 0.75rem;
+	color: var(--muted);
+}
+
+/* Móvil: en su propia línea para no ensanchar la columna. */
+.label {
+	display: block;
+}
+
+/* Discreto; móvil: fila propia a todo el ancho, bajo la descripción. */
+.tested {
+	grid-column: 1 / -1;
+	justify-self: start;
+	margin-top: 0.75rem;
+	font-family: var(--mono);
+	font-size: 0.65rem;
+	color: var(--muted);
+	text-decoration: underline;
+	text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+	text-underline-offset: 3px;
+}
+
+.tested:hover {
+	color: var(--fg);
+}
+
+/* Móvil: recortada a 3 líneas; el texto completo está en la página de la skill. */
+.description {
+	max-width: 60ch;
+	margin-top: 0.75rem;
+	color: var(--muted);
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	line-clamp: 3;
+	-webkit-box-orient: vertical;
+}
+
+.link:hover .description {
+	color: var(--fg);
+}
+
+/* Escritorio: bloque nombre + descripción centrado; la descripción va sangrada y el nombre sobresale a la izquierda. */
+@media (min-width: 800px) {
+	.item {
+		/* Columna central de ancho fijo: todas las filas empiezan en la misma línea. */
+		grid-template-columns: 1fr minmax(0, 44rem) 1fr;
+		/* La fila flexible absorbe la altura del enlace; "tested" queda pegado a meta. */
+		grid-template-rows: auto 1fr;
+		padding: 1.5rem 0;
+	}
+
+	.link {
+		grid-column: 2;
+		grid-row: 1 / span 2;
+	}
+
+	.tested {
+		grid-column: 3;
+		grid-row: 2;
+		justify-self: end;
+		align-self: start;
+		margin-top: 0.25rem;
+		white-space: nowrap;
+	}
+
+	.name {
+		font-size: clamp(1.5rem, 2.5vw, 2rem);
+	}
+
+	.description {
+		margin-top: 0.5rem;
+		margin-left: 4rem;
+		max-width: none;
+		font-size: 0.875rem;
+		/* En escritorio se ve entera. */
+		display: block;
+		-webkit-line-clamp: unset;
+		line-clamp: unset;
+	}
+
+	.label {
+		display: inline;
+	}
+
+	.meta {
+		grid-column: 3;
+		grid-row: 1;
+		justify-self: end;
+		white-space: nowrap;
+	}
+}

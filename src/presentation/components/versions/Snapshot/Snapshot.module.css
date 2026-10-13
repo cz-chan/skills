@@ -1,0 +1,14 @@
+.snapshot {
+  margin-top: 3rem;
+}
+
+.summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.content {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

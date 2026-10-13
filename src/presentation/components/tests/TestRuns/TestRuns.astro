@@ -1,0 +1,41 @@
+---
+import type { TestRound } from "@domain/entities/TestReport";
+import { transcriptBlocks } from "@presentation/format/transcript";
+import styles from "./TestRuns.module.css";
+
+interface Props {
+	rounds: TestRound[];
+}
+
+const { rounds } = Astro.props;
+const labelOf = { user: "user", text: "agent", tool: "tool", result: "result", end: "end" };
+---
+
+{
+	rounds.map((round) => (
+		<section class={styles.round}>
+			<p class={styles.roundTitle}>
+				{round.round} <span class={styles.muted}>· {round.date}</span>
+			</p>
+			{round.transcripts.map((t) => (
+				<details class={styles.transcript}>
+					<summary class={styles.summary}>
+						<span class={styles.id}>{t.caseId}</span>
+						{t.turns.length > 1 && <span class={styles.muted}>{t.turns.length} turns</span>}
+					</summary>
+					{t.turns.map((turn) => (
+						<div class={styles.turn}>
+							{turn.turn && <p class={styles.turnTitle}>turn {turn.turn}</p>}
+							{transcriptBlocks(turn.text).map((block) => (
+								<div class={styles.block} data-kind={block.kind}>
+									<span class={styles.kind}>{labelOf[block.kind]}</span>
+									<pre class={styles.text}>{block.text}</pre>
+								</div>
+							))}
+						</div>
+					))}
+				</details>
+			))}
+		</section>
+	))
+}

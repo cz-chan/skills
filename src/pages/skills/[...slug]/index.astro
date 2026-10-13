@@ -1,0 +1,20 @@
+---
+import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
+import { listSkillDetails, renderSkillBody, SKILLS_DIR } from "@container";
+import SkillLayout from "@presentation/layouts/SkillLayout/SkillLayout.astro";
+import Prose from "@presentation/components/ui/Prose/Prose.astro";
+
+export const getStaticPaths = (async () => {
+  const details = await listSkillDetails.execute();
+  return details.map((detail) => ({ params: { slug: detail.skill.id }, props: { detail } }));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { detail } = Astro.props;
+const Content = await renderSkillBody(detail.skill.id);
+---
+
+<SkillLayout title={`${detail.skill.name} · skills`} detail={detail} path={`${SKILLS_DIR}/${detail.skill.id}`}>
+  <Prose>{Content && <Content />}</Prose>
+</SkillLayout>

@@ -1,0 +1,31 @@
+---
+import type { EvalCase } from "@domain/entities/TestReport";
+import styles from "./TestCases.module.css";
+
+interface Props {
+	cases: EvalCase[];
+}
+
+const { cases } = Astro.props;
+---
+
+<ol class={styles.cases}>
+	{
+		cases.map((c) => (
+			<li class={styles.case}>
+				<p class={styles.head}>
+					<span class={styles.id}>{c.id}</span> {c.name}
+				</p>
+				<p class={styles.prompt}>
+					<code>{c.prompt}</code>
+				</p>
+				<p class={styles.state}>state: {c.state}</p>
+				<ul class={styles.checks}>
+					{c.checks.map((check) => (
+						<li>{check}</li>
+					))}
+				</ul>
+			</li>
+		))
+	}
+</ol>

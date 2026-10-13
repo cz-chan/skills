@@ -1,0 +1,11 @@
+---
+import styles from "./SectionLabel.module.css";
+
+interface Props {
+  as?: "h2" | "p";
+}
+
+const { as: Tag = "h2" } = Astro.props;
+---
+
+<Tag class={styles.label}><slot /></Tag>

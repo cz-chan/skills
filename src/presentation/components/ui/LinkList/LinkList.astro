@@ -1,0 +1,29 @@
+---
+import type { SkillLink } from "@domain/entities/Skill";
+import SectionLabel from "@presentation/components/ui/SectionLabel/SectionLabel.astro";
+import styles from "./LinkList.module.css";
+
+interface Props {
+  title: string;
+  links: SkillLink[];
+}
+
+const { title, links } = Astro.props;
+---
+
+{
+  links.length > 0 && (
+    <section class={styles.section}>
+      <SectionLabel>{title}</SectionLabel>
+      <ul class={styles.list}>
+        {links.map((link) => (
+          <li>
+            <a href={link.url} target="_blank" rel="noopener noreferrer">
+              {link.title} <span class={styles.arrow}>↗</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}

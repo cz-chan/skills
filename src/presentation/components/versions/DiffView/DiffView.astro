@@ -1,0 +1,21 @@
+---
+import type { FileDiff } from "@domain/entities/Diff";
+import styles from "./DiffView.module.css";
+
+interface Props {
+  files: FileDiff[];
+}
+
+const { files } = Astro.props;
+---
+
+{
+  files.map((file) => (
+    <section class={styles.file}>
+      <p class={styles.head}>
+        {file.path} <span class={styles.added}>+{file.added}</span> <span class={styles.deleted}>−{file.deleted}</span>
+      </p>
+      <pre class={styles.diff}>{file.lines.map((l) => <span class={styles[l.kind]}>{l.text}</span>)}</pre>
+    </section>
+  ))
+}

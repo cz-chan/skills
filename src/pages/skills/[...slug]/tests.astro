@@ -1,0 +1,50 @@
+---
+import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
+import { getTestDetails, listSkillDetails, renderTestReport, SKILLS_DIR } from "@container";
+import SkillLayout from "@presentation/layouts/SkillLayout/SkillLayout.astro";
+import Prose from "@presentation/components/ui/Prose/Prose.astro";
+import Section from "@presentation/components/ui/Section/Section.astro";
+import TestCases from "@presentation/components/tests/TestCases/TestCases.astro";
+import TestRuns from "@presentation/components/tests/TestRuns/TestRuns.astro";
+
+// Solo las skills con evals/<id>/TESTING.md tienen página de pruebas.
+export const getStaticPaths = (async () => {
+	const details = await listSkillDetails.execute();
+	return details
+		.filter((detail) => detail.tests)
+		.map((detail) => ({ params: { slug: detail.skill.id }, props: { detail } }));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { detail } = Astro.props;
+const [Content, { cases, rounds }] = await Promise.all([
+	renderTestReport(detail.skill.id),
+	getTestDetails.execute(detail.skill.id),
+]);
+---
+
+<SkillLayout
+	title={`${detail.skill.name} · tests · skills`}
+	detail={detail}
+	path={`${SKILLS_DIR}/${detail.skill.id}`}
+	currentTests
+>
+	<Prose>{Content && <Content />}</Prose>
+
+	{
+		cases.length > 0 && (
+			<Section title="test cases" aside={String(cases.length)} divider>
+				<TestCases cases={cases} />
+			</Section>
+		)
+	}
+
+	{
+		rounds.length > 0 && (
+			<Section title="runs" aside={String(rounds.length)}>
+				<TestRuns rounds={rounds} />
+			</Section>
+		)
+	}
+</SkillLayout>

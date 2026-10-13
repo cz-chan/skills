@@ -1,0 +1,326 @@
+.sidebar {
+  position: sticky;
+  top: 2rem;
+  /* Scroll propio: con muchas versiones o ficheros no se corta ni arrastra la página. */
+  max-height: calc(100dvh - 4rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.name {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+}
+
+.description {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin: 0.75rem 0 0.5rem;
+}
+
+.created {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 1rem;
+  margin: 1rem 0 1.5rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+/* Título de sección pegado a su contenido; el contenido, sangrado bajo el título. */
+.sidebar h2 {
+  margin-bottom: 0.4rem;
+}
+
+.sidebar section > ul,
+.sidebar .versions {
+  padding-left: 0.75rem;
+}
+
+/* Pegado a las fechas: es parte del resumen de la skill. */
+.tested {
+  margin: -0.75rem 0 1.5rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.actions {
+  margin-bottom: 2.5rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.actionsBody {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.6rem;
+}
+
+/* Línea discontinua entre acciones para distinguirlas. */
+.actionsBody > * + * {
+  padding-top: 0.6rem;
+  border-top: 1px dashed color-mix(in srgb, var(--muted) 45%, transparent);
+}
+
+/* Escritorio: los desplegables no se ven como tales. */
+.summary,
+.actionsSummary {
+  display: none;
+}
+
+/* Va pegada al botón de copiar como markdown, sin separador. */
+.actionsBody > .warning {
+  margin: -0.3rem 0 0;
+  padding-top: 0;
+  border-top: 0;
+  font-size: 0.7rem;
+  color: var(--warn);
+}
+
+.pending {
+  color: var(--accent);
+  font-size: 0.8rem;
+  margin: -1.5rem 0 2.5rem;
+}
+
+.empty {
+  color: var(--muted);
+}
+
+.files {
+  margin-bottom: 2.5rem;
+  font-size: 0.85rem;
+}
+
+.files ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.files a,
+.folder {
+  display: block;
+  padding: 0.2rem 0;
+  overflow-wrap: anywhere;
+  color: var(--muted);
+}
+
+/* Solo el texto es clicable, no toda la línea. */
+.files a {
+  width: fit-content;
+  max-width: 100%;
+}
+
+.files a:hover,
+.files a[aria-current="page"] {
+  color: var(--fg);
+}
+
+/* Subrayado para que se vea que son enlaces; el abierto no lo lleva. */
+.files a:not([aria-current="page"]) {
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--muted) 50%, transparent);
+  text-underline-offset: 3px;
+}
+
+.files a:hover {
+  text-decoration-color: currentColor;
+}
+
+.folder {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+}
+
+.files .nested {
+  padding-left: 1rem;
+}
+
+.versions {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.versions a {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  gap: 0.75rem;
+  padding: 0.3rem 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.versions a:hover,
+.versions a[aria-current="page"] {
+  color: var(--fg);
+}
+
+.number {
+  min-width: 3.5rem;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+}
+
+.versions a[aria-current="page"] .number {
+  color: var(--accent);
+}
+
+.subject {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 860px) {
+  .sidebar {
+    position: static;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  /* Móvil: barra fija mínima abajo; al tocarla se abre el panel con las acciones. */
+  .actions {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 10;
+    margin: 0;
+    padding: 0 var(--gutter) env(safe-area-inset-bottom);
+    background: var(--bg);
+    border-bottom: 0;
+  }
+
+  .actions[open] {
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  }
+
+  /* Hueco para la barra fija, en el body para que tampoco tape el footer. */
+  :global(body):has(.actions) {
+    padding-bottom: 3rem;
+  }
+
+  .actionsSummary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.6rem 0;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .actionsSummary::-webkit-details-marker {
+    display: none;
+  }
+
+  .actionsName {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+
+  .actionsToggle {
+    flex-shrink: 0;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    font-size: 0.75rem;
+  }
+
+  .actionsToggle::after {
+    content: " ▴";
+    color: var(--accent);
+  }
+
+  .actions[open] .actionsToggle::after {
+    content: " ▾";
+  }
+
+  .actionsBody {
+    gap: 0.5rem;
+    padding-top: 0.25rem;
+  }
+
+  .actionsBody > * + * {
+    padding-top: 0.5rem;
+  }
+
+  .actionsBody > .warning {
+    margin-top: -0.2rem;
+    font-size: 0.65rem;
+    line-height: 1.35;
+  }
+
+  .name {
+    font-size: 1.75rem;
+  }
+
+  .description {
+    margin-top: 0.5rem;
+  }
+
+  .created {
+    margin-bottom: 1rem;
+  }
+
+  .more {
+    margin-bottom: 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .more[open] {
+    padding-bottom: 1rem;
+  }
+
+  .summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    font-size: 0.8rem;
+    color: var(--muted);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .summary::after {
+    content: "+";
+    font-family: var(--mono);
+    color: var(--accent);
+  }
+
+  .more[open] .summary::after {
+    content: "−";
+  }
+
+  /* Dentro del desplegable, bloques más juntos que en escritorio. */
+  .more .pending {
+    margin: 0 0 1.25rem;
+  }
+
+  .more > section {
+    margin-bottom: 1.25rem;
+  }
+
+  .more h2 {
+    margin-bottom: 0.4rem;
+  }
+}

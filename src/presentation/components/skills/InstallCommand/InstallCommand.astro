@@ -1,0 +1,84 @@
+---
+import CopyButton from "@presentation/components/ui/CopyButton/CopyButton.astro";
+import styles from "./InstallCommand.module.css";
+
+interface Props {
+	/** Ruta de la skill en el repo: "skills/code-mentor". */
+	path: string;
+}
+
+const { path } = Astro.props;
+
+/**
+ * Carpeta de skills del proyecto que lee cada agente, según su documentación oficial (2026-10-13).
+ * Claude Code no lee .agents/skills; Codex, Copilot, Cursor, Gemini CLI y OpenCode sí.
+ */
+const targets = [
+	{ id: "agents", label: "All (.agents)", dir: ".agents/skills" },
+	{ id: "claude", label: "Claude (.claude)", dir: ".claude/skills" },
+];
+const commandFor = (dir: string) => `mkdir -p ${dir} && cp -r ${path} ${dir}/`;
+---
+
+<div
+	class={styles.install}
+	data-install
+>
+	<label class={styles.label}>
+		install for
+		<select
+			class={styles.select}
+			data-install-target
+		>
+			{
+				targets.map((t) => (
+					<option
+						value={t.id}
+						data-command={commandFor(t.dir)}
+					>
+						{t.label}
+					</option>
+				))
+			}
+		</select>
+	</label>
+	<CopyButton text={commandFor(targets[0].dir)} />
+</div>
+
+<script>
+	const KEY = "install-target";
+
+	// astro:page-load: también tras navegar con el ClientRouter, no solo en la primera carga.
+	document.addEventListener("astro:page-load", () => {
+		let saved: string | null = null;
+		try {
+			saved = localStorage.getItem(KEY);
+		} catch {}
+
+		document
+			.querySelectorAll<HTMLElement>("[data-install]")
+			.forEach((install) => {
+				const select = install.querySelector<HTMLSelectElement>(
+					"[data-install-target]",
+				);
+				const code = install.querySelector("code");
+				const button = install.querySelector<HTMLButtonElement>("[data-copy]");
+				if (!select || !code || !button) return;
+
+				const apply = () => {
+					const command = select.selectedOptions[0]?.dataset.command ?? "";
+					code.textContent = command;
+					button.dataset.copy = command;
+				};
+				if (saved && [...select.options].some((o) => o.value === saved))
+					select.value = saved;
+				apply();
+				select.addEventListener("change", () => {
+					apply();
+					try {
+						localStorage.setItem(KEY, select.value);
+					} catch {}
+				});
+			});
+	});
+</script>

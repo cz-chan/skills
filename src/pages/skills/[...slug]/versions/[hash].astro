@@ -1,0 +1,31 @@
+---
+import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
+import { listSkillVersions, SKILLS_DIR } from "@container";
+import SkillLayout from "@presentation/layouts/SkillLayout/SkillLayout.astro";
+import DiffView from "@presentation/components/versions/DiffView/DiffView.astro";
+import Snapshot from "@presentation/components/versions/Snapshot/Snapshot.astro";
+import VersionHeader from "@presentation/components/versions/VersionHeader/VersionHeader.astro";
+
+export const getStaticPaths = (async () => {
+  const versions = await listSkillVersions.execute();
+  return versions.map((entry) => ({
+    params: { slug: entry.detail.skill.id, hash: entry.version.hash },
+    props: { ...entry },
+  }));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { detail, version, number, diff, snapshot } = Astro.props;
+---
+
+<SkillLayout
+  title={`${detail.skill.name} v${number} · skills`}
+  detail={detail}
+  path={`${SKILLS_DIR}/${detail.skill.id}`}
+  current={version.hash}
+>
+  <VersionHeader version={version} number={number} diff={diff} />
+  <DiffView files={diff} />
+  {snapshot && <Snapshot title={`SKILL.md at v${number}`} content={snapshot} />}
+</SkillLayout>

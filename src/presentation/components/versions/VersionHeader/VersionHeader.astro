@@ -1,0 +1,30 @@
+---
+import type { FileDiff } from "@domain/entities/Diff";
+import type { Version } from "@domain/entities/Version";
+import { formatDate } from "@presentation/format/date";
+import SectionLabel from "@presentation/components/ui/SectionLabel/SectionLabel.astro";
+import styles from "./VersionHeader.module.css";
+
+interface Props {
+  version: Version;
+  number: number;
+  diff: FileDiff[];
+}
+
+const { version, number, diff } = Astro.props;
+const added = diff.reduce((n, f) => n + f.added, 0);
+const deleted = diff.reduce((n, f) => n + f.deleted, 0);
+---
+
+<header>
+  <SectionLabel as="p">
+    v{number} · <time datetime={version.date.toISOString()}>{formatDate(version.date)}</time> · {version.author} ·
+    {version.shortHash}
+  </SectionLabel>
+  <h1 class={styles.title}>{version.subject}</h1>
+  {version.body && <p class={styles.body}>{version.body}</p>}
+  <p class={styles.stats}>
+    {`${diff.length} ${diff.length === 1 ? "file" : "files"} · `}
+    <span class={styles.added}>+{added}</span> <span class={styles.deleted}>−{deleted}</span>
+  </p>
+</header>

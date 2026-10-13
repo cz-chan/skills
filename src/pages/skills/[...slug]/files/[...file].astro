@@ -1,0 +1,34 @@
+---
+import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
+import { listSkillFiles, renderSkillFile, SKILLS_DIR } from "@container";
+import { fileSlugOf } from "@domain/services/skillFiles";
+import SkillLayout from "@presentation/layouts/SkillLayout/SkillLayout.astro";
+import FileHeader from "@presentation/components/skills/FileHeader/FileHeader.astro";
+import Prose from "@presentation/components/ui/Prose/Prose.astro";
+
+export const getStaticPaths = (async () => {
+	const files = await listSkillFiles.execute();
+	return files.map((entry) => ({
+		params: { slug: entry.detail.skill.id, file: fileSlugOf(entry.file.path) },
+		props: { ...entry },
+	}));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { detail, file, body } = Astro.props;
+const Content = await renderSkillFile(detail.skill.id, file.path);
+---
+
+<SkillLayout
+	title={`${detail.skill.name} · ${file.title} · skills`}
+	detail={detail}
+	path={`${SKILLS_DIR}/${detail.skill.id}`}
+	currentFile={file.path}
+>
+	<FileHeader
+		file={file}
+		body={body}
+	/>
+	<Prose>{Content && <Content />}</Prose>
+</SkillLayout>

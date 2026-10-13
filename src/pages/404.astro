@@ -1,0 +1,12 @@
+---
+import BaseLayout from "@presentation/layouts/BaseLayout/BaseLayout.astro";
+import NotFound from "@presentation/components/site/NotFound/NotFound.astro";
+
+const REDIRECT_DELAY = 5;
+---
+
+<BaseLayout title="not found · skills">
+  <meta slot="head" http-equiv="refresh" content={`${REDIRECT_DELAY};url=/`} />
+  <meta slot="head" name="robots" content="noindex" />
+  <NotFound delay={REDIRECT_DELAY} />
+</BaseLayout>

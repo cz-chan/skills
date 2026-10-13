@@ -1,0 +1,242 @@
+---
+import type { SkillDetail } from "@application/use-cases/ListSkillDetails";
+import { fileNameOf, fileSlugOf, folderOf } from "@domain/services/skillFiles";
+import { formatDate, formatLongDate } from "@presentation/format/date";
+import BackLink from "@presentation/components/ui/BackLink/BackLink.astro";
+import CopyButton from "@presentation/components/ui/CopyButton/CopyButton.astro";
+import InstallCommand from "@presentation/components/skills/InstallCommand/InstallCommand.astro";
+import LinkList from "@presentation/components/ui/LinkList/LinkList.astro";
+import SectionLabel from "@presentation/components/ui/SectionLabel/SectionLabel.astro";
+import styles from "./SkillSidebar.module.css";
+
+interface Props {
+	detail: SkillDetail;
+	/** Ruta de la skill en el repo, para el comando de instalación. */
+	path: string;
+	/** Hash de la versión abierta; vacío en la vista de la skill. */
+	current?: string;
+	/** Fichero extra abierto; vacío fuera de su página. */
+	currentFile?: string;
+	/** Página de pruebas abierta. */
+	currentTests?: boolean;
+}
+
+const { detail, path, current, currentFile, currentTests } = Astro.props;
+const { skill, markdown, history, pendingChanges, tests } = detail;
+const base = `/skills/${skill.id}/`;
+// Ficheros agrupados por carpeta; vienen ordenados por ruta, así que los grupos salen ordenados.
+const folders = Map.groupBy(skill.files, (file) => folderOf(file.path));
+const viewingSkill = !current && !currentFile && !currentTests;
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+const linkCount = (skill.credits?.length ?? 0) + skill.links.length;
+// Resumen del desplegable en móvil
+const summary = [
+	skill.files.length > 0 && plural(skill.files.length + 1, "file"),
+	plural(history.length || 1, "version"),
+	linkCount > 0 && plural(linkCount, "link"),
+	pendingChanges.length > 0 && "uncommitted",
+]
+	.filter(Boolean)
+	.join(" · ");
+---
+
+<aside class={styles.sidebar}>
+	{
+		/* Desde un fichero o versión se vuelve a la skill; desde la skill, al índice. */
+	}
+	{
+		viewingSkill ? (
+			<BackLink
+				href="/"
+				label="all skills"
+			/>
+		) : (
+			<BackLink
+				href={base}
+				label={skill.name}
+			/>
+		)
+	}
+	<span class={styles.name}>{skill.name}</span>
+	<p class={styles.description}>{skill.description}</p>
+	<p class={styles.created}>
+		<span>
+			created <time datetime={skill.createdAt.toISOString()}
+				>{formatDate(skill.createdAt)}</time
+			>
+		</span>
+		{
+			skill.updatedAt && (
+				<span>
+					updated{" "}
+					<time datetime={skill.updatedAt.toISOString()}>
+						{formatDate(skill.updatedAt)}
+					</time>
+				</span>
+			)
+		}
+	</p>
+	{
+		tests && (
+			<p class={styles.tested}>
+				this skill was tested on{" "}
+				<time datetime={tests.report.date.toISOString()}>
+					{formatLongDate(tests.report.date)}
+				</time>
+				{tests.status === "outdated" && " (an older version)"}
+			</p>
+		)
+	}
+
+	{
+		/* En móvil es una barra fija mínima que abre el panel; en escritorio siempre abierto. */
+	}
+	<details
+		class={styles.actions}
+		data-sidebar-more
+	>
+		<summary class={styles.actionsSummary}>
+			<span class={styles.actionsName}>{skill.name}</span>
+			<span class={styles.actionsToggle}>install</span>
+		</summary>
+		<div class={styles.actionsBody}>
+			<InstallCommand path={path} />
+			<CopyButton
+				text={markdown}
+				caption="copy only SKILL.md as markdown"
+			/>
+			{
+				skill.files.length > 0 && (
+					<p class={styles.warning}>
+						{/* Sin nombres de fichero: ya están en "files" y así el aviso no crece. */}
+						⚠ SKILL.md alone is not enough: this skill uses {skill.files.length}{" "}
+						more {skill.files.length === 1 ? "file" : "files"} (see files). Use the{" "}
+						<code>cp</code> command above to get {skill.files.length === 1 ? "it" : "them all"}.
+					</p>
+				)
+			}
+		</div>
+	</details>
+
+	{
+		/* En móvil se pliega para que el contenido de la skill asome arriba; en escritorio siempre abierto. */
+	}
+	<details
+		class={styles.more}
+		data-sidebar-more
+	>
+		<summary class={styles.summary}>{summary}</summary>
+		{
+			pendingChanges.length > 0 && (
+				<p class={styles.pending}>uncommitted: {pendingChanges.join(", ")}</p>
+			)
+		}
+
+		{
+			skill.files.length > 0 && (
+				<section class={styles.files}>
+					<SectionLabel>files</SectionLabel>
+					<ul>
+						<li>
+							<a
+								href={base}
+								aria-current={viewingSkill ? "page" : undefined}
+							>
+								SKILL.md
+							</a>
+						</li>
+						{[...folders].map(([folder, files]) => (
+							<li>
+								{folder && <span class={styles.folder}>{folder}/</span>}
+								<ul class={folder ? styles.nested : undefined}>
+									{files.map((file) => (
+										<li>
+											<a
+												href={`${base}files/${fileSlugOf(file.path)}/`}
+												aria-current={
+													file.path === currentFile ? "page" : undefined
+												}
+											>
+												{fileNameOf(file.path)}
+											</a>
+										</li>
+									))}
+								</ul>
+							</li>
+						))}
+					</ul>
+				</section>
+			)
+		}
+
+		{
+			tests && (
+				<section class={styles.files}>
+					<SectionLabel>tests</SectionLabel>
+					<ul>
+						<li>
+							<a
+								href={`${base}tests/`}
+								aria-current={currentTests ? "page" : undefined}
+							>
+								TESTING.md · {tests.report.passed}/{tests.report.total} passed
+							</a>
+						</li>
+					</ul>
+				</section>
+			)
+		}
+
+		<LinkList
+			title="credits"
+			links={skill.credits ?? []}
+		/>
+		<LinkList
+			title="related"
+			links={skill.links}
+		/>
+
+		<SectionLabel>versions</SectionLabel>
+		{
+			history.length === 0 ? (
+				<p class={styles.empty}>only version: v1.</p>
+			) : (
+				<ol class={styles.versions}>
+					<li>
+						<a
+							href={base}
+							aria-current={viewingSkill ? "page" : undefined}
+						>
+							<span class={styles.number}>current</span>
+						</a>
+					</li>
+					{history.map((v, i) => (
+						<li>
+							<a
+								href={`${base}versions/${v.hash}/`}
+								aria-current={v.hash === current ? "page" : undefined}
+							>
+								<span class={styles.number}>v{history.length - i}</span>
+								<span class={styles.subject}>{v.subject}</span>
+							</a>
+						</li>
+					))}
+				</ol>
+			)
+		}
+	</details>
+</aside>
+
+<script is:inline>
+	// Inline para abrirlo antes del primer pintado y que en escritorio no parpadee.
+	(() => {
+		const desktop = matchMedia("(min-width: 861px)");
+		const sync = () =>
+			desktop.matches &&
+			document
+				.querySelectorAll("[data-sidebar-more]")
+				.forEach((d) => (d.open = true));
+		sync();
+		desktop.addEventListener("change", sync);
+	})();
+</script>

@@ -1,0 +1,15 @@
+/* Footer siempre abajo: el <main> crece para llenar la pantalla. Los hijos llevan width: 100% porque el margin auto los encogería. */
+.body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+/* Columna centrada con el ancho de la rejilla de escritorio. */
+.main {
+  flex: 1 0 auto;
+  width: 100%;
+  max-width: calc(var(--page-max) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding: clamp(1.5rem, 5vw, 3.5rem) var(--gutter) 6rem;
+}

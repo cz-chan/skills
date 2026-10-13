@@ -1,0 +1,20 @@
+.section {
+  margin-bottom: 2.5rem;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.85rem;
+}
+
+.list li {
+  padding: 0.2rem 0;
+  overflow-wrap: anywhere;
+}
+
+.arrow {
+  color: var(--muted);
+  font-size: 0.75rem;
+}

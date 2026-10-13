@@ -1,0 +1,21 @@
+---
+import SectionLabel from "@presentation/components/ui/SectionLabel/SectionLabel.astro";
+import styles from "./Section.module.css";
+
+interface Props {
+  title: string;
+  /** Texto secundario junto al título, p. ej. un recuento. */
+  aside?: string;
+  /** Separa la sección de lo anterior con aire y una línea: marca que empieza algo distinto. */
+  divider?: boolean;
+}
+
+const { title, aside, divider } = Astro.props;
+---
+
+<section class:list={[styles.section, divider && styles.divider]}>
+  <SectionLabel>
+    {title}{aside && ` (${aside})`}
+  </SectionLabel>
+  <slot />
+</section>

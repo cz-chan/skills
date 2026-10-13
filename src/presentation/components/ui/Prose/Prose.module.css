@@ -1,0 +1,150 @@
+/* El HTML del markdown no lleva clases: se estiliza por etiqueta dentro de .prose. */
+.prose {
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.prose > :first-child {
+  margin-top: 0;
+}
+
+.prose h1 {
+  font-size: 2.25rem;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.prose h2 {
+  font-size: 1.25rem;
+  margin-top: 2.5rem;
+}
+
+.prose h3 {
+  font-size: 1rem;
+}
+
+.prose pre {
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  overflow-wrap: normal;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  tab-size: 2;
+  background: var(--code-bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+/* Sin esto, code dentro de pre vuelve a aplicar 0.8em y la fuente queda diminuta. */
+.prose pre code {
+  font-size: inherit;
+}
+
+/* Shiki (defaultColor: false) emite --shiki-light / --shiki-dark; se elige según el esquema. */
+.prose pre,
+.prose pre :global(span) {
+  color: var(--shiki-light);
+}
+
+@media (prefers-color-scheme: dark) {
+  .prose pre,
+  .prose pre :global(span) {
+    color: var(--shiki-dark);
+  }
+}
+
+.prose :not(pre) > code {
+  color: var(--accent);
+}
+
+.prose a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prose img,
+.prose video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Tablas: se desplazan en horizontal antes que partir palabras dentro de las celdas. */
+.prose table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 0.9em;
+  line-height: 1.5;
+}
+
+.prose th,
+.prose td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: normal;
+  border-bottom: 1px solid var(--line);
+}
+
+.prose th:first-child,
+.prose td:first-child {
+  padding-left: 0;
+}
+
+.prose th {
+  white-space: nowrap;
+  border-bottom-color: var(--fg);
+}
+
+/* Celdas cortas (etiquetas) en una línea; las largas ocupan al menos un ancho legible. */
+.prose td {
+  min-width: 10rem;
+}
+
+.prose td:first-child {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+/* Listas: sangría corta para aprovechar el ancho, sobre todo en móvil. */
+.prose ul,
+.prose ol {
+  padding-left: 1.25rem;
+}
+
+.prose li {
+  padding-left: 0.15rem;
+}
+
+.prose li > ul,
+.prose li > ol {
+  margin: 0.25rem 0;
+  padding-left: 1rem;
+}
+
+.prose li + li {
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 640px) {
+  .prose {
+    line-height: 1.6;
+  }
+
+  .prose h1 {
+    font-size: 1.75rem;
+  }
+
+  .prose ul,
+  .prose ol {
+    padding-left: 1.1rem;
+  }
+
+  .prose li > ul,
+  .prose li > ol {
+    padding-left: 0.85rem;
+  }
+}

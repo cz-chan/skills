@@ -1,0 +1,47 @@
+---
+import type { SkillSummary } from "@application/use-cases/ListSkills";
+import { formatDate } from "@presentation/format/date";
+import styles from "./SkillIndex.module.css";
+
+interface Props {
+	skills: SkillSummary[];
+}
+
+const { skills } = Astro.props;
+---
+
+<ul class={styles.index}>
+	{
+		skills.map((s) => (
+			<li class={styles.item}>
+				{/* Solo nombre y descripción son clicables; el resto de la fila no. */}
+				<a
+					href={`/skills/${s.id}/`}
+					class={styles.link}
+				>
+					{s.category && <span class={styles.category}>{s.category}/</span>}
+					<span class={styles.name}>{s.name}</span>
+					<span class={styles.description}>{s.description}</span>
+				</a>
+				<span class={styles.meta}>
+					{s.versionCount > 0 ? `v${s.versionCount}` : "—"}
+					<br />
+					{/* Sin updatedAt, la última actualización es la creación. */}
+					<span class={styles.label}>updated</span>{" "}
+					<time datetime={(s.updatedAt ?? s.createdAt).toISOString()}>
+						{formatDate(s.updatedAt ?? s.createdAt)}
+					</time>
+				</span>
+				{/* Fuera de meta para no ensanchar su columna en móvil. */}
+				{s.tests && (
+					<a
+						href={`/skills/${s.id}/tests/`}
+						class={styles.tested}
+					>
+						this skill was tested
+					</a>
+				)}
+			</li>
+		))
+	}
+</ul>

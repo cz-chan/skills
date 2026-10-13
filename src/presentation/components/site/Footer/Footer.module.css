@@ -1,0 +1,27 @@
+/* Mismo ancho que <main> para alinear con el contenido. */
+.footer {
+  width: 100%;
+  max-width: calc(var(--page-max) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding: 0 var(--gutter) var(--gutter);
+}
+
+.text {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  margin: 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.text a {
+  color: inherit;
+}
+
+.text a:hover {
+  color: var(--accent);
+}

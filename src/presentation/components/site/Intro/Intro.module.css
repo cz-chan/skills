@@ -1,0 +1,12 @@
+.intro {
+  max-width: 60ch;
+  margin: 0 0 1.75rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.intro code {
+  font-family: var(--mono);
+  font-size: 0.9em;
+}

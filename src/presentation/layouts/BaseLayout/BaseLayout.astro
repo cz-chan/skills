@@ -1,0 +1,58 @@
+---
+import "../../styles/global.css";
+import Footer from "@presentation/components/site/Footer/Footer.astro";
+import Header from "@presentation/components/site/Header/Header.astro";
+import styles from "./BaseLayout.module.css";
+import { ClientRouter } from "astro:transitions";
+
+interface Props {
+	title: string;
+	description?: string;
+}
+const { title, description = "my skills and their version history." } =
+	Astro.props;
+// Las URLs funcionan con y sin "/" final; el canonical usa siempre la forma con "/".
+const { pathname } = Astro.url;
+const canonical = new URL(
+	pathname.endsWith("/") ? pathname : `${pathname}/`,
+	Astro.site,
+);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<ClientRouter />
+		<meta charset="utf-8" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1"
+		/>
+		<meta
+			name="description"
+			content={description}
+		/>
+		<meta
+			name="generator"
+			content={Astro.generator}
+		/>
+		<link
+			rel="icon"
+			type="image/svg+xml"
+			href="/favicon.svg"
+		/>
+		<link
+			rel="canonical"
+			href={canonical}
+		/>
+		<title>{title}</title>
+		<slot name="head" />
+	</head>
+	<body class={styles.body}>
+		<Header />
+		<main class={styles.main}>
+			<slot />
+		</main>
+		<Footer />
+	</body>
+</html>

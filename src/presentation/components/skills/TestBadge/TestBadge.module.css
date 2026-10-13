@@ -1,0 +1,39 @@
+.badge {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0 0.35em;
+	font-family: var(--mono);
+	font-size: 0.75rem;
+	color: var(--add);
+}
+
+/* Probada, pero no la versión actual o no todas pasan: aviso, no éxito. */
+.badge[data-status="outdated"],
+.badge[data-status="unpinned"],
+.badge[data-passed="some"] {
+	color: var(--warn);
+}
+
+.mark {
+	font-weight: 700;
+}
+
+.date,
+.note {
+	color: var(--muted);
+}
+
+a.badge {
+	text-decoration: underline;
+	text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
+	text-underline-offset: 3px;
+}
+
+a.badge:hover {
+	text-decoration-color: currentColor;
+}
+
+a.badge[aria-current="page"] {
+	text-decoration: none;
+}

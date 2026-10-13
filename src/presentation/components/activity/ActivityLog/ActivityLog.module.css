@@ -1,0 +1,68 @@
+.empty {
+  color: var(--muted);
+}
+
+.log {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.log td {
+  padding: 0.5rem 1.5rem 0.5rem 0;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.date,
+.skills,
+.hash {
+  color: var(--muted);
+}
+
+.date {
+  white-space: nowrap;
+}
+
+.hash {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+}
+
+.log td.hash {
+  padding-right: 0;
+  text-align: right;
+}
+
+@media (max-width: 640px) {
+  .log,
+  .log tbody,
+  .log td {
+    display: block;
+  }
+
+  .log tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0 1rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .log td,
+  .log td.hash {
+    padding: 0;
+    border: 0;
+    text-align: left;
+  }
+
+  .subject {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    overflow-wrap: anywhere;
+  }
+
+  .skills {
+    display: none !important;
+  }
+}

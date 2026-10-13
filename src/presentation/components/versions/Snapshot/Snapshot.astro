@@ -1,0 +1,15 @@
+---
+import styles from "./Snapshot.module.css";
+
+interface Props {
+  title: string;
+  content: string;
+}
+
+const { title, content } = Astro.props;
+---
+
+<details class={styles.snapshot}>
+  <summary class={styles.summary}>{title}</summary>
+  <pre class={styles.content}>{content}</pre>
+</details>

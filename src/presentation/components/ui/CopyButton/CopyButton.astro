@@ -1,0 +1,30 @@
+---
+import styles from "./CopyButton.module.css";
+
+interface Props {
+  /** Texto que se copia al portapapeles. */
+  text: string;
+  /** Descripción junto al botón; si falta, se muestra `text` como código. */
+  caption?: string;
+}
+
+const { text, caption } = Astro.props;
+---
+
+<div class={styles.wrapper}>
+  {caption ? <span class={styles.caption}>{caption}</span> : <code class={styles.caption}>{text}</code>}
+  <button type="button" class={styles.button} data-copy={text}>copy</button>
+</div>
+
+<script>
+  // astro:page-load: también tras navegar con el ClientRouter, no solo en la primera carga.
+  document.addEventListener("astro:page-load", () => {
+    document.querySelectorAll<HTMLButtonElement>("[data-copy]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        await navigator.clipboard.writeText(button.dataset.copy ?? "");
+        button.textContent = "copied";
+        setTimeout(() => (button.textContent = "copy"), 1500);
+      });
+    });
+  });
+</script>

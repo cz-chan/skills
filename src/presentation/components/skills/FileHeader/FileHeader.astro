@@ -1,0 +1,19 @@
+---
+import type { SkillFile } from "@domain/entities/Skill";
+import CopyButton from "@presentation/components/ui/CopyButton/CopyButton.astro";
+import SectionLabel from "@presentation/components/ui/SectionLabel/SectionLabel.astro";
+import styles from "./FileHeader.module.css";
+
+interface Props {
+  file: SkillFile;
+  /** Contenido del fichero, para copiarlo. */
+  body: string;
+}
+
+const { file, body } = Astro.props;
+---
+
+<header class={styles.header}>
+  <SectionLabel as="p">{file.path}</SectionLabel>
+  <CopyButton text={body} caption="copy file as markdown" />
+</header>

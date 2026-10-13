@@ -1,0 +1,34 @@
+---
+import type { ActivityEntry } from "@domain/entities/Version";
+import { formatDate } from "@presentation/format/date";
+import styles from "./ActivityLog.module.css";
+
+interface Props {
+  entries: ActivityEntry[];
+}
+
+const { entries } = Astro.props;
+---
+
+{
+  entries.length === 0 ? (
+    <p class={styles.empty}>no commits yet.</p>
+  ) : (
+    <table class={styles.log}>
+      <tbody>
+        {entries.map((e) => (
+          <tr>
+            <td class={styles.date}>
+              <time datetime={e.date.toISOString()}>{formatDate(e.date)}</time>
+            </td>
+            <td class={styles.subject}>
+              {e.skillIds[0] ? <a href={`/skills/${e.skillIds[0]}/versions/${e.hash}/`}>{e.subject}</a> : e.subject}
+            </td>
+            <td class={styles.skills}>{e.skillIds.join(", ")}</td>
+            <td class={styles.hash}>{e.shortHash}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
+}

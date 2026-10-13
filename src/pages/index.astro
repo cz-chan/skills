@@ -1,0 +1,17 @@
+---
+import { listSkills } from "@container";
+import BaseLayout from "@presentation/layouts/BaseLayout/BaseLayout.astro";
+import Intro from "@presentation/components/site/Intro/Intro.astro";
+import Section from "@presentation/components/ui/Section/Section.astro";
+import SkillIndex from "@presentation/components/skills/SkillIndex/SkillIndex.astro";
+
+const skills = await listSkills.execute();
+---
+
+<BaseLayout title="skills">
+  <Intro />
+
+  <Section title="index" aside={String(skills.length)}>
+    <SkillIndex skills={skills} />
+  </Section>
+</BaseLayout>

@@ -1,0 +1,12 @@
+---
+import { BLOG_URL, REPO_URL } from "@presentation/site";
+import styles from "./Header.module.css";
+---
+
+<header class={styles.header}>
+  <a href="/" class={styles.logo}>skills/</a>
+  <nav class={styles.nav}>
+    <a href={BLOG_URL} target="_blank" rel="noopener me" referrerpolicy="no-referrer-when-downgrade">blog ↗</a>
+    <a href={REPO_URL} target="_blank" rel="noopener">github ↗</a>
+  </nav>
+</header>

@@ -1,0 +1,18 @@
+---
+import styles from "./NotFound.module.css";
+
+interface Props {
+  /** Segundos antes de volver al inicio. */
+  delay: number;
+}
+
+const { delay } = Astro.props;
+---
+
+<div class={styles.notFound}>
+  <p class={styles.code}>404</p>
+  <h1 class={styles.title}>we couldn't find that skill.</h1>
+  <p class={styles.text}>
+    it may have been moved or deleted. Taking you to the <a href="/">index</a> in {delay} seconds.
+  </p>
+</div>

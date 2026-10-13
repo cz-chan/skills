@@ -1,0 +1,26 @@
+---
+import type { SkillDetail } from "@application/use-cases/ListSkillDetails";
+import SkillSidebar from "@presentation/components/skills/SkillSidebar/SkillSidebar.astro";
+import BaseLayout from "@presentation/layouts/BaseLayout/BaseLayout.astro";
+import styles from "./SkillLayout.module.css";
+
+interface Props {
+  title: string;
+  detail: SkillDetail;
+  path: string;
+  current?: string;
+  /** Fichero extra abierto, relativo a la carpeta de la skill. */
+  currentFile?: string;
+  /** Página de pruebas abierta. */
+  currentTests?: boolean;
+}
+
+const { title, detail, path, current, currentFile, currentTests } = Astro.props;
+---
+
+<BaseLayout title={title} description={detail.skill.description}>
+  <div class={styles.split}>
+    <SkillSidebar detail={detail} path={path} current={current} currentFile={currentFile} currentTests={currentTests} />
+    <div class={styles.content}><slot /></div>
+  </div>
+</BaseLayout>
