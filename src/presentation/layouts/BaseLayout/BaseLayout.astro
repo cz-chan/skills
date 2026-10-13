@@ -47,6 +47,10 @@ const canonical = new URL(
 		/>
 		<title>{title}</title>
 		<slot name="head" />
+		<link
+			rel="sitemap"
+			href="/sitemap-index.xml"
+		/>
 	</head>
 	<body class={styles.body}>
 		<Header />
