@@ -75,6 +75,15 @@
   display: none;
 }
 
+/* Escritorio: contenido visible aunque el <details> esté cerrado; sin JS. */
+@media (min-width: 861px) {
+  .actions::details-content,
+  .more::details-content {
+    display: block;
+    content-visibility: visible;
+  }
+}
+
 /* Va pegada al botón de copiar como markdown, sin separador. */
 .actionsBody > .warning {
   margin: -0.3rem 0 0;

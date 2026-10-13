@@ -91,10 +91,7 @@ const summary = [
 	{
 		/* En móvil es una barra fija mínima que abre el panel; en escritorio siempre abierto. */
 	}
-	<details
-		class={styles.actions}
-		data-sidebar-more
-	>
+	<details class={styles.actions}>
 		<summary class={styles.actionsSummary}>
 			<span class={styles.actionsName}>{skill.name}</span>
 			<span class={styles.actionsToggle}>install</span>
@@ -121,10 +118,7 @@ const summary = [
 	{
 		/* En móvil se pliega para que el contenido de la skill asome arriba; en escritorio siempre abierto. */
 	}
-	<details
-		class={styles.more}
-		data-sidebar-more
-	>
+	<details class={styles.more}>
 		<summary class={styles.summary}>{summary}</summary>
 		{
 			pendingChanges.length > 0 && (
@@ -226,17 +220,3 @@ const summary = [
 		}
 	</details>
 </aside>
-
-<script is:inline>
-	// Inline para abrirlo antes del primer pintado y que en escritorio no parpadee.
-	(() => {
-		const desktop = matchMedia("(min-width: 861px)");
-		const sync = () =>
-			desktop.matches &&
-			document
-				.querySelectorAll("[data-sidebar-more]")
-				.forEach((d) => (d.open = true));
-		sync();
-		desktop.addEventListener("change", sync);
-	})();
-</script>
