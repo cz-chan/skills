@@ -1,0 +1,1 @@
+- [ogzhanolguncu - how to learn in LLMs age](https://ogzhanolguncu.com/blog/how-to-keep-learning-in-the-age-of-llms/)
