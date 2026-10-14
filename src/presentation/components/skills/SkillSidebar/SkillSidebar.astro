@@ -107,8 +107,9 @@ const summary = [
 					<p class={styles.warning}>
 						{/* Sin nombres de fichero: ya están en "files" y así el aviso no crece. */}
 						⚠ SKILL.md alone is not enough: this skill uses {skill.files.length}{" "}
-						more {skill.files.length === 1 ? "file" : "files"} (see files). Use the{" "}
-						<code>cp</code> command above to get {skill.files.length === 1 ? "it" : "them all"}.
+						more {skill.files.length === 1 ? "file" : "files"} (see files). Use
+						the <code>cp</code> command above to get{" "}
+						{skill.files.length === 1 ? "it" : "them all"}.
 					</p>
 				)
 			}

@@ -13,6 +13,7 @@
   --del: #c2261a;
   --del-bg: #fcecea;
   --warn: #a86b00;
+  --shadow: rgb(0 0 0 / 0.12);
   --gutter: clamp(1rem, 4vw, 3rem);
   /* Rejilla de escritorio: lateral | hueco | texto. La comparten la home y la página de skill. */
   --aside: 300px;
@@ -37,6 +38,7 @@
     --del: #ff7b6e;
     --del-bg: #2a1513;
     --warn: #f5c542;
+    --shadow: rgb(0 0 0 / 0.7);
   }
 }
 

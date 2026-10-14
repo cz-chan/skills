@@ -12,10 +12,21 @@ const { path } = Astro.props;
 /**
  * Carpeta de skills del proyecto que lee cada agente, según su documentación oficial (2026-10-13).
  * Claude Code no lee .agents/skills; Codex, Copilot, Cursor, Gemini CLI y OpenCode sí.
+ * Codex y Gemini CLI no leen .claude/skills.
  */
 const targets = [
-	{ id: "agents", label: "All (.agents)", dir: ".agents/skills" },
-	{ id: "claude", label: "Claude (.claude)", dir: ".claude/skills" },
+	{
+		id: "agents",
+		label: "All (.agents)",
+		dir: ".agents/skills",
+		warning: "Claude doesn't read .agents yet, only .claude.",
+	},
+	{
+		id: "claude",
+		label: "Claude (.claude)",
+		dir: ".claude/skills",
+		warning: "Some agents only read .agents.",
+	},
 ];
 const commandFor = (dir: string) => `mkdir -p ${dir} && cp -r ${path} ${dir}/`;
 ---
@@ -35,6 +46,7 @@ const commandFor = (dir: string) => `mkdir -p ${dir} && cp -r ${path} ${dir}/`;
 					<option
 						value={t.id}
 						data-command={commandFor(t.dir)}
+						data-warning={t.warning}
 					>
 						{t.label}
 					</option>
@@ -43,6 +55,12 @@ const commandFor = (dir: string) => `mkdir -p ${dir} && cp -r ${path} ${dir}/`;
 		</select>
 	</label>
 	<CopyButton text={commandFor(targets[0].dir)} />
+	<p
+		class={styles.warning}
+		data-install-warning
+	>
+		⚠ {targets[0].warning}
+	</p>
 </div>
 
 <script>
@@ -63,12 +81,17 @@ const commandFor = (dir: string) => `mkdir -p ${dir} && cp -r ${path} ${dir}/`;
 				);
 				const code = install.querySelector("code");
 				const button = install.querySelector<HTMLButtonElement>("[data-copy]");
+				const warning = install.querySelector<HTMLElement>(
+					"[data-install-warning]",
+				);
 				if (!select || !code || !button) return;
 
 				const apply = () => {
 					const command = select.selectedOptions[0]?.dataset.command ?? "";
 					code.textContent = command;
 					button.dataset.copy = command;
+					if (warning)
+						warning.textContent = `⚠ ${select.selectedOptions[0]?.dataset.warning ?? ""}`;
 				};
 				if (saved && [...select.options].some((o) => o.value === saved))
 					select.value = saved;

@@ -211,6 +211,8 @@
 
   .actions[open] {
     padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+    /* Sombra arriba para separar el panel abierto del contenido de detrás. */
+    box-shadow: 0 -6px 16px var(--shadow);
   }
 
   /* Hueco para la barra fija, en el body para que tampoco tape el footer. */
