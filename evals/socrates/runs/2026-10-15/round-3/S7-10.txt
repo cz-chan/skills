@@ -1,0 +1,11 @@
+USER: ah vale, res es la respuesta http y .json() saca el cuerpo. entonces cuando hago console.log(user) el fetch todavía no ha terminado, por eso pending. tendría que hacer await getUser(1)
+TOOL Bash {"command":"cd <sandbox>; node --version; ls package.json 2>&1; cat README.md | head -30","description":"Check Node version and project setup"}
+RESULT  v24.12.0
+ls: package.json: No such file or directory
+# demo
+
+Small JS scripts to practice. Run with `node src/user.js`.
+TEXT: Eso es: `res` es la respuesta HTTP, `.json()` saca el cuerpo, y en la línea 7 el `fetch` sigue en curso → `pending`.
+
+Ahora pruébalo: cambia la línea 6 por tu versión con `await`, ejecuta `node src/user.js` y dime qué imprime ahora la línea 7.
+RESULT_FINAL success 2 0.262027

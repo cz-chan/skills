@@ -1,0 +1,37 @@
+USER: [new session, fixtures/async-promises-progress.md] socrates, seguimos
+TOOL Skill {"skill":"socrates","args":"seguimos"}
+RESULT  Launching skill: socrates
+TOOL Bash {"command":"find .socrates -type f | head -50; ls .claude/skills/socrates/references","description":"List saved socrates files and references"}
+RESULT  .socrates/notes/code/001-async-promises-progress.md
+domain-template.md
+maintaining-domains.md
+session-notes.md
+session-recap.md
+TOOL Read {"file_path":"<sandbox>/.socrates/notes/code/001-async-promises-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	domain: code
+4	topic: async-promises
+5	concepts: [async, promise, pending, await]
+6	updated: 2026-10-15
+7	---
+8	
+9	## Wh
+TOOL Read {"file_path":"<sandbox>/.claude/skills/socrates/references/session-notes.md"}
+RESULT  1	# Session notes
+2	
+3	Notes let the user review what they learned, and let you start the next session where the last one ended instead of from zero.
+
+TOOL Bash {"command":"cat -n src/user.js 2>/dev/null; ls -R src 2>/dev/null","description":"Show user.js source"}
+RESULT       1	async function getUser(id) {
+     2	  const res = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`);
+     3	  return res.json();
+
+TEXT: Retomamos **async-promises** (`src/user.js`).
+
+**Dónde lo dejaste:** ya descubriste que `async` mete lo que devuelves en una promesa, así que `user` (línea 6) es una `Promise`. Queda abierto: qué no ha terminado aún cuando se ejecuta la línea 7, y cómo sacar el usuario de esa promesa.
+
+Siguiente paso. La línea 2 hace `fetch(...)` a un servidor externo:
+
+¿Cuánto tarda más o menos esa petición en responder, comparado con lo que tarda JavaScript en pasar de la línea 6 a la línea 7?
+RESULT_FINAL success 7 0.22302560000000002

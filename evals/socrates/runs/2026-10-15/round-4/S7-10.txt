@@ -1,0 +1,7 @@
+USER: ah vale, res es la respuesta http y .json() saca el cuerpo. entonces cuando hago console.log(user) el fetch todavía no ha terminado, por eso pending. tendría que hacer await getUser(1)
+TEXT: Exacto. La línea 7 se ejecuta mientras el `fetch` sigue esperando, así que la promesa está `pending`. `await` es la forma de esperar a que se resuelva.
+
+Antes de cerrar, pruébalo: cambia la línea 6 a `const user = await getUser(1);` y ejecuta `node src/user.js`.
+
+¿Qué te sale, y qué crees que significa?
+RESULT_FINAL success 1 0.264

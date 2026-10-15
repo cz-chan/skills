@@ -1,0 +1,35 @@
+USER: [new session] socrates, seguimos
+TOOL Skill {"skill":"socrates","args":"seguimos"}
+RESULT  Launching skill: socrates
+TOOL Bash {"command":"find .socrates -type f && cat .claude/skills/socrates/references/session-notes.md","description":"List socrates notes and read notes reference"}
+RESULT  .socrates/notes/code/001-async-promises-progress.md
+# Session notes
+
+Notes let the user review what they learned, and let you start the next session w
+TOOL Bash {"command":"cat .socrates/notes/code/001-async-promises-progress.md; ls .socrates; ls","description":"Read progress note and list project"}
+RESULT  ---
+status: in-progress
+domain: code
+topic: async-promises
+concepts: [async, promises, await, fetch]
+updated: 2026-10-15
+---
+
+## Where you left off
+
+Q
+TOOL Bash {"command":"cat -n src/user.js","description":"Show user.js"}
+RESULT       1	async function getUser(id) {
+     2	  const res = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`);
+     3	  return res.json();
+
+TEXT: Retomamos **async/promesas** (`src/user.js`).
+
+**Dónde lo dejaste:**
+- Ya descubriste: una función `async` siempre envuelve su `return` en una promesa (`cinco()` → `Promise { 5 }`).
+- Pendiente: por qué la promesa de `getUser` sigue `<pending>` y no resuelta como la de `cinco()`, y cómo obtener el usuario.
+
+`cinco()` imprimió `Promise { 5 }`, con el valor ya dentro. `getUser(1)` imprime `Promise { <pending> }`, todavía vacía.
+
+Mira las líneas 2–3: ¿qué hace `getUser` que `cinco()` no hace, y que podría tardar?
+RESULT_FINAL success 6 0.2000542

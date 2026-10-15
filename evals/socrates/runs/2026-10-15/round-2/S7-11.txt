@@ -1,0 +1,5 @@
+USER: [learner edited line 6 to `const user = await getUser(1);`] lo he cambiado y ahora imprime el objeto, { id: 1, name: 'Leanne Graham', ... }
+TEXT: Ya funciona: ahora `user` es el objeto, no la promesa.
+
+Último paso: **explícalo con tus palabras, de principio a fin. ¿Por qué antes salía `Promise { <pending> }` y qué cambia exactamente el `await` de la línea 6?**
+RESULT_FINAL success 1 0.26591880000000007

@@ -1,0 +1,17 @@
+USER: sí, crea la guía. no tengo enlaces
+TOOL Read {"file_path":"<sandbox>/.claude/skills/socrates/references/domain-template.md"}
+RESULT  1	# Domain template
+2	
+3	Structure for `.socrates/domains/<domain-slug>.md`. Keep it under ~80 lines; concrete examples beat general advice. Always wr
+TOOL Write {"file_path":"<sandbox>/.socrates/domains/code.md","content":"# Code\n\nDomain guide for the Socratic method: programming concepts and debugging, e.g. async/promises, scope, closures, data flow, runti
+RESULT  File created successfully at: <sandbox>/.socrates/domains/code.md (file state is current in your context — no need to Read it back)
+TEXT: He creado la guía en `.socrates/domains/code.md`. Está en inglés porque es para mí; puedes editarla cuando quieras. Incluye:
+
+- **Anclas:** preguntar con líneas concretas (la 7 frente al `fetch` de la línea 2).
+- **Andamiaje:** los 4 niveles, con el ejemplo de `Promise { <pending> }`.
+- **Mini-ejemplo:** `cinco()`, con la predicción equivocada típica (`5`).
+- **Errores típicos:** que `async` no cambia el `return`, que `res` ya tiene su valor antes de que vuelva el `fetch`, confundir `Response` con `.json()`, y el `await` de nivel superior.
+- **Recursos:** vacío, ya que no tienes enlaces.
+
+¿Seguimos con el **top-level await**, es decir, por qué tu `await` funciona fuera de una función `async`?
+RESULT_FINAL success 3 0.4986640000000001

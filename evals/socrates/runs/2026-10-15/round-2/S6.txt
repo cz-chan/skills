@@ -1,0 +1,35 @@
+USER: explícame por qué src/user.js imprime Promise { <pending> }
+TOOL Read {"file_path":"<sandbox>.S6/src/user.js"}
+RESULT  1	async function getUser(id) {
+2	  const res = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`);
+3	  return res.json();
+4	}
+5	
+6	const 
+TEXT: **Causa:** `getUser` es `async`, así que **siempre devuelve una Promise**, no el valor. En `src/user.js:6` guardas la promesa sin esperarla, y en la línea 7 `console.log` se ejecuta de inmediato, antes de que el `fetch` termine. Por eso imprime `Promise { <pending> }`.
+
+Orden real de ejecución:
+1. Se llama a `getUser(1)`. Arranca el `fetch` y la función se pausa en el `await`.
+2. La función devuelve enseguida una promesa pendiente.
+3. `console.log(user)` imprime esa promesa.
+4. Después llega la respuesta, se ejecuta `res.json()` y la promesa se resuelve, pero ya nadie la está mirando.
+
+**Arreglo:** espera la promesa con una de estas opciones:
+
+```js
+// opción 1: top-level await (ESM: .mjs o "type": "module")
+const user = await getUser(1);
+console.log(user);
+
+// opción 2: .then
+getUser(1).then(user => console.log(user));
+
+// opción 3: envolver en una función async
+(async () => {
+  const user = await getUser(1);
+  console.log(user);
+})();
+```
+
+Conviene añadir manejo de errores: `try/catch` con `await`, o `.catch` con `.then`.
+RESULT_FINAL success 2 0.149143

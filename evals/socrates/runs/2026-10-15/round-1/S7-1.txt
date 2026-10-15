@@ -1,0 +1,9 @@
+USER: Socratic: no entiendo por qué src/user.js imprime Promise { <pending> } en vez del usuario
+TOOL Skill {"skill":"socrates","args":"no entiendo por qué src/user.js imprime Promise { <pending> } en vez del usuario"}
+RESULT  Launching skill: socrates
+TOOL Bash {"command":"cd <sandbox>; ls -a .socrates .socrates/* 2>/dev/null; cat -n src/user.js","description":"Check socrates folder and read user.js"}
+RESULT  (eval):1: no matches found: .socrates/*
+     1	async function getUser(id) {
+     2	  const res = await fetch(`https://jsonplaceholder.typicode.com/use
+TEXT: Entiendo que quieres descubrir por qué `console.log(user)` en `src/user.js:7` muestra una `Promise { <pending> }` en lugar de los datos del usuario, y cómo conseguir que imprima el usuario. ¿Es eso? Si es así, empezamos.
+RESULT_FINAL success 4 0.17495699999999997

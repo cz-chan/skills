@@ -1,0 +1,149 @@
+{
+	"skill_name": "socrates",
+	"sandbox": "Local git repo built by scripts/setup.sh: src/user.js with an async bug (prints Promise { <pending> }). No remote, nothing installed, no .socrates/.",
+	"evals": [
+		{
+			"id": "S1",
+			"name": "code-material-first-turn",
+			"state": "clean",
+			"prompt": "Socratic: no entiendo por qué src/user.js imprime Promise { <pending> } en vez del usuario",
+			"checks": [
+				"Loads the skill",
+				"Checks for .socrates/ (notes and domains) before answering",
+				"Reads src/user.js",
+				"Does not state the answer (missing await / async returns a promise)",
+				"Summarizes the target in 1–2 sentences and waits for confirmation",
+				"Replies in Spanish"
+			]
+		},
+		{
+			"id": "S2",
+			"name": "from-zero-no-domain",
+			"state": "clean",
+			"prompt": "Quiero aprender cómo funciona el interés compuesto, en modo Socrates. No sé nada de finanzas.",
+			"checks": [
+				"Loads the skill",
+				"Does not offer to create a domain guide at the start",
+				"Does not ask to create .socrates/ (nothing to write yet)",
+				"At most one question, concrete (numbers or a situation), no definition of compound interest"
+			]
+		},
+		{
+			"id": "S3",
+			"name": "resume-interrupted-session",
+			"state": "fixtures/compound-interest-progress.md (content in English) at .socrates/notes/finance/001-compound-interest-progress.md",
+			"prompt": "socrates, seguimos con lo que dejamos",
+			"checks": [
+				"Finds the -progress.md file and names topic and date",
+				"Shows the 'Where you left off' summary in Spanish (the file is in English)",
+				"Asks the next question after the last conclusion (does not restart from zero)",
+				"Does not reveal the remaining ladder steps or the answer"
+			]
+		},
+		{
+			"id": "S4",
+			"name": "topic-already-learned",
+			"state": "fixtures/async-promises-done.md at .socrates/notes/code/ + fixtures/domain-code.md at .socrates/domains/code.md; turn 2 (\"sí\") run with scripts/turn.sh to see the first question",
+			"prompt": "Socratic: quiero entender bien async/await en JavaScript",
+			"checks": [
+				"Reads the previous note and cites it",
+				"Starts after what was already learned (does not re-teach 'async returns a promise' from scratch)",
+				"Tests the old thinking error early",
+				"Reads .socrates/domains/code.md"
+			]
+		},
+		{
+			"id": "S5",
+			"name": "user-domain-used",
+			"state": "fixtures/domain-code.md at .socrates/domains/code.md",
+			"prompt": "Socratic: no entiendo por qué src/user.js imprime Promise { <pending> } en vez del usuario",
+			"checks": [
+				"Lists .socrates/domains/ and reads only code.md",
+				"Does not look for domains inside the skill folder",
+				"Does not state the answer"
+			]
+		},
+		{
+			"id": "S6",
+			"name": "should-not-trigger",
+			"state": "clean",
+			"prompt": "explícame por qué src/user.js imprime Promise { <pending> }",
+			"checks": [
+				"Does NOT load the skill (no mention of Socrates / the Socratic method in any language)"
+			]
+		},
+		{
+			"id": "S7",
+			"name": "multi-turn-full-session",
+			"state": "clean; learner simulated by hand following persona-S7.md (scripts/turn.sh S7 …)",
+			"prompt": "Socratic: no entiendo por qué src/user.js imprime Promise { <pending> } en vez del usuario",
+			"checks": [
+				"One anchored question per turn during the ladder",
+				"On the first wrong answer, drops one level with a counter-question that exposes the contradiction (no correction)",
+				"Uses a mini-example only on the second failure of the same step",
+				"On 'no sé', drops a scaffolding level",
+				"On 'dímelo ya' (first ask), encourages and gives an easier question",
+				"Before the first write, asks to create .socrates/ and explains why not .claude/",
+				"On a mid-ladder stop, saves a -progress.md file without the remaining ladder steps",
+				"In a new session, 'seguimos' resumes from the progress file with the summary in Spanish",
+				"At the end: asks for the final explanation, recap, saves the note without asking again, renames the file with the date",
+				"Offers a domain guide and writes it to .socrates/domains/, never inside the skill or .claude/"
+			]
+		},
+		{
+			"id": "S8",
+			"name": "several-interrupted-sessions",
+			"state": "fixtures/compound-interest-progress.md at .socrates/notes/finance/ + fixtures/fetch-errors-progress.md at .socrates/notes/code/",
+			"prompt": "socrates, seguimos",
+			"checks": [
+				"Lists both -progress.md files with topic and date",
+				"Asks which one to resume (or start something new) instead of picking one",
+				"Asks no ladder question yet"
+			]
+		},
+		{
+			"id": "S9",
+			"name": "declines-socrates-folder",
+			"state": "clean; multi-turn with scripts/turn.sh S9 …",
+			"prompt": "Quiero aprender cómo funciona el interés compuesto, en modo Socrates. No sé nada de finanzas.",
+			"checks": [
+				"On a mid-ladder stop, asks to create .socrates/",
+				"On 'no', writes nothing anywhere",
+				"When the learner resumes and stops again in the same session, does not ask again"
+			]
+		},
+		{
+			"id": "S10",
+			"name": "improve-existing-guide",
+			"state": "fixtures/domain-code.md at .socrates/domains/code.md + fixtures/fetch-errors-progress.md at .socrates/notes/code/001-fetch-errors-progress.md; multi-turn with scripts/turn.sh S10 …",
+			"prompt": "socrates, seguimos",
+			"checks": [
+				"Resumes the fetch-errors session",
+				"At the end proposes 1–3 concrete additions to the existing guide, saying where each goes (main file or topic file)",
+				"Does not offer to create a new guide",
+				"Applies only the additions the learner accepts, in .socrates/domains/, in English",
+				"Keeps code.md under ~80 lines"
+			]
+		},
+		{
+			"id": "S11",
+			"name": "trigger-spanish-adjective",
+			"state": "clean",
+			"prompt": "Ayúdame de forma socrática a entender por qué src/user.js imprime Promise { <pending> }",
+			"checks": [
+				"Loads the skill ('socrática', no 'socratic' / 'Socrates')",
+				"Does not state the answer"
+			]
+		},
+		{
+			"id": "S12",
+			"name": "trigger-spanish-name",
+			"state": "clean",
+			"prompt": "Enséñame interés compuesto como lo haría Sócrates",
+			"checks": [
+				"Loads the skill ('Sócrates' with accent)",
+				"At most one question, no definition of compound interest"
+			]
+		}
+	]
+}

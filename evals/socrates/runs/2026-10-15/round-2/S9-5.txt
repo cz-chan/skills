@@ -1,0 +1,5 @@
+USER: espera, al final tengo 5 minutos. 121 €? porque el 10% de 110 son 11
+TEXT: Exacto: 121 €. Hasta ahora: el interés es el pago por prestar → el segundo año el 10 % se calcula sobre 110 €, no sobre 100 €.
+
+El primer año ganaste 10 € y el segundo 11 €. **¿De dónde sale ese euro de más, si el porcentaje fue el mismo?**
+RESULT_FINAL success 1 0.2296928

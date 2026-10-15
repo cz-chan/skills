@@ -1,0 +1,16 @@
+USER: sí
+TEXT: Empezamos con lo que quedó abierto la otra vez:
+
+```js
+async function getUser() { return { name: "Ana" }; }
+
+async function main() {
+  const user = await getUser();
+  return user.name;
+}
+
+console.log(main());
+```
+
+¿Qué crees que imprime la última línea?
+RESULT_FINAL success 1 0.23061139999999997

@@ -1,0 +1,40 @@
+USER: Socratic: quiero entender bien async/await en JavaScript
+TOOL Skill {"skill":"socrates","args":"quiero entender bien async/await en JavaScript"}
+RESULT  Launching skill: socrates
+TOOL Bash {"command":"ls -R .socrates 2>/dev/null | head -50","description":"List existing socrates notes and domains"}
+RESULT  domains
+notes
+
+.socrates/domains:
+code.md
+
+.socrates/notes:
+code
+
+.socrates/notes/code:
+001-async-promises-2026-10-14.md
+TOOL Read {"file_path":"<sandbox>.S4/.claude/skills/socrates/references/session-notes.md"}
+RESULT  1	# Session notes
+2	
+3	Notes let the user review what they learned, and let you start the next session where the last one ended instead of from zero.
+
+TOOL Read {"file_path":"<sandbox>.S4/.socrates/notes/code/001-async-promises-2026-10-14.md"}
+RESULT  1	---
+2	status: done
+3	domain: code
+4	topic: Por qué getUser imprime Promise { <pending> }
+5	concepts: [async, promises, await]
+6	updated: 2026-10-14
+
+TOOL Read {"file_path":"<sandbox>.S4/.socrates/domains/code.md"}
+RESULT  1	# Code
+2	
+3	Domain guide for the Socratic method: programming, debugging, reading codebases, configs.
+4	
+5	## Target
+6	
+7	Usually closed: the bug is
+TEXT: Ayer (14-10) descubriste que una función `async` siempre devuelve una promesa y que con `await` obtienes el valor. Hoy seguimos desde ahí: qué pasa exactamente cuando el código llega a un `await` (qué se pausa y qué sigue corriendo), cómo se capturan los errores y cuándo usar `await` hace tu código más lento sin necesidad.
+
+Al final deberías poder explicarlo con tus palabras, usarlo en código nuevo y decir cuándo falla. ¿Te parece bien, o prefieres enfocarte en otra parte?
+RESULT_FINAL success 7 0.2160472

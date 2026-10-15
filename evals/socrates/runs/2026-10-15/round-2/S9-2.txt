@@ -1,0 +1,7 @@
+USER: son lo que gana mi amigo por usar mi dinero? o sea me paga por prestárselo
+TEXT: Correcto: te paga por prestarle tu dinero. Esos 10 € los ganas tú, no él, y se llaman **interés**. Como son 10 € por cada 100, se dice que el interés es del **10 % anual**.
+
+Ahora imagina que pasa el año, tu amigo te devuelve los 110 € y tú se los vuelves a prestar, entero, por otro año y otra vez al 10 %.
+
+**¿Cuánto dinero tendrías al final de ese segundo año?**
+RESULT_FINAL success 1 0.1929014

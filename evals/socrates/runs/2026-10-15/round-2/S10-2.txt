@@ -1,0 +1,5 @@
+USER: nada, la devuelve igual aunque sea un 404. tendría que comprobar res.ok y lanzar un error si es false
+TEXT: Exacto. Hasta ahora: `fetch` solo falla por red → un 404 llega con `res.ok === false` → `getUser` tiene que comprobarlo ella misma.
+
+Escribe cómo quedarían las líneas 2–4 con esa comprobación. ¿Qué pondrías dentro del `Error` para que quien lo reciba sepa qué ha pasado?
+RESULT_FINAL success 1 0.235456

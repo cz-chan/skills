@@ -1,0 +1,33 @@
+USER: [new session, fixtures/async-promises-progress.md] socrates, seguimos
+TOOL Skill {"skill":"socrates","args":"seguimos"}
+RESULT  Launching skill: socrates
+TOOL Bash {"command":"cd <sandbox>; find .socrates -type f; cat .claude/skills/socrates/references/session-notes.md","description":"List socrates files and read notes reference"}
+RESULT  .socrates/notes/code/001-async-promises-progress.md
+# Session notes
+
+Notes let the user review what they learned, and let you start the next session w
+TOOL Bash {"command":"cd <sandbox>; cat .socrates/notes/code/001-async-promises-progress.md; ls .socrates; ls","description":"Read progress note and list project"}
+RESULT  ---
+status: in-progress
+domain: code
+topic: async-promises
+concepts: [async, promise, pending, await]
+updated: 2026-10-15
+---
+
+## Where you left off
+
+
+TOOL Bash {"command":"cd <sandbox>; ls src; cat -n src/user.js","description":"Read user.js source"}
+RESULT  user.js
+     1	async function getUser(id) {
+     2	  const res = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`);
+     3	  return res.
+TEXT: Retomamos **async-promises** (`src/user.js`), donde lo dejamos:
+
+- Querías entender por qué se imprime `Promise { <pending> }` en vez del usuario.
+- Ya descubriste que `async` mete lo que devuelves en una promesa, así que `user` (línea 6) es una `Promise`.
+- Falta: ¿qué no ha terminado todavía al llegar a la línea 7? ¿Y cómo sacas el usuario de esa promesa?
+
+Siguiente pregunta. Mira la línea 2: `await fetch(...)` va a pedir datos a un servidor por internet. Cuando se ejecuta la línea 7, justo después de llamar a `getUser(1)`, ¿qué crees que está pasando todavía con esa petición?
+RESULT_FINAL success 6 0.20916420000000002

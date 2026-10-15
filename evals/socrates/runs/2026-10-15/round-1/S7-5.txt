@@ -1,0 +1,5 @@
+USER: la b? porque async mete lo que devuelves en una promesa
+TEXT: Exacto: `async` siempre envuelve el resultado en una promesa.
+
+Volvamos a tu archivo. En `cinco()` sale `Promise { 5 }`, pero en tu línea 7 sale `Promise { <pending> }`, sin valor dentro. ¿Qué tiene `getUser` (líneas 2–3) que `cinco` no tiene, y que explicaría que aún no haya valor cuando se ejecuta el `console.log`?
+RESULT_FINAL success 1 0.24750439999999999

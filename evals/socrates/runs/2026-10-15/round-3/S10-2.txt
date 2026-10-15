@@ -1,0 +1,5 @@
+USER: res.ok es false, y la función no hace nada con eso, devuelve res.json() igual. tendría que comprobar res.ok y lanzar un error si es false
+TEXT: Exacto. Hasta ahora: un 404 no hace fallar a `fetch` → `res.ok` es `false` → `getUser` ignora ese dato.
+
+Escribe tú las líneas que irían entre la 2 y la 3 de `src/user.js`. ¿Cómo quedarían?
+RESULT_FINAL success 1 0.2375588

@@ -1,0 +1,5 @@
+USER: if (!res.ok) throw new Error('usuario ' + id + ' no encontrado: ' + res.status) antes del return. pondría el id y el status
+TEXT: Bien: id y status es justo lo que necesita quien depura.
+
+Una cosa sobre tu mensaje: imagina que la API devuelve un **500** (el servidor se cae) para `getUser(1)`. ¿Qué texto exacto mostraría tu error, y sería cierto?
+RESULT_FINAL success 1 0.2501968

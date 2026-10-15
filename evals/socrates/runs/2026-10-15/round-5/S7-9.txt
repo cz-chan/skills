@@ -1,0 +1,5 @@
+USER: el fetch todavía no ha vuelto, sigue esperando. pero res ya es el json del usuario, no?
+TEXT: Bien: cuando corre la línea 7, el `fetch` todavía no ha vuelto.
+
+Ahora fíjate en la línea 2: `res` se asigna con lo que devuelve `await fetch(...)`. Si el `fetch` aún no ha vuelto cuando se ejecuta la línea 7, ¿qué valor puede tener `res` en ese momento?
+RESULT_FINAL success 1 0.23652120000000001

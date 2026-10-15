@@ -1,0 +1,11 @@
+USER: diría 'usuario 1 no encontrado: 500' y sería mentira, el usuario existe pero el server falló. mejor 'error al pedir usuario 1: status 500'
+TEXT: Eso es: el mensaje describe lo que sabes (falló, con qué status), no lo que supones.
+
+Ahora el lado de quien llama. La línea 6 sigue así:
+
+```js
+const user = getUser(9999);
+```
+
+Con tu `throw` ya dentro de `getUser`, ¿dónde acaba ese error? ¿Lo ve alguien?
+RESULT_FINAL success 1 0.2631434

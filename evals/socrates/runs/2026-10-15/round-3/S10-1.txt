@@ -1,0 +1,38 @@
+USER: socrates, seguimos
+TOOL Skill {"skill":"socrates","args":"seguimos"}
+RESULT  Launching skill: socrates
+TOOL Bash {"command":"find .socrates -type f && cat .claude/skills/socrates/references/session-notes.md","description":"List socrates notes and read notes reference"}
+RESULT  .socrates/domains/code.md
+.socrates/notes/code/001-fetch-errors-progress.md
+# Session notes
+
+Notes let the user review what they learned, and let you 
+TOOL Bash {"command":"cat .socrates/notes/code/001-fetch-errors-progress.md; echo ----; cat .socrates/domains/code.md; git ls-files","description":"Read progress note, domain file, tracked files"}
+RESULT  ---
+status: in-progress
+domain: code
+topic: Why fetch does not fail on a 404
+concepts: [fetch, http-errors, res-ok]
+updated: 2026-10-13
+---
+
+## Where 
+TOOL Read {"file_path":"<sandbox>/src/user.js"}
+RESULT  1	async function getUser(id) {
+2	  const res = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`);
+3	  return res.json();
+4	}
+5	
+6	const 
+TEXT: Retomamos **por qué `fetch` no falla con un 404** (13-oct).
+
+**Dónde lo dejaste:** querías entender por qué `getUser(9999)` no lanza ningún error aunque el usuario no existe. Ya descubriste:
+- `fetch` solo rechaza la promesa si falla la red.
+- Con un 404 la promesa se resuelve igual y `res.ok` vale `false`.
+
+Queda abierto: ¿qué tendría que hacer `getUser` para que quien la llama se entere de que el usuario no existe?
+
+---
+
+Mira `src/user.js`: en la línea 2 ya tienes `res`, y en la línea 3 haces `return res.json()` directamente. Con `getUser(9999)`, ¿qué valor tiene `res.ok` justo entre esas dos líneas, y qué hace hoy la función con ese dato?
+RESULT_FINAL success 6 0.221437

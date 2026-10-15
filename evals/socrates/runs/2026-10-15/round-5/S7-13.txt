@@ -1,0 +1,60 @@
+USER: no, de verdad, paso
+TOOL Read {"file_path":"<sandbox>/.claude/skills/socrates/references/session-recap.md"}
+RESULT  1	# Session recap
+2	
+3	Now you may state things directly. Use the user's own words where possible, in their language. Render it as normal Markdown (no
+TOOL Read {"file_path":"<sandbox>/.claude/skills/socrates/references/maintaining-domains.md"}
+RESULT  1	# Maintaining domain files
+2	
+3	Domain files get better after each session. Only write with the user's OK, and always in English.
+4	
+5	Write only to
+TOOL Bash {"command":"cd <sandbox>/.socrates/notes/code && mv 001-async-promises-progress.md 001-async-promises-2026-10-15.md && ls","description":"Rename progress note to finished name"}
+RESULT  001-async-promises-2026-10-15.md
+TOOL Read {"file_path":"<sandbox>/.socrates/notes/code/001-async-promises-2026-10-15.md"}
+RESULT  1	---
+2	status: in-progress
+3	domain: code
+4	topic: async-promises
+5	concepts: [async, promise, pending, await]
+6	updated: 2026-10-15
+7	---
+8	
+9	## Wh
+TOOL Write {"file_path":"<sandbox>/.socrates/notes/code/001-async-promises-2026-10-15.md","content":"---\nstatus: done\ndomain: code\ntopic: async-promises\nconcepts: [async, promise, pending, await]\nupdated: 2
+RESULT  The file <sandbox>/.socrates/notes/code/001-async-promises-2026-10-15.md has been updated successfully. (file state is current in your context — no ne
+TEXT: Respetado. Tu solución es correcta: `await` espera a que la promesa termine y te da el usuario.
+
+# Async y promesas (15-10-2026)
+
+## Conclusiones a las que llegaste
+
+- "async mete lo que devuelves en una promesa", así que `user` (línea 6) es una `Promise`.
+- Cuando corre la línea 7, "el fetch todavía no ha vuelto, sigue esperando".
+- "res es la respuesta http y .json() saca el cuerpo".
+- "cuando hago console.log(user) el fetch todavía no ha terminado, por eso pending. tendría que hacer await getUser(1)". Lo probaste y salió `{ id: 1, name: 'Leanne Graham', ... }`.
+
+## Preguntas que te llevaron ahí
+
+1. ¿Qué devuelve `async function cinco() { return 5 }`? → `Promise { 5 }`, no `5`.
+2. ¿Cuánto tarda el `fetch` comparado con pasar de la línea 6 a la 7? → Cuando llega la línea 7 todavía no ha vuelto.
+3. Si el `fetch` no ha vuelto, ¿qué valor puede tener `res` en la línea 7? → Todavía ninguno. `res` es la respuesta HTTP y `.json()` saca el cuerpo.
+4. Si la línea 6 pasa a `await getUser(1)`, ¿qué sale? → El objeto del usuario.
+
+## Errores de razonamiento y cómo los corregiste
+
+- **Creías:** que `async` no cambia nada → **Viste:** que `cinco()` devuelve `Promise { 5 }`.
+- **Creías:** que `res` ya era el JSON → **Viste:** que sin respuesta del `fetch` no puede tener nada. Y cuando llega es la respuesta HTTP: el cuerpo se saca con `.json()`.
+
+## Para explorar después
+
+- ¿Por qué `await` funciona en la línea 6, fuera de una función `async`? (top-level await, ESM vs CommonJS)
+- Si pides 3 usuarios con `await` uno detrás de otro, ¿cuánto tarda en total? (`Promise.all`)
+- ¿Qué pasa si el `fetch` falla? (`try/catch` con `await`)
+
+Guardado en `.socrates/notes/code/001-async-promises-2026-10-15.md`.
+
+**¿Seguimos con otro tema?** Te recomiendo `Promise.all`. Ahora sabes que cada `await` espera a que su promesa termine, así que 3 `await` seguidos esperan 3 veces. Es el paso natural después de esto.
+
+**Guía de dominio:** no hay ninguna para `code`. ¿Creo `.socrates/domains/code.md` con lo que ha funcionado hoy (el mini-ejemplo `cinco()` y el error de "res ya es el JSON")?
+RESULT_FINAL success 6 0.4141802

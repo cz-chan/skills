@@ -1,0 +1,3 @@
+USER: no, no crees nada
+TEXT: Vale, no creo nada ni volveré a preguntarlo en esta sesión. Para retomar, vuelve a pedirme el modo Sócrates y dime que ya sabes qué es el interés: seguimos con la pregunta de los 110 €. ¡Hasta luego!
+RESULT_FINAL success 1 0.2190494

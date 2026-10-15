@@ -1,0 +1,7 @@
+USER: uf no sé, dímelo ya
+TEXT: Venga, uno más y te lo pongo fácil. Con ese `cinco()`, ¿qué imprime?
+
+- a) `5`
+- b) `Promise { 5 }`
+- c) `undefined`
+RESULT_FINAL success 1 0.22962039999999997

@@ -1,0 +1,57 @@
+USER: [learner edited line 6 to `const user = await getUser(1);`] lo he cambiado y ahora imprime el objeto, { id: 1, name: 'Leanne Graham', ... }
+TOOL Bash {"command":"cd <sandbox>; cat .claude/skills/socrates/references/session-recap.md; cat .claude/skills/socrates/references/maintaining-domains.md; ls .claude/skills/socrates/references","description":"
+RESULT  # Session recap
+
+Now you may state things directly. Use the user's own words where possible, in their language. Render it as normal Markdown (not insi
+TOOL Bash {"command":"cd <sandbox>/.socrates/notes/code; mv 001-async-promises-progress.md 001-async-promises-2026-10-15.md && ls","description":"Rename progress note to finished name"}
+RESULT ERR  Commands that change directories and perform write operations require explicit approval to ensure paths are evaluated correctly. For security, Claude 
+TOOL Read {"file_path":"<sandbox>/.socrates/notes/code/001-async-promises-2026-10-15.md"}
+RESULT ERR  File does not exist. Note: your current working directory is <sandbox>.
+TOOL Bash {"command":"mv .socrates/notes/code/001-async-promises-progress.md .socrates/notes/code/001-async-promises-2026-10-15.md && ls .socrates/notes/code","description":"Rename progress note to finished nam
+RESULT  001-async-promises-2026-10-15.md
+TOOL Read {"file_path":"<sandbox>/.socrates/notes/code/001-async-promises-2026-10-15.md"}
+RESULT  1	---
+2	status: in-progress
+3	domain: code
+4	topic: async-promises
+5	concepts: [async, promise, pending, await]
+6	updated: 2026-10-15
+7	---
+8	
+9	## Wh
+TOOL Write {"file_path":"<sandbox>/.socrates/notes/code/001-async-promises-2026-10-15.md","content":"---\nstatus: done\ndomain: code\ntopic: async-promises\nconcepts: [async, promise, pending, await]\nupdated: 2
+RESULT  The file <sandbox>/.socrates/notes/code/001-async-promises-2026-10-15.md has been updated successfully. (file state is current in your context — no ne
+TEXT: Correcto, lo conseguiste: con `await` esperas a que la promesa se resuelva y `user` pasa a ser el objeto.
+
+# async / promesas — 2026-10-15
+
+## Lo que descubriste
+
+- "async mete lo que devuelves en una promesa", así que `user` (línea 6) es una `Promise`.
+- En la línea 7 "el fetch todavía no ha vuelto, sigue esperando", y por eso sale `pending`.
+- `res` es la respuesta HTTP y `.json()` saca el cuerpo. Mientras el `fetch` no vuelve, `res` todavía no tiene valor.
+- Con `const user = await getUser(1)` se imprime `{ id: 1, name: 'Leanne Graham', ... }`.
+
+## Preguntas que te llevaron ahí
+
+1. ¿Qué devuelve `async function cinco() { return 5 }`? → `Promise { 5 }`
+2. ¿Qué pasa con la petición de la línea 2 cuando se ejecuta la línea 7? → sigue esperando
+3. Si el `fetch` no ha vuelto, ¿qué vale `res`? → nada aún; además es la respuesta HTTP, no el JSON
+4. ¿Qué imprime con `await`? → el objeto del usuario
+
+## Errores de razonamiento
+
+- **Creías:** que `async` no cambia lo que devuelve el `return` → **Viste:** que `cinco()` da `Promise { 5 }`.
+- **Creías:** que `res` ya era el JSON en la línea 7 → **Viste:** que es la respuesta HTTP, solo existe cuando vuelve el `fetch`, y `.json()` saca el cuerpo.
+
+## Para seguir
+
+- Tu `await` de la línea 6 está fuera de cualquier función `async`. ¿Por qué funciona aquí y no en otros sitios?
+- `res.json()` también devuelve algo especial. ¿Por qué `return res.json()` funciona sin `await`?
+
+Guardado en `.socrates/notes/code/001-async-promises-2026-10-15.md` (era el archivo `-progress`, ahora renombrado y marcado como terminado).
+
+**Siguiente tema:** te propongo el **top-level await**, la primera pregunta de la lista. Usaste `await` fuera de una función `async` y funcionó porque Node 24 trata este archivo como módulo ES. En otros contextos falla. Entender por qué completa lo de hoy: dónde se puede esperar una promesa y qué hacer donde no se puede (`.then`). ¿Seguimos con eso?
+
+**Guía del dominio:** todavía no hay guía para `code`. ¿Quieres que cree `.socrates/domains/code.md` a partir de esta sesión (el mini-ejemplo `cinco()`, el anclaje en `fetch` y el error de `res`)?
+RESULT_FINAL success 7 0.3955714

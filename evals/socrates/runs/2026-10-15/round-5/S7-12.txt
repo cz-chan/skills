@@ -1,0 +1,5 @@
+USER: prefiero no explicarlo, pásame directamente el resumen
+TEXT: Vale. Solo una cosa: explicarlo tú es lo que hace que no se te olvide mañana, y son dos frases.
+
+¿Lo intentas, o paso directamente al resumen?
+RESULT_FINAL success 1 0.29536779999999996

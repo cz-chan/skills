@@ -1,0 +1,5 @@
+USER: sí
+TEXT: Bien. Mira la línea 1: `async function getUser(id)`.
+
+¿Qué crees que cambia en lo que **devuelve** una función cuando le pones `async` delante?
+RESULT_FINAL success 1 0.18368359999999997

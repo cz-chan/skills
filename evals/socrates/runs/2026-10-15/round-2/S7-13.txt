@@ -1,0 +1,19 @@
+USER: sí, crea la guía. no tengo enlaces
+TOOL Read {"file_path":"<sandbox>/.claude/skills/socrates/references/domain-template.md"}
+RESULT  1	# Domain template
+2	
+3	Structure for `.socrates/domains/<domain-slug>.md`. Keep it under ~80 lines; concrete examples beat general advice. Always wr
+TOOL Write {"file_path":"<sandbox>/.socrates/domains/code.md","content":"# Code\n\nDomain guide for the Socratic method: programming and debugging, JavaScript, async/promises, reading and fixing the user's own s
+RESULT  File created successfully at: <sandbox>/.socrates/domains/code.md (file state is current in your context — no need to Read it back)
+TEXT: Creada: `.socrates/domains/code.md`. Está en inglés, porque esas guías las leo yo y no tú, y se puede editar cuando quieras.
+
+Incluye:
+- el mini-ejemplo `cinco()`
+- los 4 niveles de pistas para el caso `Promise { <pending> }`
+- 3 errores típicos: `async` no cambia lo que devuelve, `res` ya es el JSON, y el código "espera solo"
+- la sección de enlaces vacía, porque no tienes ninguno
+
+El archivo antiguo `001-async-promises-progress.md` sigue ahí. Bórralo tú o dame permiso y lo hago yo.
+
+¿Seguimos con el manejo de errores en `fetch`?
+RESULT_FINAL success 3 0.4307896000000001

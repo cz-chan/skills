@@ -1,0 +1,5 @@
+USER: en la promesa rechazada que devuelve getUser, y como nadie hace await ni catch nadie lo ve, sale como unhandled rejection. tendría que hacer try { await getUser(9999) } catch (e) { console.error(e.message) }
+TEXT: Correcto: async + `throw` = promesa rechazada, y solo `await`/`.catch` la recogen.
+
+Has llegado al objetivo. Para cerrar: explícalo con tus palabras, de principio a fin. ¿Por qué `getUser(9999)` no fallaba antes y qué cadena hace ahora que el error llegue hasta quien llama?
+RESULT_FINAL success 1 0.275838

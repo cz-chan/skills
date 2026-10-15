@@ -1,0 +1,40 @@
+USER: getUser es async así que devuelve una promesa al momento, y como dentro hace un fetch que tarda, la promesa sigue pending cuando se ejecuta el console.log. con await el código espera a que la promesa se resuelva y user ya es el objeto.
+TOOL Read {"file_path":"<sandbox>/.claude/skills/socrates/references/session-recap.md"}
+RESULT  1	# Session recap
+2	
+3	Now you may state things directly. Use the user's own words where possible, in their language. Render it as normal Markdown (no
+TOOL Read {"file_path":"<sandbox>/.claude/skills/socrates/references/maintaining-domains.md"}
+RESULT  1	# Maintaining domain files
+2	
+3	Domain files get better after each session. Only write with the user's OK, and always in English.
+4	
+5	Write only to
+TOOL Write {"file_path":"<sandbox>/.socrates/notes/code/001-async-promises-2026-10-15.md","content":"---\nstatus: done\ndomain: code\ntopic: async-promises\nconcepts: [async, promise, pending, await, fetch, resp
+RESULT  File created successfully at: <sandbox>/.socrates/notes/code/001-async-promises-2026-10-15.md (file state is current in your context — no need to Read
+TOOL Bash {"command":"rm <sandbox>/.socrates/notes/code/001-async-promises-progress.md","description":"Remove old in-progress note"}
+RESULT ERR  This command requires approval
+TEXT: Correcto, y completo: la promesa se devuelve enseguida, el `fetch` tarda, y `await` espera a que termine.
+
+# Async y promesas — 2026-10-15
+
+## Conclusiones a las que llegaste
+- `async` mete lo que devuelves en una promesa, así que `user` es una `Promise`.
+- El `fetch` va a internet y tarda; pasar de la línea 6 a la 7 es casi instantáneo.
+- `res` es la respuesta HTTP y `.json()` saca el cuerpo.
+- En el `console.log` el fetch aún no ha terminado, por eso sale `pending`.
+- Con `await getUser(1)`, `user` ya es el objeto. Lo comprobaste: imprime `{ id: 1, name: 'Leanne Graham', ... }`.
+
+## Errores de razonamiento y cómo los corregiste
+- **Creías:** que `async` no cambia lo que devuelve la función → **Viste:** `cinco()` da `Promise { 5 }`.
+- **Creías:** que `res` ya es el JSON → **Viste:** es la respuesta HTTP, y por eso la línea 3 llama a `.json()`.
+
+## Para explorar después
+- `res.json()` también devuelve una promesa. ¿Por qué funciona `return res.json()` sin `await`? ¿Y qué pasa si el fetch falla (sin red, error 404)?
+- Pedir 3 usuarios: ¿uno tras otro con `await`, o a la vez con `Promise.all`?
+
+He guardado el resumen en `.socrates/notes/code/001-async-promises-2026-10-15.md`. No he podido borrar el archivo antiguo `001-async-promises-progress.md` porque el borrado necesitaba tu aprobación; bórralo tú o dame permiso y lo hago yo.
+
+**Siguientes pasos:**
+- ¿Seguimos con el manejo de errores en `fetch`? Es lo siguiente que te va a pasar en `src/user.js` en cuanto falle la red.
+- Todavía no hay guía para `code`. ¿Creo `.socrates/domains/code.md` a partir de esta sesión? Incluiría el mini-ejemplo `cinco()` y los dos errores de arriba.
+RESULT_FINAL success 5 0.35639260000000006

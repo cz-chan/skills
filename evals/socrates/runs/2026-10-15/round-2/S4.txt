@@ -1,0 +1,31 @@
+USER: Socratic: quiero entender bien async/await en JavaScript
+TOOL Skill {"skill":"socrates","args":"quiero entender bien async/await en JavaScript"}
+RESULT  Launching skill: socrates
+TOOL Bash {"command":"find .socrates -type f | head -50","description":"List socrates project files"}
+RESULT  .socrates/domains/code.md
+.socrates/notes/code/001-async-promises-2026-10-14.md
+TOOL Read {"file_path":"<sandbox>.S4/.socrates/notes/code/001-async-promises-2026-10-14.md"}
+RESULT  1	---
+2	status: done
+3	domain: code
+4	topic: Por qué getUser imprime Promise { <pending> }
+5	concepts: [async, promises, await]
+6	updated: 2026-10-14
+
+TOOL Read {"file_path":"<sandbox>.S4/.socrates/domains/code.md"}
+RESULT  1	# Code
+2	
+3	Domain guide for the Socratic method: programming, debugging, reading codebases, configs.
+4	
+5	## Target
+6	
+7	Usually closed: the bug is
+TOOL Read {"file_path":"<sandbox>.S4/.claude/skills/socrates/references/session-notes.md"}
+RESULT  1	# Session notes
+2	
+3	Notes let the user review what they learned, and let you start the next session where the last one ended instead of from zero.
+
+TEXT: Vi tu sesión del 14/10: ya sabes que una función `async` siempre devuelve una promesa y que `await` saca el valor. Seguimos desde ahí: qué pasa **mientras** se espera (orden de ejecución), errores con `try/catch`, y cuándo `await` te hace ir más lento de lo necesario. Objetivo: que puedas explicarlo, usarlo en código nuevo y decir cuándo falla.
+
+¿Te parece bien? ¿O prefieres centrarte en algo concreto (p. ej. un código tuyo)?
+RESULT_FINAL success 7 0.21631299999999998

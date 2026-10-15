@@ -1,0 +1,7 @@
+USER: el fetch, que va a internet y tarda. pero res ya es el json del usuario, no?
+TEXT: Bien: el `fetch` va a internet y tarda, mientras que pasar de la línea 6 a la 7 es casi instantáneo.
+
+Sobre `res`, fíjate en la línea 3: `return res.json();`
+
+**Si `res` ya fuera el JSON del usuario, ¿para qué haría falta llamar a `.json()` sobre él?**
+RESULT_FINAL success 1 0.22073520000000002

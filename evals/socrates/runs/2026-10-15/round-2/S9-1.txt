@@ -1,0 +1,11 @@
+USER: Quiero aprender cómo funciona el interés compuesto, en modo Socrates. No sé nada de finanzas.
+TOOL Skill {"skill":"socrates","args":"Quiero aprender cómo funciona el interés compuesto, en modo Socrates. No sé nada de finanzas."}
+RESULT  Launching skill: socrates
+TOOL Bash {"command":"ls -R .socrates 2>/dev/null || echo NONE","description":"Check for prior session notes and domains"}
+RESULT  NONE
+TEXT: Entendido: quieres llegar a entender el interés compuesto desde cero. La meta es que puedas explicarlo con tus palabras, aplicarlo a un caso nuevo y saber cuándo no te ayuda.
+
+Antes de empezar, una pregunta para saber desde dónde partimos:
+
+**Si le prestas 100 € a un amigo y te dice "te devuelvo 110 € dentro de un año", ¿qué dirías que son esos 10 € de diferencia y por qué crees que te los da?**
+RESULT_FINAL success 4 0.1740194

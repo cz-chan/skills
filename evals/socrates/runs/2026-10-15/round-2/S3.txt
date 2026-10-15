@@ -1,0 +1,25 @@
+USER: socrates, seguimos con lo que dejamos
+TOOL Skill {"skill":"socrates","args":"seguimos con lo que dejamos"}
+RESULT  Launching skill: socrates
+TOOL Bash {"command":"cd .socrates && find . -type f | head -50","description":"List socrates files"}
+TOOL Read {"file_path":"<sandbox>.S3/.claude/skills/socrates/references/session-notes.md"}
+RESULT  1	# Session notes
+2	
+3	Notes let the user review what they learned, and let you start the next session where the last one ended instead of from zero.
+
+RESULT  ./notes/finance/001-compound-interest-progress.md
+TOOL Read {"file_path":"<sandbox>.S3/.socrates/notes/finance/001-compound-interest-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	domain: finance
+4	topic: Compound interest
+5	concepts: [compound-interest, simple-interest, exponential-growth]
+6	update
+TEXT: Retomamos **interés compuesto** (sesión del 12-10).
+
+**Dónde lo dejaste:** querías entender por qué el interés compuesto hace crecer el dinero más rápido con el tiempo. Ya descubriste que el interés de cada año se calcula sobre el nuevo total, no sobre los 100 € del principio. Por eso 3 años al 10 % dan +33,1 % y no +30 %. Queda pendiente: ¿qué pasa con esa diferencia si lo dejas correr 30 años en vez de 3?
+
+**Objetivo:** explicar el interés compuesto, aplicarlo a una deuda y decir cuándo deja de jugar a tu favor.
+
+Empezamos por el caso fácil. Con **interés simple** (10 € fijos cada año), ¿cuánto tendrías tras **30 años** si empiezas con 100 €?
+RESULT_FINAL success 6 0.2051268

@@ -1,0 +1,51 @@
+USER: getUser es async así que devuelve una promesa al momento, y como dentro hace un fetch que tarda, la promesa sigue pending cuando se ejecuta el console.log. con await el código espera a que la promesa se resuelva y user ya es el objeto.
+TOOL Bash {"command":"cd <sandbox>/.claude/skills/socrates/references && cat session-recap.md maintaining-domains.md","description":"Read recap and domain maintenance references"}
+RESULT  # Session recap
+
+Now you may state things directly. Use the user's own words where possible, in their language. Render it as normal Markdown (not insi
+TOOL Bash {"command":"cd <sandbox>/.socrates/notes/code && mv 001-async-promises-progress.md 001-async-promises-2026-10-15.md && ls","description":"Rename progress note to finished filename"}
+RESULT  001-async-promises-2026-10-15.md
+TOOL Read {"file_path":"<sandbox>/.socrates/notes/code/001-async-promises-2026-10-15.md"}
+RESULT  1	---
+2	status: in-progress
+3	domain: code
+4	topic: async-promises
+5	concepts: [async, promises, await, fetch]
+6	updated: 2026-10-15
+7	---
+8	
+9	## Whe
+TOOL Write {"file_path":"<sandbox>/.socrates/notes/code/001-async-promises-2026-10-15.md","content":"---\nstatus: done\ndomain: code\ntopic: async-promises\nconcepts: [async, promises, await, fetch, response-jso
+RESULT  The file <sandbox>/.socrates/notes/code/001-async-promises-2026-10-15.md has been updated successfully. (file state is current in your context — no ne
+TEXT: Exacto, objetivo conseguido.
+
+# Async y promesas — 2026-10-15
+
+## Conclusiones a las que llegaste
+- Una función `async` envuelve su `return` en una promesa: `cinco()` → `Promise { 5 }`. (Con opciones como pista.)
+- `getUser` hace un `fetch` a internet, que tarda; `cinco()` no espera nada.
+- `res` es la respuesta HTTP y `.json()` saca el cuerpo.
+- El `console.log` se ejecuta antes de que el `fetch` termine, así que la promesa sigue `pending`.
+- `await getUser(1)` espera a que la promesa se resuelva, y `user` ya es el objeto.
+
+## Preguntas que te llevaron ahí
+1. ¿Qué devuelve `async function cinco() { return 5 }`? → `Promise { 5 }`
+2. ¿Qué hace `getUser` que `cinco()` no, y que podría tardar? → un `fetch`
+3. Si `res` ya fuera el JSON, ¿para qué llamar a `res.json()`? → `res` es la respuesta HTTP
+4. Cambia la línea 6 y ejecuta. ¿Qué imprime? → el objeto del usuario
+
+## Errores de razonamiento y cómo los corregiste
+- **Suponías:** que `async` no cambia nada → **Viste:** con `cinco()` sale `Promise { 5 }`.
+- **Suponías:** que `res` ya es el JSON → **Viste:** si lo fuera, `res.json()` sobraría.
+
+## Para seguir explorando
+- ¿Por qué el `await` de la línea 6 funciona fuera de una función? ¿Funcionaría en cualquier `.js`? Es el *top-level await* (módulos ES vs CommonJS).
+- Con tres `await getUser(...)` seguidos, ¿cuánto tarda en total? ¿Se pueden hacer en paralelo? (`Promise.all`)
+- ¿Qué pasa si el `fetch` falla o el id no existe? (`try/catch`, `res.ok`)
+
+Guardado en `.socrates/notes/code/001-async-promises-2026-10-15.md` (antes era el archivo `-progress`).
+
+**¿Seguimos?** Te propongo `Promise.all`. Ya sabes que cada `await` espera a que termine su `fetch`. La pregunta natural es qué pasa cuando pides varios usuarios, y es el siguiente error típico con async.
+
+**Guía del dominio:** todavía no hay guía para `code`. ¿Quieres que cree `.socrates/domains/code.md` a partir de esta sesión? Recogería el ejemplo `cinco()`, la pregunta de `res.json()` y los dos errores de hoy. Si tienes enlaces de confianza para la sección de recursos, pásamelos.
+RESULT_FINAL success 5 0.36944820000000006

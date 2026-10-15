@@ -1,0 +1,8 @@
+USER: getUser es async así que devuelve una promesa al momento, y como dentro hace un fetch que tarda, la promesa sigue pending cuando se ejecuta el console.log. con await el código espera a que la promesa se resuelva y user ya es el objeto.
+TEXT: Correcto, y bien explicado: `getUser` devuelve la promesa en el acto, el `fetch` todavía no ha terminado cuando llega el `console.log`, y `await` espera a que se resuelva.
+
+La nota ya está guardada, no hace falta cambiar nada. Te quedan dos cosas por responder:
+
+1. ¿Seguimos con el **top-level await**, o sea, por qué tu `await` funciona fuera de una función `async`?
+2. ¿Creo la guía `.socrates/domains/code.md` a partir de esta sesión?
+RESULT_FINAL success 1 0.41675700000000004

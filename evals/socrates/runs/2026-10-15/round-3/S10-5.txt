@@ -1,0 +1,49 @@
+USER: fetch solo falla por errores de red, un 404 o 500 es una respuesta normal con res.ok false. por eso getUser tiene que mirar res.ok y lanzar un error con el id y el status. como getUser es async ese throw rechaza la promesa, y quien llama tiene que hacer await dentro de un try/catch para verlo
+TOOL Bash {"command":"cd <sandbox>/.claude/skills/socrates/references && cat session-recap.md maintaining-domains.md","description":"Read recap and domain maintenance references"}
+RESULT  # Session recap
+
+Now you may state things directly. Use the user's own words where possible, in their language. Render it as normal Markdown (not insi
+TOOL Bash {"command":"cd <sandbox>/.socrates/notes/code && mv 001-fetch-errors-progress.md 001-fetch-errors-2026-10-15.md && ls","description":"Rename progress note to finished name"}
+RESULT  001-fetch-errors-2026-10-15.md
+TOOL Read {"file_path":"<sandbox>/.socrates/notes/code/001-fetch-errors-2026-10-15.md"}
+RESULT  1	---
+2	status: in-progress
+3	domain: code
+4	topic: Why fetch does not fail on a 404
+5	concepts: [fetch, http-errors, res-ok]
+6	updated: 2026-10-13
+7	
+TOOL Write {"file_path":"<sandbox>/.socrates/notes/code/001-fetch-errors-2026-10-15.md","content":"---\nstatus: done\ndomain: code\ntopic: Why fetch does not fail on a 404\nconcepts: [fetch, http-errors, res-ok,
+RESULT  The file <sandbox>/.socrates/notes/code/001-fetch-errors-2026-10-15.md has been updated successfully. (file state is current in your context — no need
+TEXT: Correcto: lo cubre todo, desde por qué `fetch` no falla hasta cómo se entera quien llama.
+
+# Por qué fetch no falla con un 404 — 2026-10-15
+
+## Conclusiones a las que llegaste
+- `fetch` solo rechaza la promesa con errores de red.
+- Un 404 o un 500 es una respuesta normal: la promesa se resuelve y `res.ok` es `false`.
+- `getUser` ignoraba `res.ok` y devolvía `res.json()` igualmente.
+- Solución: `if (!res.ok) throw new Error(...)` con el id y el status, antes del `return`.
+- En una función `async`, ese `throw` se convierte en una promesa rechazada. Si nadie hace `await`/`catch`, acaba como unhandled rejection.
+- Quien llama tiene que hacer `await getUser(...)` dentro de un `try/catch`.
+
+## Preguntas que te llevaron hasta ahí
+1. ¿Qué valor tiene `res.ok` entre las líneas 2 y 3, y qué hace la función con él? → `false`, y lo ignora.
+2. ¿Qué líneas irían entre la 2 y la 3? → `if (!res.ok) throw new Error(...)`.
+3. Con las líneas 6–7 tal cual, ¿dónde aparece el `Error`? → En la promesa rechazada, que nadie espera. Hace falta `try { await ... } catch`.
+
+## Errores de razonamiento y cómo los corregiste
+- **Suponías:** que cualquier código de error HTTP hace que `fetch` lance → **Te diste cuenta:** al ver que `getUser(9999)` devolvía `{}` sin error.
+
+## Para explorar después y por qué
+- ¿Qué pasa si `res.ok` es `true` pero el cuerpo no es JSON válido? ¿Dónde salta ese error?
+- [MDN JavaScript Guide](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide): la parte de promesas y async/await, para ver cómo se propagan los errores.
+
+He guardado la nota en `.socrates/notes/code/001-fetch-errors-2026-10-15.md` (antes era el archivo `-progress`).
+
+**¿Seguimos con algo relacionado?** Hay un fallo en las líneas 6–7 de `src/user.js`: `console.log(user)` imprime `Promise { <pending> }`. Ahí ves la otra mitad de lo de hoy: qué devuelve realmente una función `async` y cuándo está disponible el valor.
+
+**Mejoras para la guía `.socrates/domains/code.md`** (dime cuáles aplico):
+1. Archivo nuevo `code/fetch-errors.md` con la escalera de hoy: `res.ok` → `throw` → `await` + `try/catch`.
+2. Un error típico más en el archivo principal: "Pensar que un `throw` dentro de una función `async` le llega al llamador sin `await`".
+RESULT_FINAL success 5 0.3787752

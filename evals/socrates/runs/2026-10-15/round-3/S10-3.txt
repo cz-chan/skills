@@ -1,0 +1,5 @@
+USER: if (!res.ok) throw new Error('error al pedir usuario ' + id + ': status ' + res.status) antes del return
+TEXT: Correcto, y meter `res.status` en el mensaje ayuda a saber qué pasó.
+
+Ahora mira quién llama: líneas 6–7, `const user = getUser(1); console.log(user);`. Si cambias el `1` por `9999`, ¿qué crees que imprime la línea 7 y dónde aparece tu `Error`? Predícelo y luego ejecútalo (`node src/user.js`) para comprobarlo.
+RESULT_FINAL success 1 0.2517878

@@ -1,0 +1,5 @@
+USER: la b? porque async mete lo que devuelves en una promesa
+TEXT: Exacto: `async` envuelve lo que devuelves en una promesa.
+
+Ahora vuelve a tu archivo. En la línea 7 sale `<pending>` y no `{ ...usuario }`, aunque la línea 3 hace `return res.json()`. ¿Qué crees que todavía no ha terminado cuando se ejecuta la línea 7?
+RESULT_FINAL success 1 0.2175918

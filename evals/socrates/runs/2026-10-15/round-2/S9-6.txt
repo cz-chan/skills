@@ -1,0 +1,7 @@
+USER: ahora sí que me voy, lo dejamos
+TEXT: Vale. Hoy llegaste a dos cosas:
+- El interés es lo que te pagan por prestar tu dinero (10 € sobre 100 € = 10 % anual).
+- Si vuelves a prestarlo todo, el segundo año ganas 11 € en lugar de 10 €, porque el 10 % se calcula sobre 110 €.
+
+Queda pendiente: ¿de dónde sale ese euro de más? No he guardado nada, así que cuando quieras seguir, pide el modo Sócrates y menciona lo de los 121 €. ¡Hasta luego!
+RESULT_FINAL success 1 0.2417714

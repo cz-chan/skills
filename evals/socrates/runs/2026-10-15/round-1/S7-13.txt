@@ -1,0 +1,17 @@
+USER: sí, crea la guía. no tengo enlaces
+TOOL Read {"file_path":"<sandbox>/.claude/skills/socrates/references/domain-template.md"}
+RESULT  1	# Domain template
+2	
+3	Structure for `.socrates/domains/<domain-slug>.md`. Keep it under ~80 lines; concrete examples beat general advice. Always wr
+TOOL Write {"file_path":"<sandbox>/.socrates/domains/code.md","content":"# Code\n\nDomain guide for the Socratic method: programming, debugging, language semantics (JavaScript so far: async, promises, fetch).\n\
+RESULT  File created successfully at: <sandbox>/.socrates/domains/code.md (file state is current in your context — no need to Read it back)
+TOOL Write {"file_path":"<sandbox>/.socrates/domains/code/async-promises.md","content":"# Async and promises\n\n## Mini-examples\n\n`async` always wraps the return value in a promise:\n\n```js\nasync function ci
+RESULT  File created successfully at: <sandbox>/.socrates/domains/code/async-promises.md (file state is current in your context — no need to Read it back)
+TEXT: He creado la guía, en dos archivos en inglés:
+- `.socrates/domains/code.md`: la guía general de código, con cómo anclar preguntas a líneas concretas, los niveles de pista, cómo comprobar ejecutando el código y los errores típicos. La sección de recursos queda vacía.
+- `.socrates/domains/code/async-promises.md`: lo específico de async, con el ejemplo `cinco()`, la pregunta de `res.json()`, tus errores de hoy y los temas para seguir.
+
+Puedes editarlos cuando quieras.
+
+¿Seguimos con `Promise.all`?
+RESULT_FINAL success 4 0.46167600000000003

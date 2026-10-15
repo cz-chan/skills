@@ -1,0 +1,5 @@
+USER: el fetch todavía no ha vuelto, sigue esperando. pero res ya es el json del usuario, no?
+TEXT: Correcto: el `fetch` todavía está esperando la respuesta del servidor.
+
+Sobre `res`: la línea 2 dice `const res = await fetch(...)`. Si al llegar a la línea 7 el `fetch` todavía no ha vuelto, ¿qué valor tiene `res` en ese momento?
+RESULT_FINAL success 1 0.22587540000000003

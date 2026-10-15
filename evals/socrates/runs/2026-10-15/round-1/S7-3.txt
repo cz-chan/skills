@@ -1,0 +1,12 @@
+USER: no sé, creo que nada, devuelve lo que pongas en el return
+TEXT: Hagamos la prueba con algo mínimo, sin `fetch` de por medio:
+
+```js
+async function cinco() {
+  return 5;
+}
+console.log(cinco());
+```
+
+Si fuera como dices, imprimiría `5`. ¿Qué crees que imprime de verdad? Si quieres, ejecútalo con `node -e "..."` y compara con tu predicción.
+RESULT_FINAL success 1 0.19900659999999998

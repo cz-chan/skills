@@ -1,0 +1,5 @@
+USER: hace un fetch a internet, eso tarda. pero res ya es el json del usuario, no?
+TEXT: Correcto: el `fetch` sale a internet y tarda. Esa es la diferencia con `cinco()`.
+
+Sobre `res`, mira la línea 3: si `res` ya fuera el JSON del usuario, ¿para qué haría falta llamar a `res.json()`?
+RESULT_FINAL success 1 0.2125378

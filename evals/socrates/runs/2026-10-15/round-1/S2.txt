@@ -1,0 +1,11 @@
+USER: Quiero aprender cómo funciona el interés compuesto, en modo Socrates. No sé nada de finanzas.
+TOOL Skill {"skill":"socrates"}
+RESULT  Launching skill: socrates
+TOOL Bash {"command":"ls -R .socrates 2>/dev/null | head -50","description":"Check for past sessions and domain files"}
+RESULT  (Bash completed with no output)
+TEXT: Entiendo que quieres saber qué es el interés compuesto y por qué hace crecer tanto el dinero, empezando desde cero. Al final deberías poder explicarlo con tus palabras, aplicarlo a un caso nuevo y decir cuándo no funciona a tu favor.
+
+¿Te parece bien? Si es así, empezamos con esta pregunta:
+
+**Le prestas 100 € a un amigo y te dice: "Te devuelvo 110 € dentro de un año". ¿Qué crees que son esos 10 € de más y por qué crees que te los da?**
+RESULT_FINAL success 4 0.17160140000000002

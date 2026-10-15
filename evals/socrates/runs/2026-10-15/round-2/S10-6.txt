@@ -1,0 +1,47 @@
+USER: fetch solo falla por errores de red, un 404 o 500 es una respuesta normal con res.ok false. por eso getUser tiene que mirar res.ok y lanzar un error con el id y el status. como getUser es async ese throw rechaza la promesa, y quien llama tiene que hacer await dentro de un try/catch para verlo
+TOOL Bash {"command":"cd <sandbox>/.claude/skills/socrates/references; cat session-recap.md maintaining-domains.md","description":"Read recap and domain-maintenance references"}
+RESULT  # Session recap
+
+Now you may state things directly. Use the user's own words where possible, in their language. Render it as normal Markdown (not insi
+TOOL Write {"file_path":"<sandbox>/.socrates/notes/code/001-fetch-errors-2026-10-15.md","content":"---\nstatus: done\ndomain: code\ntopic: Why fetch does not fail on a 404\nconcepts: [fetch, http-errors, res-ok,
+RESULT ERR  Claude requested permissions to write to <sandbox>/.socrates/notes/code/001-fetch-errors-2026-10-15.md, but you haven't granted it yet.
+TOOL Bash {"command":"rm <sandbox>/.socrates/notes/code/001-fetch-errors-progress.md","description":"Remove old in-progress note (replaced by finished one)"}
+RESULT ERR  rm in '<sandbox>/.socrates/notes/code/001-fetch-errors-progress.md' needs approval. The path is inside the working directories for this session ('<san
+TEXT: Correcto, y completo.
+
+# Por qué `fetch` no falla con un 404 — 2026-10-15
+
+## Conclusiones a las que llegaste
+- `fetch` solo rechaza la promesa con errores de red.
+- Un 404 o un 500 es una respuesta normal: la promesa se resuelve y `res.ok` es `false`.
+- `return res.json()` ignoraba `res.ok` y devolvía el cuerpo igual.
+- `getUser` comprueba `if (!res.ok)` y lanza un `Error` con el id y el status.
+- El mensaje dice lo que sabes, no lo que supones: `'error al pedir usuario ' + id + ': status ' + res.status`.
+- Como `getUser` es async, el `throw` rechaza la promesa. Sin `await` o `catch` nadie lo ve (unhandled rejection).
+- Quien llama: `try { await getUser(9999) } catch (e) { console.error(e.message) }`.
+
+## Preguntas que te llevaron ahí
+1. ¿Qué hace la línea 3 con `res.ok`? → Nada, devuelve el cuerpo igual.
+2. ¿Cómo quedan las líneas 2–4 y qué va en el `Error`? → `if (!res.ok) throw ...` con el id y el status.
+3. ¿Qué diría tu mensaje con un 500? → "no encontrado", que sería mentira, así que lo cambiaste.
+4. Con la línea 6 tal cual, ¿dónde acaba el error? → En la promesa rechazada, sin que nadie lo vea.
+
+## Errores de razonamiento y cómo los corregiste
+- **Supusiste:** cualquier error HTTP hace que `fetch` lance → **Te diste cuenta:** al ver que `getUser(9999)` devolvía `{}` sin error.
+- **Supusiste:** si `res.ok` es `false`, el usuario no existe → **Te diste cuenta:** al pensar en un 500 con un usuario que sí existe.
+
+## Para seguir
+- ¿Qué pasa si llega un 200 pero el cuerpo no es JSON válido? ¿Quién lanza ese error?
+- [MDN JavaScript Guide](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide): sección de promesas y async/await.
+
+---
+
+**No he podido guardar la sesión:** tocaba crear `.socrates/notes/code/001-fetch-errors-2026-10-15.md` y borrar `001-fetch-errors-progress.md`, pero las dos acciones están pendientes de tu permiso. Si lo apruebas, lo hago.
+
+**Siguiente tema:** errores de `res.json()`. Es el mismo patrón (una promesa que se rechaza sin que lo esperes), pero el error ahora sale del cuerpo y no del status. ¿Seguimos con eso?
+
+**Mejoras para `.socrates/domains/code.md`** (¿cuáles añado?):
+1. Error típico nuevo: "Pensar que si `!res.ok`, el recurso no existe (un 500 no es un 404)."
+2. Error típico nuevo: "Lanzar un error dentro de una función async sin que quien la llama haga `await`/`catch`: acaba como unhandled rejection."
+3. Pregunta que funcionó bien, para una guía `code/fetch-errors.md`: "Con un 500, ¿qué diría tu mensaje y sería cierto?"
+RESULT_FINAL success 4 0.37963140000000006
