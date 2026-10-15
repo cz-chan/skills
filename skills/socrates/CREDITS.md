@@ -1,0 +1,1 @@
+- [skills.sh - bevibing](https://www.skills.sh/bevibing/socrates-skill/socrates)
