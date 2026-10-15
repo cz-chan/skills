@@ -147,7 +147,7 @@ const summary = [
 									{files.map((file) => (
 										<li>
 											<a
-												href={`${base}files/${fileSlugOf(file.path)}/`}
+												href={`${base}${fileSlugOf(file.path)}/`}
 												aria-current={
 													file.path === currentFile ? "page" : undefined
 												}

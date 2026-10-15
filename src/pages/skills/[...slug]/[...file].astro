@@ -1,13 +1,20 @@
 ---
 import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
-import { listSkillFiles, renderSkillFile, SKILLS_DIR } from "@container";
-import { fileSlugOf } from "@domain/services/skillFiles";
+import { listSkillDetails, listSkillFiles, renderSkillFile, SKILLS_DIR } from "@container";
+import { fileRouteConflictOf, fileSlugOf } from "@domain/services/skillFiles";
 import SkillLayout from "@presentation/layouts/SkillLayout/SkillLayout.astro";
 import FileHeader from "@presentation/components/skills/FileHeader/FileHeader.astro";
 import Prose from "@presentation/components/ui/Prose/Prose.astro";
 
 export const getStaticPaths = (async () => {
 	const files = await listSkillFiles.execute();
+	// Sin prefijo files/, una URL repetida haría que una página tape a otra sin avisar.
+	const skillIds = (await listSkillDetails.execute()).map(({ skill }) => skill.id);
+	const conflicts = files.flatMap(({ detail, file }) => {
+		const reason = fileRouteConflictOf(detail.skill.id, file.path, skillIds);
+		return reason ? [`${SKILLS_DIR}/${detail.skill.id}/${file.path}: ${reason}`] : [];
+	});
+	if (conflicts.length) throw new Error(`URLs de ficheros en conflicto:\n${conflicts.join("\n")}`);
 	return files.map((entry) => ({
 		params: { slug: entry.detail.skill.id, file: fileSlugOf(entry.file.path) },
 		props: { ...entry },

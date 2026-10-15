@@ -19,3 +19,14 @@ export function fileSlugOf(path: string): string {
 export function fileNameOf(path: string): string {
 	return path.slice(path.lastIndexOf("/") + 1);
 }
+
+/**
+ * Motivo por el que la URL de un fichero pisaría otra página, o undefined si está libre.
+ * Los ficheros comparten /skills/<id>/ con tests/, versions/ y las skills anidadas.
+ */
+export function fileRouteConflictOf(skillId: string, path: string, skillIds: string[]): string | undefined {
+	const slug = fileSlugOf(path);
+	if (slug === "tests") return "pisa la página de tests";
+	if (slug.startsWith("versions/")) return "pisa las páginas de versiones";
+	if (skillIds.includes(`${skillId}/${slug}`)) return `pisa la skill ${skillId}/${slug}`;
+}
