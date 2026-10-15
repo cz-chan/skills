@@ -4,6 +4,12 @@
 	min-width: 0;
 }
 
+.selects {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem 1rem;
+}
+
 .label {
 	display: flex;
 	align-items: center;

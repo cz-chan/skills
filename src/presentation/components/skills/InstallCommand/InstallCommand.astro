@@ -28,33 +28,68 @@ const targets = [
 		warning: "Some agents only read .agents.",
 	},
 ];
-const commandFor = (dir: string) => `mkdir -p ${dir} && cp -r ${path} ${dir}/`;
+
+/** Scripts de public/: descargan la skill de GitHub en el proyecto del usuario. */
+const systems = [
+	{
+		id: "unix",
+		label: "macOS / Linux",
+		command: (skill: string, dir: string) =>
+			`curl -fsSL ${new URL("/install.sh", Astro.site)} | sh -s ${skill} ${dir}`,
+	},
+	{
+		id: "windows",
+		label: "Windows",
+		// irm | iex no admite argumentos; el scriptblock sí.
+		command: (skill: string, dir: string) =>
+			`& ([scriptblock]::Create((irm ${new URL("/install.ps1", Astro.site)}))) ${skill} ${dir}`,
+	},
+];
+
+const skill = path.replace(/^skills\//, "");
+// Un comando por combinación "<sistema>:<carpeta>"; el script del cliente elige.
+const commands = Object.fromEntries(
+	systems.flatMap((s) =>
+		targets.map((t) => [`${s.id}:${t.id}`, s.command(skill, t.dir)]),
+	),
+);
 ---
 
 <div
 	class={styles.install}
 	data-install
+	data-commands={JSON.stringify(commands)}
 >
-	<label class={styles.label}>
-		install for
-		<select
-			class={styles.select}
-			data-install-target
-		>
-			{
-				targets.map((t) => (
-					<option
-						value={t.id}
-						data-command={commandFor(t.dir)}
-						data-warning={t.warning}
-					>
-						{t.label}
-					</option>
-				))
-			}
-		</select>
-	</label>
-	<CopyButton text={commandFor(targets[0].dir)} />
+	<div class={styles.selects}>
+		<label class={styles.label}>
+			install for
+			<select
+				class={styles.select}
+				data-install-target
+			>
+				{
+					targets.map((t) => (
+						<option
+							value={t.id}
+							data-warning={t.warning}
+						>
+							{t.label}
+						</option>
+					))
+				}
+			</select>
+		</label>
+		<label class={styles.label}>
+			on
+			<select
+				class={styles.select}
+				data-install-os
+			>
+				{systems.map((s) => <option value={s.id}>{s.label}</option>)}
+			</select>
+		</label>
+	</div>
+	<CopyButton text={commands[`${systems[0].id}:${targets[0].id}`]} />
 	<p
 		class={styles.warning}
 		data-install-warning
@@ -64,43 +99,70 @@ const commandFor = (dir: string) => `mkdir -p ${dir} && cp -r ${path} ${dir}/`;
 </div>
 
 <script>
-	const KEY = "install-target";
+	const KEYS = { target: "install-target", os: "install-os" } as const;
+
+	const load = (key: string) => {
+		try {
+			return localStorage.getItem(key);
+		} catch {
+			return null;
+		}
+	};
+	const save = (key: string, value: string) => {
+		try {
+			localStorage.setItem(key, value);
+		} catch {}
+	};
 
 	// astro:page-load: también tras navegar con el ClientRouter, no solo en la primera carga.
 	document.addEventListener("astro:page-load", () => {
-		let saved: string | null = null;
-		try {
-			saved = localStorage.getItem(KEY);
-		} catch {}
+		const savedTarget = load(KEYS.target);
+		// Sin preferencia guardada, se adivina por el navegador.
+		const savedOs =
+			load(KEYS.os) ??
+			(/Win/i.test(navigator.userAgent) ? "windows" : null);
 
 		document
 			.querySelectorAll<HTMLElement>("[data-install]")
 			.forEach((install) => {
-				const select = install.querySelector<HTMLSelectElement>(
+				const target = install.querySelector<HTMLSelectElement>(
 					"[data-install-target]",
+				);
+				const os = install.querySelector<HTMLSelectElement>(
+					"[data-install-os]",
 				);
 				const code = install.querySelector("code");
 				const button = install.querySelector<HTMLButtonElement>("[data-copy]");
 				const warning = install.querySelector<HTMLElement>(
 					"[data-install-warning]",
 				);
-				if (!select || !code || !button) return;
+				if (!target || !os || !code || !button) return;
 
+				const commands: Record<string, string> = JSON.parse(
+					install.dataset.commands ?? "{}",
+				);
+				const restore = (select: HTMLSelectElement, value: string | null) => {
+					if (value && [...select.options].some((o) => o.value === value))
+						select.value = value;
+				};
 				const apply = () => {
-					const command = select.selectedOptions[0]?.dataset.command ?? "";
+					const command = commands[`${os.value}:${target.value}`] ?? "";
 					code.textContent = command;
 					button.dataset.copy = command;
 					if (warning)
-						warning.textContent = `⚠ ${select.selectedOptions[0]?.dataset.warning ?? ""}`;
+						warning.textContent = `⚠ ${target.selectedOptions[0]?.dataset.warning ?? ""}`;
 				};
-				if (saved && [...select.options].some((o) => o.value === saved))
-					select.value = saved;
+
+				restore(target, savedTarget);
+				restore(os, savedOs);
 				apply();
-				select.addEventListener("change", () => {
+				target.addEventListener("change", () => {
 					apply();
-					try {
-						localStorage.setItem(KEY, select.value);
-					} catch {}
+					save(KEYS.target, target.value);
+				});
+				os.addEventListener("change", () => {
+					apply();
+					save(KEYS.os, os.value);
 				});
 			});
 	});
