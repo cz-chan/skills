@@ -1,8 +1,8 @@
 import type { TestTranscript } from "../entities/TestReport";
 
-const RUN_FILE = /^(T\d+)(?:-(\d+))?\.txt$/;
+const RUN_FILE = /^([A-Z]+\d+)(?:-(\d+))?\.txt$/;
 
-/** "T7-12.txt" → { caseId: "T7", turn: 12 }; "T1.txt" → { caseId: "T1" }; otro → undefined. */
+/** "T7-12.txt" → { caseId: "T7", turn: 12 }; "S1.txt" → { caseId: "S1" }; otro → undefined. */
 export function parseRunFile(name: string): { caseId: string; turn?: number } | undefined {
   const match = name.match(RUN_FILE);
   if (!match) return undefined;
@@ -19,7 +19,7 @@ export function groupTranscripts(files: { name: string; text: string }[]): TestT
     transcript.turns.push({ turn: parsed.turn, text: file.text });
     byCase.set(parsed.caseId, transcript);
   }
-  const number = (id: string) => Number(id.slice(1));
+  const number = (id: string) => Number(id.replace(/^\D+/, ""));
   for (const t of byCase.values()) t.turns.sort((a, b) => (a.turn ?? 0) - (b.turn ?? 0));
   return [...byCase.values()].sort((a, b) => number(a.caseId) - number(b.caseId));
 }
