@@ -10,13 +10,13 @@
 		"new": "bun scripts/new-skill.ts"
 	},
 	"dependencies": {
-		"@astrojs/markdown-satteri": "0.4.3",
+		"@astrojs/markdown-satteri": "0.4.6",
 		"@astrojs/sitemap": "3.7.4",
-		"astro": "7.3.8"
+		"astro": "7.4.4"
 	},
 	"devDependencies": {
-		"@astrojs/check": "0.9.10",
-		"@types/bun": "1.4.2",
+		"@astrojs/check": "0.9.12",
+		"@types/bun": "1.4.4",
 		"typescript": "6.0.3"
 	}
 }
