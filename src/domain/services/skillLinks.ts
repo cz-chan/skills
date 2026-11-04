@@ -21,6 +21,5 @@ export function skillLinkOf(source: string, href: string, isSkill: (dir: string)
 
 	const path = resolved.slice(id.length + 1);
 	if (path === "SKILL.md") return `/skills/${id}/${rest}`;
-	if (path === "CREDITS.md") return;
 	return `/skills/${id}/${fileSlugOf(path)}/${rest}`;
 }

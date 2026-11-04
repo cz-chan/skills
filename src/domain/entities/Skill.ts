@@ -18,7 +18,7 @@ export interface Skill {
   createdAt: Date;
   /** metadata.updatedAt del SKILL.md, si lo tiene. */
   updatedAt?: Date;
-  credits?: SkillLink[];
+  credits: SkillLink[];
   links: SkillLink[];
   files: SkillFile[];
 }

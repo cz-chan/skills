@@ -1,17 +1,16 @@
 import { getCollection, getEntry, type CollectionEntry } from "astro:content";
-import type { Skill, SkillFile, SkillLink } from "@domain/entities/Skill";
+import type { Skill, SkillFile } from "@domain/entities/Skill";
 import type { SkillRepository } from "@domain/repositories/SkillRepository";
-import { parseCredits } from "@domain/services/skillCredits";
 import { fileTitleOf } from "@domain/services/skillFiles";
 import { ownerOf } from "@domain/services/skillPaths";
 
-const toSkill = (entry: CollectionEntry<"skills">, files: SkillFile[], credits?: SkillLink[]): Skill => ({
+const toSkill = (entry: CollectionEntry<"skills">, files: SkillFile[]): Skill => ({
   id: entry.id,
   name: entry.data.name,
   description: entry.data.description,
   createdAt: entry.data.metadata.created,
   updatedAt: entry.data.metadata.updatedAt,
-  credits,
+  credits: entry.data.credits,
   links: entry.data.links,
   files,
 });
@@ -19,14 +18,8 @@ const toSkill = (entry: CollectionEntry<"skills">, files: SkillFile[], credits?:
 export class ContentSkillRepository implements SkillRepository {
   async findAll(): Promise<Skill[]> {
     const entries = await getCollection("skills");
-    const credits = new Map(
-      (await getCollection("credits")).map((entry) => [
-        entry.id,
-        parseCredits(entry.body ?? "", `skills/${entry.id}/CREDITS.md`),
-      ]),
-    );
     const files = await this.filesBySkill(entries.map((entry) => entry.id));
-    return entries.map((entry) => toSkill(entry, files.get(entry.id) ?? [], credits.get(entry.id)));
+    return entries.map((entry) => toSkill(entry, files.get(entry.id) ?? []));
   }
 
   async bodyOf(id: string): Promise<string> {

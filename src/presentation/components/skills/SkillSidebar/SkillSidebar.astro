@@ -28,7 +28,7 @@ const base = `/skills/${skill.id}/`;
 const folders = Map.groupBy(skill.files, (file) => folderOf(file.path));
 const viewingSkill = !current && !currentFile && !currentTests;
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
-const linkCount = (skill.credits?.length ?? 0) + skill.links.length;
+const linkCount = skill.credits.length + skill.links.length;
 // Resumen del desplegable en móvil
 const summary = [
 	skill.files.length > 0 && plural(skill.files.length + 1, "file"),
@@ -184,10 +184,10 @@ const summary = [
 
 		<LinkList
 			title="credits"
-			links={skill.credits ?? []}
+			links={skill.credits}
 		/>
 		<LinkList
-			title="related"
+			title="dogfooding"
 			links={skill.links}
 		/>
 

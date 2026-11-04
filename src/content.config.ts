@@ -2,7 +2,7 @@ import { defineCollection } from "astro:content";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
-/** Enlace externo: recurso relacionado. */
+/** Enlace externo. */
 const link = z.object({
   title: z.string(),
   url: z.url(),
@@ -28,25 +28,17 @@ const skills = defineCollection({
           .optional(),
       })
       .catchall(z.string()),
-    /** Recursos relacionados. */
+    /** Agradecimientos. */
+    credits: z.array(link).default([]),
+    /** Proyectos donde se ha usado la skill. */
     links: z.array(link).default([]),
   }),
 });
 
-/** Agradecimientos: CREDITS.md junto al SKILL.md, sin frontmatter. El agente no lo carga. */
-const credits = defineCollection({
-  loader: glob({
-    pattern: "**/CREDITS.md",
-    base: "./skills",
-    generateId: ({ entry }) => entry.replace(/\/?CREDITS\.md$/, ""),
-  }),
-  schema: z.object({}),
-});
-
-/** Ficheros extra de una skill (references/, domains/…): cualquier .md salvo SKILL.md y CREDITS.md. */
+/** Ficheros extra de una skill (references/, domains/…): cualquier .md salvo SKILL.md. */
 const files = defineCollection({
   loader: glob({
-    pattern: ["**/*.md", "!**/SKILL.md", "!**/CREDITS.md"],
+    pattern: ["**/*.md", "!**/SKILL.md"],
     base: "./skills",
     generateId: ({ entry }) => entry,
   }),
@@ -74,4 +66,4 @@ const tests = defineCollection({
   }),
 });
 
-export const collections = { skills, credits, files, tests };
+export const collections = { skills, files, tests };
