@@ -1,1 +1,0 @@
-- [anthropics / skills](https://github.com/anthropics/skills/tree/main)

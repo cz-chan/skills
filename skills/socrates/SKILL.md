@@ -4,6 +4,9 @@ description: "Socratic method teaching skill that guides users to discover answe
 metadata:
   created: "2026-10-09"
   updatedAt: "2026-10-15"
+credits:
+  - title: "skills.sh - bevibing"
+    url: "https://www.skills.sh/bevibing/socrates-skill/socrates"
 ---
 
 # Socratic Method Teaching
