@@ -1,0 +1,77 @@
+TOOL Skill {"skill":"code-mentor","args":"quiero hacer un botón de likes con Neon para aprender bases de datos. soy principiante: yo escribo el esquema y las queries y tú el resto. explícamelo con detalle y con 
+RESULT  Launching skill: code-mentor
+TOOL Bash {"command":"git status --short; git log -5 --oneline; ls -la; find . -path ./node_modules -prune -o -type f -not -path './.git/*' -print | head -100","description":"Show repo status, history and files
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  No files found
+RESULT  17d2edd fixture: initial state
+total 32
+drwxr-xr-x@ 10 user  wheel  320 Nov  4 14:50 .
+drwxr-xr-x@  9 user  wheel  288 Nov  4 14:50 ..
+drwxr-xr-x@  3 
+TOOL Read {"file_path":"<sandbox>/.claude/skills/code-mentor/references/memory-example.md"}
+RESULT  1	# Memory file examples
+2	
+3	Examples of how to write files in `.code-mentor/memory/` (see section 6 of `SKILL.md`).
+4	This file is a reference only 
+TOOL Bash {"command":"cat package.json .gitignore src/index.ts; echo ---; ls -a src runs; ls node_modules 2>/dev/null | head; ls .env* 2>/dev/null; echo ---; cat reset.sh","description":"Show package config, en
+RESULT  {
+  "name": "c12z-demo",
+  "type": "module",
+  "dependencies": {
+    "hono": "4.6.0",
+    "@neondatabase/serverless": "0.10.0"
+  }
+}
+runs/
+import { Ho
+TEXT: Antes de empezar, confirmemos cómo lo repartimos. No he creado ni cambiado nada todavía.
+
+## Acuerdo
+
+```text
+Objetivo: botón de likes en c12z para aprender bases de datos.
+Tú:       esquema (la tabla) y queries SQL (sumar un like y leer el contador).
+Yo:       guía para Neon, conexión, ruta /api/likes en Hono, botón y prueba.
+Listo:    pulsas → el contador sube → recargas → sigue igual.
+Explicaciones: con detalle y con ejemplos.
+```
+
+```text
+[Botón] ──clic──▶ [POST /api/likes] ──tu SQL──▶ [Neon]
+  yo                     yo                    tabla y queries: TÚ
+   ▲                                              │
+   └────────────── { count: 8 } ◀─────────────────┘
+
+Al recargar: [Página] ──▶ [GET /api/likes] ──tu SQL──▶ [Neon]
+```
+
+El contador se mantiene porque el número se guarda en Neon, no en la página.
+
+## Lo que asumo
+- **Código:** te lo doy en la consola, explicado, y tú lo pegas. Si prefieres que yo escriba mi parte en los archivos, dímelo.
+- **Neon:** la cuenta y la clave de conexión son tuyas, así que esos pasos los haces tú con mi guía. No me pegues la clave en el chat: irá en `.env`.
+- **Likes:** hay un solo contador y cada clic suma 1, sin usuarios ni límite por persona. Así te centras en lo básico de SQL.
+- **Preparación:** falta instalar dependencias, porque no hay `node_modules`, y tampoco hay un script para arrancar la app. Además, `.gitignore` no incluye `.env` ni `node_modules`. Te daré esos cambios en el primer paso y te pediré permiso antes de instalar nada.
+
+## Tres preguntas
+
+**1. ¿El acuerdo te parece bien?**
+- a) Sí
+- b) Sí, pero escribe tú mi parte en los archivos
+- c) Quiero cambiar algo (dime qué)
+
+**2. ¿Cuál se parece más a tu nivel con bases de datos?**
+- a) Nunca he usado una ni he escrito SQL
+- b) Sé lo que es una tabla, pero casi no he escrito SQL
+- c) He escrito `SELECT` e `INSERT` sencillos, pero nunca he creado una tabla
+- d) He creado tablas y usado SQL en algún proyecto
+
+**3. ¿Añado `.code-mentor/` a `.gitignore`?**
+
+Guardaré tu progreso entre sesiones en `.code-mentor/memory/databases/0001-neon-likes-progress.md`. Va en la raíz del proyecto porque las escrituras en `.claude/` y `.agents/` están bloqueadas. Si aceptas el acuerdo, creo este archivo.
+- a) Sí, que quede fuera de git
+- b) No, quiero guardarlo en git
+- c) Prefiero que no crees el archivo
+
+Responde, por ejemplo, `1a 2b 3a`. Con eso empezamos por la primera explicación, con ejemplos, y el primer paso.
+RESULT_FINAL success 7 0.3340302

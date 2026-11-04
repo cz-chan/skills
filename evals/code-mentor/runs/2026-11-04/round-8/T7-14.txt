@@ -1,0 +1,56 @@
+TEXT: Lo explico de otra forma, siguiendo un solo clic.
+
+La app tiene tres partes, y cada una corre en un sitio distinto:
+
+```
+NAVEGADOR    la página que ve el usuario
+SERVIDOR     tu código de Hono
+NEON         la base de datos, donde está el total
+```
+
+El navegador no habla directamente con Neon: le pide las cosas al servidor, y el servidor habla con Neon.
+
+```
+NAVEGADOR ──── falta ────▶ SERVIDOR ──── hecho ────▶ NEON
+                                       (src/db.ts)
+```
+
+Tu `src/db.ts` ya cubre el tramo de la derecha. **En este paso solo construimos el de la izquierda.**
+
+## Un clic, paso a paso
+Supón que el total en Neon es 41 y alguien hace clic:
+
+```
+1. NAVEGADOR   El script avisa al servidor:
+               fetch('/api/likes', { method: 'POST' })
+
+2. SERVIDOR    Llega el aviso, y la ruta llama a tu función:
+               addLike()
+
+3. NEON        Se ejecuta tu UPDATE:
+               total pasa de 41 a 42
+
+4. SERVIDOR    addLike() devuelve 42, y la ruta contesta:
+               { "total": 42 }
+
+5. NAVEGADOR   El script recibe el 42 y lo muestra en el botón:
+               ❤ 42
+```
+
+Los pasos 3 y parte del 4 ya los escribiste tú. Lo que falta es lo que los rodea: el botón y su script (1 y 5), y la ruta (2 y 4).
+
+## Por qué hay dos tipos de petición
+Hay dos momentos distintos, y cada uno hace algo diferente:
+
+| Momento | Qué necesita | Petición | Tu función |
+|---|---|---|---|
+| Abrir o recargar la página | Ver el total | `GET` | `getLikes()` |
+| Hacer clic | Sumar uno | `POST` | `addLike()` |
+
+Si alguien recarga con el total en 42, se hace un `GET`, que solo lee. El botón muestra 42 y nada cambia.
+
+## Lo que vas a hacer
+Solo vas a pegar el código que te daré en `src/index.ts`. No tienes que escribir la ruta ni el botón.
+
+¿Te queda claro ahora? Si no, dime en qué punto te pierdes, aunque sea solo un número del clic. Si sí, ¿empezamos con el código?
+RESULT_FINAL success 1 0.40870760000000006

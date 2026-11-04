@@ -1,0 +1,36 @@
+TEXT: Hasta ahora todo ha sido leer y decidir, así que cambiamos de método: vas a ejecutar una tabla de prueba y ver cómo responde Postgres. No hace falta que decidas ni escribas nada, y al final la borramos.
+
+Abre el **SQL Editor** de tu proyecto en Neon y ejecuta cada bloque por separado. Yo no he podido ejecutarlos, así que lo que indico es lo que debería salir.
+
+**1. Crea la tabla.** Le das a Postgres la lista de columnas:
+```sql
+CREATE TABLE prueba_libros (
+  isbn    text PRIMARY KEY,
+  titulo  text NOT NULL
+);
+```
+Debería terminar sin error. Si dice que la tabla ya existe, para y avísame.
+
+**2. Guarda un libro correcto.** `INSERT` añade una fila y `SELECT` muestra lo que hay:
+```sql
+INSERT INTO prueba_libros (isbn, titulo) VALUES ('978-1', 'Dune');
+SELECT * FROM prueba_libros;
+```
+Deberías ver una fila: `978-1 | Dune`. Esa fila es lo que luego será un like en tu tabla.
+
+**3. Guarda un libro sin título.** Aquí provocamos un error a propósito:
+```sql
+INSERT INTO prueba_libros (isbn) VALUES ('978-2');
+```
+Debería fallar, porque `titulo` tiene `NOT NULL` y no le has dado valor.
+
+**4. Borra la tabla de prueba.** Así no queda nada en tu base de datos:
+```sql
+DROP TABLE prueba_libros;
+```
+
+## Qué necesito de ti
+Pégame **lo que te devuelve el bloque 3**, tal cual, aunque no lo entiendas. Lo leeremos juntos y, a partir de ahí, volvemos a tu tabla.
+
+Si te atascas antes, dime en qué bloque y qué ves en pantalla. Si no sabes abrir el SQL Editor o no tienes acceso a Neon desde esta máquina, dímelo también, porque entonces empezamos por eso.
+RESULT_FINAL success 1 0.8131268300000001

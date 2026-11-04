@@ -1,0 +1,84 @@
+TOOL Skill {"skill":"code-mentor","args":"quiero hacer la primera función de PLAN.md para aprender bases de datos"}
+RESULT  Launching skill: code-mentor
+TOOL Bash {"command":"git status; git log -5; ls -la; find .code-mentor -type f 2>/dev/null; cat .gitignore 2>/dev/null","description":"Show repo state, files and any learning progress"}
+TOOL Read {"file_path":"<sandbox>/PLAN.md"}
+RESULT  1	# Plan: Recetario
+2	
+3	App para guardar recetas y compartirlas con un enlace público.
+4	
+5	## Stack
+6	
+7	- Hono en el servidor
+8	- Postgres en Neon
+
+RESULT  On branch main
+nothing to commit, working tree clean
+commit a3a4fb2979ce4e876641a24347269ab39ff7db5e
+Author: fixture <fixture@local>
+Date:   Wed Nov 4
+TOOL Glob {"pattern":"**/*"}
+RESULT  .git/info/exclude
+.git/description
+.git/hooks/commit-msg.sample
+.git/hooks/pre-rebase.sample
+.git/hooks/sendemail-validate.sample
+.git/hooks/pre-commi
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TEXT: Modo guiado: **crear una receta (título e ingredientes)**, guardada en Neon. El repo tiene una app Hono mínima y aún no usa la base de datos. `@neondatabase/serverless` está en `package.json`, pero sin instalar.
+
+Done propuesto: `POST` con título e ingredientes → responde con el `id` → la receta sigue en Neon tras reiniciar el servidor.
+
+Ojo: `src/index.ts` tiene un `TODO: /api/likes` que no aparece en el plan. Lo dejo fuera.
+
+Antes de cerrar el acuerdo, necesito 3 respuestas:
+
+**1. ¿Qué nivel tienes en bases de datos?**
+- a) Nunca he usado SQL
+- b) He hecho `SELECT`/`INSERT` sueltos, pero nunca he conectado una app
+- c) He conectado apps y diseñado tablas simples
+- d) Diseño esquemas e índices con soltura
+
+**2. ¿Qué parte haces en cada pieza?**
+- **T** = la escribes tú
+- **G** = la escribes tú con mi guía
+- **C** = te doy el código para pegar
+
+| Pieza | Mi propuesta |
+| --- | --- |
+| Crear el proyecto en Neon y la variable de entorno | G |
+| Conexión desde el código | G |
+| Esquema (`CREATE TABLE`) | G |
+| Query `INSERT` | G |
+| Ruta `POST` en Hono y validación básica | C |
+| Test de comprobación | C |
+
+Responde "ok" o indica los cambios, por ejemplo: "ruta G".
+
+**3. ¿Tienes cuenta en Neon?**
+- a) Sí, con un proyecto que puedo usar
+- b) Sí, pero sin proyecto para esto
+- c) No, la creo ahora
+- d) No, y prefiero otra opción
+
+Ejemplo de respuesta: `1b, ok, 3c`.
+RESULT_FINAL success 8 0.2873254

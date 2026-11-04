@@ -1,0 +1,110 @@
+TOOL Bash {"command":"git status --short; ls -la db; cat db/schema.sql","description":"Show working tree status and the current schema file"}
+RESULT   M .gitignore
+?? db/
+total 8
+drwxr-xr-x@  3 user  wheel   96 Nov  4 14:53 .
+drwxr-xr-x@ 12 user  wheel  384 Nov  4 14:53 ..
+-rw-r--r--@  1 user  wheel
+TOOL Agent {"subagent_type":"web-fetch","description":"Verify PostgreSQL query docs links","prompt":"Fetch each of these URLs and report, for each one: whether it loads (no 404, no redirect to a home page), its 
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/dml-update.html","prompt":"Report the page title. Does the page cover UPDATE, including SET with an expression using the current column value? Quote the
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/dml-returning.html","prompt":"Report the page title. Does the page cover RETURNING on UPDATE? Quote the sentence that addresses RETURNING with UPDATE, i
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/tutorial-select.html","prompt":"Report the page title. Does the page cover basic SELECT with WHERE? Quote the sentence that addresses the WHERE clause, 
+RESULT  Fetched https://www.postgresql.org/docs/current/dml-update.html (HTTP 200 OK, text/html, 6305 characters).
+The text inside the <fetched-web-content> t
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/transaction-iso.html","prompt":"Report the page title. Does the page cover Read Committed behavior for concurrent UPDATE? Quote the sentence stating tha
+RESULT  Fetched https://www.postgresql.org/docs/current/dml-returning.html (HTTP 200 OK, text/html, 7217 characters).
+The text inside the <fetched-web-content
+RESULT  Fetched https://www.postgresql.org/docs/current/transaction-iso.html (HTTP 200 OK, text/html, 29049 characters).
+The text inside the <fetched-web-cont
+RESULT  Fetched https://www.postgresql.org/docs/current/tutorial-select.html (HTTP 200 OK, text/html, 7666 characters).
+The text inside the <fetched-web-conte
+RESULT  [{"type":"text","text":"  [Harness note, not part of the agent's report: WebFetch saved no files during this run. In this run WebFetch saved files onl
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Next: learner chooses to continue or stop; if continue, explain with a traced examp
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- `db/schema.sql` (to be created by the learner), `src/index.ts`\n","new_string":"-
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- PostgreSQL — Inserting Data: https://www.postgresql.org/docs/current/dml-insert.h
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: Sin commit. No sé qué parte no pillaste, así que supongo que fue lo de ejecutar `schema.sql` dos veces. Si era otra cosa, dímelo.
+
+## Ejecutar `schema.sql` dos veces
+
+Imagina que tu contador ya va por 5 y vuelves a ejecutar el archivo:
+
+```
+Sentencia      Qué intenta             Qué ocurre
+CREATE TABLE   crear la tabla likes    ERROR: ya existe
+INSERT         crear la fila id = 1    ERROR: ese id ya existe
+
+Tabla después: id=1, total=5  (no cambia)
+```
+
+Según la herramienta, puede parar en el primer error, pero el resultado es el mismo: tu total sigue en 5. Por eso `schema.sql` se ejecuta **una sola vez**, para preparar la base de datos.
+
+## Paso 2: sumar un like y leer el total
+
+Necesitas dos queries:
+- **Clic en el botón:** suma 1 y devuelve el total nuevo.
+- **Cargar la página:** lee el total.
+
+### El problema de dos clics a la vez
+
+Es la pregunta que marcaste como "no lo sé". Lo más obvio es hacerlo en dos pasos: leer el total y luego guardar ese valor más 1. Ana y Beto hacen clic a la vez, con `total = 7`:
+
+```
+Momento   Ana                     Beto                    total en la BD
+1         lee total → 7                                   7
+2                                 lee total → 7           7
+3         guarda 7 + 1 = 8                                8
+4                                 guarda 7 + 1 = 8        8   ← debería ser 9
+```
+
+Hubo dos clics, pero el total solo subió 1. Beto calculó con un 7 que ya estaba viejo, y no aparece ningún error.
+
+### La solución: que la suma la haga la base de datos
+
+En vez de enviar un número ya calculado ("guarda 8"), envías la operación ("suma 1 a lo que haya"). Es una sola sentencia, y Postgres bloquea la fila mientras se aplica:
+
+```
+Momento   Ana                     Beto                    total en la BD
+1         suma 1 (bloquea fila)   espera                  8
+2         termina                 espera                  8
+3                                 suma 1 sobre el 8       9   ← correcto
+```
+
+Beto ya no puede usar un valor viejo, porque espera y parte del 8.
+
+### La sintaxis
+
+```sql
+UPDATE tabla SET columna = nuevo_valor WHERE condicion RETURNING columna;
+
+SELECT columna FROM tabla WHERE condicion;
+```
+
+| Pieza | Qué hace | Ejemplo con `total = 7` |
+|---|---|---|
+| `SET` | Indica el valor nuevo, que puede usar el valor actual de la columna | `SET precio = precio * 2` duplica el precio de cada fila afectada |
+| `WHERE` | Elige qué filas se ven afectadas | `WHERE id = 1` → solo esa fila |
+| `RETURNING` | Devuelve datos de la fila ya modificada, sin hacer otra query | `RETURNING total` → devuelve `8` |
+| `SELECT` | Solo lee, no cambia nada | `SELECT total …` → devuelve `7` |
+
+`RETURNING` también evita un fallo: si después del `UPDATE` hicieras un `SELECT` aparte, otro clic podría colarse entre ambos y mostrarte un total que no corresponde a tu clic.
+
+**Cuidado con `WHERE`:** sin él, un `UPDATE` cambia **todas** las filas de la tabla. Aquí solo hay una, pero acostúmbrate a ponerlo siempre.
+
+## Tu turno
+
+Crea `db/queries.sql` con estas dos queries sobre tu tabla `likes`:
+
+1. **Sumar un like:** suma 1 a `total` en la fila con `id` 1 y devuelve el total nuevo. Así el botón puede mostrarlo sin hacer otra query.
+2. **Leer el total:** obtiene `total` de esa misma fila. Esta query no modifica nada, así que puedes recargar la página sin sumar likes.
+
+Son dos líneas. Dime "listo" y las reviso leyéndolas; tampoco podremos ejecutarlas hasta tener Neon. Cuando puedas, partiendo de `total = 0`, la primera debe devolver `1`, y la segunda también `1`.
+
+Si quieres profundizar por tu cuenta, estas páginas oficiales están en inglés:
+- [UPDATE](https://www.postgresql.org/docs/current/dml-update.html)
+- [RETURNING](https://www.postgresql.org/docs/current/dml-returning.html)
+- [SELECT con WHERE](https://www.postgresql.org/docs/current/tutorial-select.html)
+- [Actualizaciones simultáneas (Read Committed)](https://www.postgresql.org/docs/current/transaction-iso.html)
+RESULT_FINAL success 6 1.550465395

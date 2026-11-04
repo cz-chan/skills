@@ -1,0 +1,55 @@
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","offset":1,"limit":35}
+RESULT  1	---
+2	status: in-progress
+3	topic: Like button with Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: trainee
+6	mode: 
+TOOL Write {"file_path":"<sandbox>/db/schema.sql","content":"-- Esquema de la DB. Los pasos 4 y 5 insertarán y contarán sobre esta tabla.\n-- Escribe aquí tu CREATE TABLE likes:\n\n"}
+RESULT  File created successfully at: <sandbox>/db/schema.sql (file state is current in your context — no need to Read it back)
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Step 3: design the `likes` table. Next: decide the columns\n(`post_id`, `created_at
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"updated: 2026-10-13","new_string":"updated: 2026-11-04"}
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: Hecho: creé `db/schema.sql`, vacío para tu tabla, y anoté en el progreso que los pasos 1 y 2 están en tu otra máquina.
+
+## Qué necesitas saber
+La forma general de crear una tabla es esta:
+
+```
+CREATE TABLE nombre (
+  columna1 tipo opciones,
+  columna2 tipo opciones
+);
+```
+
+Las columnas van separadas por comas, sin coma tras la última, y el `;` cierra la instrucción.
+
+**Piezas para tus columnas:**
+
+| Pieza | Qué hace | Por qué la quieres |
+|---|---|---|
+| `text` | Tipo: texto de cualquier largo | Para `post_id`, como `hola-mundo` |
+| `bigint` | Tipo: número entero grande | Para `id` |
+| `timestamptz` | Tipo: fecha y hora con zona horaria | Para `created_at`; es el mismo instante esté donde esté el servidor |
+| `GENERATED ALWAYS AS IDENTITY` | La DB numera cada fila: 1, 2, 3… | Tú nunca eliges el `id` |
+| `PRIMARY KEY` | El valor es único e identifica la fila | Marca `id` como identificador |
+| `NOT NULL` | Prohíbe dejar la columna vacía | Un like sin post no significa nada |
+| `DEFAULT now()` | Si no envías valor, usa la hora actual | La DB rellena `created_at` |
+
+## Qué debe pasar
+Cuando en el paso 4 guardes un like enviando solo `post_id = 'hola-mundo'`:
+
+| Columna | Valor | Quién lo pone |
+|---|---|---|
+| `id` | 1 | La DB numera |
+| `post_id` | `hola-mundo` | Tú |
+| `created_at` | 2026-11-04 10:00 | La DB usa la hora actual |
+
+Si envías un like sin `post_id`, la DB lo rechaza con un error. Así no se guardan datos que luego no podrías contar.
+
+## Qué hacer ahora
+1. Abre `db/schema.sql`.
+2. Escribe el `CREATE TABLE likes` con `id`, `post_id` y `created_at`, usando las piezas de la tabla. Para cada columna, pregúntate quién pone el valor.
+3. **No lo ejecutes todavía.** Avísame y lo reviso antes: después lo correrás en el SQL Editor de Neon, que funciona en el navegador y no necesita tu `.env`.
+RESULT_FINAL success 5 0.597813185

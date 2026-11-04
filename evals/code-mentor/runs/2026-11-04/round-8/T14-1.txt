@@ -1,0 +1,127 @@
+TOOL Bash {"command":"git log --stat -n 3 && git status --short && ls -la","description":"Show recent commits and project files"}
+RESULT  commit e938ce857f335644b908290f552c971247694b7f
+Author: fixture <fixture@local>
+Date:   Wed Nov 4 19:27:30 2026 +0100
+
+    wip
+
+ .../memory/databases/
+TOOL Glob {"pattern":"**/*","path":"~/.claude/projects/-private-tmp-claude-501--Users-user-Desktop-projects-prod-cz-skills-a54ea246-387e-4d48-b65f-5594c8587ebd-scratchpad-final-language/memory"}
+RESULT  No files found
+TOOL Grep {"pattern":"TODO|FIXME|WIP|learning|progress","-i":true,"glob":"!node_modules/**","output_mode":"content","head_limit":30}
+RESULT  src/index.ts:7:// TODO: /api/likes
+.code-mentor/memory/databases/0001-neon-likes-progress.md:2:status: in-progress
+.code-mentor/memory/databases/0001-
+TOOL Skill {"skill":"code-mentor","args":"continuemos"}
+RESULT  Launching skill: code-mentor
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Botón de likes con Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: junior
+6	mode:
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Bash {"command":"cat package.json; echo ---; cat .gitignore; echo ---; cat reset.sh; echo ---; ls -a src; find src -type f; echo ---; test -e .env && echo \".env existe\" || echo \".env no existe\"; ls -d 
+RESULT  {
+  "name": "c12z-demo",
+  "type": "module",
+  "dependencies": {
+    "hono": "4.6.0",
+    "@neondatabase/serverless": "0.10.0"
+  }
+}
+---
+runs/
+---
+#!/
+TOOL Agent {"description":"Verify two docs links","subagent_type":"web-fetch","prompt":"Fetch these two pages. For each, report: did it load (not a 404 or redirect to a home page), final URL, page title, and in 
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-basics.html","prompt":"Report the page title, and state in one line whether this page covers basics of creating a table in Postgres, including colum
+TOOL WebFetch {"url":"https://neon.com/docs/get-started/query-with-neon-sql-editor","prompt":"Report the page title, and state in one line whether this page covers running SQL in the Neon Console SQL Editor without
+RESULT ERR  Claude requested permissions to use WebFetch, but you haven't granted it yet.
+RESULT ERR  Fetch did not complete within the 300s deadline
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TEXT: Retomo **Botón de likes con Neon**, paso 3. No hay links a docs: no pude comprobarlos (WebFetch sin permiso y timeout).
+
+## Antes de empezar: el repo no coincide con el progreso
+El archivo (actualizado el 13-oct) marca los pasos 1 y 2 como hechos, pero aquí no hay rastro de ellos:
+
+| Según el progreso | En este repo |
+|---|---|
+| `.env` con la connection string | no existe |
+| `src/pages/api/likes.ts` | no existe; solo está `src/index.ts`, con `// TODO: /api/likes` |
+| `SELECT 1` desde Hono | no está en el código |
+| `@neondatabase/serverless` | en `package.json`, pero sin `node_modules` |
+
+Los dos commits son del 4-nov y solo añaden la base del proyecto y el archivo de progreso. No puedo saber si tu proyecto en Neon sigue existiendo.
+
+Además, `.gitignore` solo tiene `runs/`. Cuando crees `.env`, añádelo antes de hacer commit, porque contiene la contraseña de la DB.
+
+## El panorama
+Construimos un botón de likes en c12z.io para que aprendas bases de datos.
+
+```
+[Botón] ──click──▶ [API /likes] ──query──▶ [Neon DB]
+   yo                  yo                     TÚ
+```
+
+- **Hecho, según el archivo:** crear el proyecto en Neon y conectarte desde la API. Ahí aprendiste que la connection string es secreta y solo vive en el servidor.
+- **Ahora:** paso 3, crear la tabla `likes`.
+- **Falta:** insertar un like (4), contar likes por post (5) y conectar botón → API → DB (6).
+
+El paso 2 demostró que la conexión funciona, pero `SELECT 1` no guarda nada. Para guardar likes hace falta un sitio donde ponerlos.
+
+## El problema
+Alguien da like a `hola-mundo` y el contador pasa de 2 a 3. Si ese 3 solo vive en la memoria del servidor o del navegador, se pierde al reiniciar el servidor o recargar la página. Además, ahora mismo la DB no tiene ningún lugar donde escribirlo.
+
+## La idea
+Una **tabla** es una lista de filas con columnas fijas, y cada columna tiene un tipo de dato. Aquí, **cada like es una fila**:
+
+| Evento | `post_id` | `created_at` |
+|---|---|---|
+| click a las 10:00 | `hola-mundo` | 10:00 |
+| click a las 10:05 | `hola-mundo` | 10:05 |
+| click a las 10:07 | `otro-post` | 10:07 |
+
+Para saber los likes de `hola-mundo`, se cuentan sus filas y salen **2**. El número no se guarda: se calcula al preguntar. Como las filas siguen en la DB, recargar la página no cambia nada.
+
+## Por qué así
+Lo obvio sería una sola fila por post con un contador (`hola-mundo | likes = 2`) y sumarle 1 en cada click. Es más simple y más rápido de leer, pero no sabes cuándo ocurrió cada like ni de quién fue. Tampoco podrías evitar likes repetidos más adelante. Una fila por like conserva esa información y te hace practicar el insert y el count que quieres aprender.
+
+## Qué nos da
+Los pasos 4 y 5 ya tendrán dónde escribir y qué contar.
+
+**Comprobación del paso:** la tabla aparece en Neon con tus columnas y sus tipos, y consultarla devuelve 0 filas sin error.
+
+## Cómo
+
+```
+Tú: columnas ──▶ CREATE TABLE ──▶ lo ejecutas en Neon ──▶ compruebas la tabla
+```
+
+Este paso es todo tuyo:
+1. Decidir las columnas: `post_id`, `created_at` y si incluir `user_id`.
+2. Elegir el tipo de cada columna.
+3. Escribir el `CREATE TABLE`, que es la orden SQL que crea la tabla.
+4. Ejecutarlo en el SQL Editor de Neon, que no necesita `.env`.
+
+Después te daré yo el cableado de la ruta y los tests.
+
+## Dos preguntas
+**1. ¿Qué hacemos con los pasos 1 y 2?**
+- **A.** Están en otro sitio (otra carpeta o máquina): dime dónde.
+- **B.** El proyecto de Neon sigue existiendo, pero hay que rehacer aquí `.env` y la conexión. Te recomiendo esta si es tu caso: hacemos el paso 3 en el SQL Editor y rehacemos la conexión antes del paso 4.
+- **C.** Hay que empezar desde el paso 1. Desmarco los pasos 1 y 2 en el archivo.
+
+**2. ¿Te queda claro y empezamos a escribir código?**
+RESULT_FINAL success 10 0.41576875999999996

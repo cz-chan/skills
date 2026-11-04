@@ -1,0 +1,49 @@
+TOOL Read {"file_path":"<sandbox>/.claude/skills/code-mentor/references/memory-example.md"}
+RESULT  1	# Memory file examples
+2	
+3	Examples of how to write files in `.code-mentor/memory/` (see section 6 of `SKILL.md`).
+4	This file is a reference only 
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","limit":35}
+RESULT  1	---
+2	status: in-progress
+3	topic: Like button with Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: junior
+6	mode: g
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Step 3: design the `likes` table. Next: decide the columns\n(`post_id`, `created_at
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"updated: 2026-10-13","new_string":"updated: 2026-11-04"}
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- Hono — Environment variables: <url> (official)\n","new_string":"- Hono — Environm
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: Vale, nos centramos en la tabla. Ya anoté en el progreso que los pasos 1 y 2 están en la otra máquina; hará falta traerlos antes del paso 4.
+
+## Decisión: ¿`user_id`?
+
+- **Sin `user_id` (recomendado):** aquí no veo login, y sin él no hay un usuario que guardar. Lo malo es que una persona puede dar like varias veces. Si luego hay login, se puede añadir la columna.
+- **Con `user_id`:** evitaría duplicados, pero necesitas saber quién es cada usuario, y eso ya es otro tema (auth).
+
+Si tu código de la otra máquina sí tiene login, dímelo y lo revisamos.
+
+## Tu tarea
+
+Escribe el `CREATE TABLE` de `likes` con la forma general:
+
+```sql
+CREATE TABLE nombre_tabla (
+  columna tipo reglas,
+  columna tipo reglas
+);
+```
+
+Cada columna necesita lo siguiente:
+
+1. **`post_id`**
+   - **Tipo:** guarda valores como `hola-mundo`, así que necesitas un tipo de texto.
+   - **Regla:** no puede quedar vacío, porque un like sin post no se podría contar. Busca la regla que lo prohíbe.
+2. **`created_at`**
+   - **Tipo:** guarda fecha y hora. Postgres tiene `timestamp` y `timestamptz`. Recomiendo `timestamptz`, que representa un instante exacto y evita confusiones de zona horaria.
+   - **Regla:** que la rellene la propia base de datos, con un valor por defecto. Así la API no tiene que enviarla y todas las horas salen del mismo reloj. Busca cómo se indica un valor por defecto y qué función da la hora actual.
+
+**Todavía no lo ejecutes en Neon.** Pégalo aquí y lo revisamos juntos, porque cambiar una tabla ya creada da más trabajo que corregir el texto.
+RESULT_FINAL success 6 0.59683646

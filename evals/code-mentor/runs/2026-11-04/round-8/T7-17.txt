@@ -1,0 +1,16 @@
+TOOL Glob {"pattern":".code-mentor/memory/databases/*"}
+RESULT  .code-mentor/memory/databases/0001-neon-likes-progress.md
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Final quiz: asked (which one stops two different people losing a like, `button.disa
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- Stuck on: did not follow the first overview of the step (browser, route and DB to
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: No, la correcta es la **B**.
+
+`button.disabled` corre dentro de cada navegador: bloquea el botón de Ana, pero no sabe nada del de Luis. Solo evita el doble clic de una misma persona.
+
+Con el total en 7, los dos `UPDATE` llegan a Neon a la vez. El de Ana bloquea la fila y deja 8, y el de Luis espera y suma sobre ese 8, así que deja 9. No se pierde ningún like.
+
+Lo he anotado en el registro del paso 4, con esta regla: pregúntate dónde corre una protección y a quién puede ver.
+
+El archivo de progreso sigue con el nombre antiguo, así que aún necesitas ejecutar el `mv` que te pasé. Tarea terminada.
+RESULT_FINAL success 4 0.8674264000000002

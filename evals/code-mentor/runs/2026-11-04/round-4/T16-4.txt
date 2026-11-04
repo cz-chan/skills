@@ -1,0 +1,36 @@
+TOOL Read {"file_path":"<sandbox>/db/schema.sql"}
+RESULT  1	-- Esquema de la DB. Los pasos 4 y 5 insertarán y contarán sobre esta tabla.
+2	-- Escribe aquí tu CREATE TABLE likes:
+3	
+4	
+TEXT: Vamos a hacerlo más pequeño: olvida la tabla entera y piensa solo en una línea. Cada columna es una frase traducida a SQL:
+
+| Lo que dirías en español | En SQL |
+|---|---|
+| "email: texto, obligatorio" | `email text NOT NULL` |
+| "edad: número entero, puede faltar" | `edad integer` |
+| "puntos: número entero, obligatorio, 0 si no lo envían" | `puntos integer NOT NULL DEFAULT 0` |
+
+Primero va el nombre, luego el tipo y al final las reglas. Si una regla no aplica, no se escribe, como en `edad`.
+
+## Un solo paso
+No partas de cero: vas a editar algo que ya funciona, para cambiar solo lo que hace falta.
+
+1. Pega esto en `db/schema.sql`, debajo del comentario:
+
+   ```sql
+   CREATE TABLE productos (
+     id     bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+     nombre text NOT NULL,
+     stock  integer NOT NULL DEFAULT 0
+   );
+   ```
+
+2. Haz solo estos dos cambios:
+   - Cambia `productos` por `likes`, porque es tu tabla.
+   - Cambia `nombre` por `post_id`, porque la frase es la misma: "texto, obligatorio".
+
+La línea de `id` se queda igual, porque tus likes también los numera la DB. La línea de `stock` no la toques todavía; será el siguiente paso.
+
+Guarda y dime "listo". Yo leo el archivo y seguimos con esa última línea. Si algo no te cuadra, dime qué parte y empezamos por ahí.
+RESULT_FINAL success 2 0.777762985

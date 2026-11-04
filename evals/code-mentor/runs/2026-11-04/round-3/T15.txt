@@ -1,0 +1,75 @@
+TOOL Skill {"skill":"code-mentor","args":"léeme lo que he aprendido hasta ahora en la tarea de los likes"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  .code-mentor/memory/databases/0001-neon-likes-progress.md
+TOOL Bash {"command":"git status --short; git log -5 --stat --format='%h %ad %s' --date=short","description":"Show working tree status and recent commits"}
+TOOL Glob {"pattern":"PLAN.md"}
+RESULT  No files found
+RESULT  c1baa7e 2026-11-04 wip likes
+
+ .../memory/databases/0001-neon-likes-progress.md   | 68 ++++++++++++++++++++++
+ 1 file changed, 68 insertions(+)
+87a5b9
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Like button with Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: junior
+6	mode: g
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Glob {"pattern":"src/**/*"}
+RESULT  src/index.ts
+TOOL Bash {"command":"test -f .env && echo \".env exists\" || echo \".env missing\"; cat .gitignore","description":"Check env file exists and show gitignore"}
+RESULT  .env missing
+runs/
+TEXT: Tarea: botón de like con Neon (nivel junior). Pasos 1 y 2 de 6 hechos; siguiente, el 3 (tabla `likes`).
+
+**1. Proyecto Neon + `.env` (12-10-2026)**
+- **Hiciste:** creaste el proyecto y guardaste la connection string en `.env`.
+- **Atasco:** no sabías qué era `?sslmode=require` y lo borraste.
+- **Solución:** repasamos cada parte de la URL y leíste la página "Connect" de Neon.
+- **Lección:**
+  - Una connection string no es solo una dirección: lleva usuario, contraseña, host, nombre de la base de datos y opciones.
+  - `sslmode=require` obliga a cifrar la conexión. Sin él, Neon la rechaza.
+  - Regla: no quites parámetros de la URL sin saber qué hacen.
+  - Si la conexión falla justo tras editar la URL, mira primero qué quitaste.
+
+**2. Conectar desde la API (13-10-2026)**
+- **Hiciste:** `SELECT 1` desde la ruta Hono con `@neondatabase/serverless`.
+- **Atasco:** importaste el cliente de la DB en un componente de navegador, y la connection string llegó al cliente.
+- **Solución:** moviste la query a la ruta del servidor y leíste allí la variable de entorno.
+- **Lección:**
+  - Todo el código del navegador es público: se descarga y cualquiera lo lee en devtools.
+  - La connection string contiene la contraseña, así que solo puede vivir en el servidor.
+  - El cliente habla con la DB únicamente a través de tu API.
+  - Antes de usar un secreto en un archivo, pregúntate dónde se ejecuta ese archivo.
+
+**El repo no coincide con el log:**
+- No existen `.env` ni `src/pages/api/likes.ts`.
+- `src/index.ts` solo tiene `// TODO: /api/likes`, sin rastro del `SELECT 1`.
+- `@neondatabase/serverless` sí está en `package.json`.
+- `.gitignore` no incluye `.env`: añádelo antes de recrearlo, o la contraseña podría acabar en git.
+
+¿Ese código está en otro sitio o rehacemos los pasos 1 y 2 antes de seguir?
+RESULT_FINAL success 11 0.296786

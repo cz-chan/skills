@@ -1,0 +1,65 @@
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","offset":29,"limit":12}
+RESULT  29	## Current step
+30	
+31	Step 3: write the `likes` table.
+32	Problem: the API connects, but nothing stores a like, so a reload loses the count.
+33	Wh
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Next: learner writes the `CREATE TABLE` and pastes it for review before running it\
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: ## La solución
+
+```sql
+CREATE TABLE likes (
+  id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  post_id text NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+```
+
+No la he ejecutado porque no tengo acceso a tu base de datos, así que la prueba de abajo es la que lo confirma.
+
+## Por qué es así
+
+Cada línea es una columna, con la forma `nombre tipo reglas`:
+
+- **`id`**: identifica cada like.
+  - `GENERATED ALWAYS AS IDENTITY` hace que la base de datos ponga 1, 2, 3… y no te deje poner un número a mano.
+  - `PRIMARY KEY` garantiza que no se repita ni esté vacío, así que no hace falta añadir `NOT NULL`.
+- **`post_id`**: dice a qué post pertenece el like. Es `text` porque guarda valores como `hola-mundo`, y `NOT NULL` porque un like sin post no tiene sentido.
+- **`created_at`**: dice cuándo se dio el like. Es `timestamptz` porque guarda un instante exacto, sin depender de la zona horaria del servidor. `DEFAULT now()` lo rellena solo.
+
+## Cómo encaja con lo demás
+
+Como `id` y `created_at` se rellenan solos, la API solo tendrá que enviar `post_id`:
+
+```
+Clic en hola-mundo → la API envía post_id = 'hola-mundo' → fila nueva: id 1, hola-mundo, hora actual
+```
+
+Para saber el total, el paso 5 contará las filas con ese `post_id`.
+
+## Pruébala
+
+Hazlo en el editor SQL de Neon, en tu proyecto:
+
+**1. Crea la tabla** ejecutando el `CREATE TABLE` de arriba.
+
+**2. Inserta una fila de prueba y léela:**
+
+```sql
+INSERT INTO likes (post_id) VALUES ('hola-mundo');
+SELECT * FROM likes;
+```
+
+Debe salir una fila con `id = 1`, `post_id = hola-mundo` y `created_at` con la hora actual.
+
+**3. Borra la fila de prueba** para que no cuente como un like real:
+
+```sql
+DELETE FROM likes WHERE post_id = 'hola-mundo';
+```
+
+El siguiente like tendrá `id = 2`, no 1. Es normal: los números no se reutilizan.
+
+Pégame lo que devuelve el `SELECT`, o el error si falla. El estado de este paso ya está guardado en el progreso.
+RESULT_FINAL success 3 0.853233515

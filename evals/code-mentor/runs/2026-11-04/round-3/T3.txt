@@ -1,0 +1,147 @@
+TOOL Skill {"skill":"code-mentor","args":"seguimos"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  .code-mentor/memory/databases/0001-neon-likes-progress.md
+TOOL Bash {"command":"git status && git log -5 --stat --format='%h %ad %s' --date=iso","description":"Show working tree status and recent commits"}
+TOOL Glob {"pattern":"PLAN.md"}
+RESULT  No files found
+RESULT  On branch main
+nothing to commit, working tree clean
+97582ee 2026-11-04 11:50:56 +0100 wip likes
+
+ .../memory/databases/0001-neon-likes-progress.md   
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Like button with Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: junior
+6	mode: g
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Bash {"command":"ls -a; ls -R src; cat .gitignore; test -f .env && echo \".env exists\" || echo \"no .env\"; test -f .env && (grep -q '^DATABASE_URL=' .env && echo \"DATABASE_URL set\" || echo \"no DATABAS
+RESULT ERR  This command uses shell operators that require approval for safety
+TOOL Read {"file_path":"<sandbox>/reset.sh"}
+RESULT  1	#!/bin/sh
+2	# Copied into the sandbox by setup.sh. Back to the initial commit, no memory.
+3	# Refuses to run anywhere else: it discards uncommitted 
+TOOL Glob {"pattern":"src/**/*"}
+RESULT  src/index.ts
+TOOL Glob {"pattern":".env*"}
+RESULT  No files found
+TOOL Grep {"pattern":"neon|DATABASE_URL|SELECT 1","path":"src","-i":true,"output_mode":"content"}
+RESULT  No matches found
+TOOL Bash {"command":"ls -a","description":"List project root files"}
+RESULT  .
+..
+.claude
+.code-mentor
+.git
+.gitignore
+AGENTS.md
+package.json
+reset.sh
+runs
+src
+TOOL Read {"file_path":"<sandbox>/.gitignore"}
+RESULT  1	runs/
+2	
+TOOL Bash {"command":"git log --all --oneline -- src/pages/api/likes.ts","description":"Check history of the likes route file"}
+RESULT  (Bash completed with no output)
+TOOL Agent {"description":"Verify docs links load","subagent_type":"web-fetch","run_in_background":false,"prompt":"Fetch each URL and report, per URL: does it load (not 404, not a redirect to a home page), the f
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-basics.html","prompt":"Report the page's <title>, whether it loaded (not a 404 or redirect to a home page), and whether it explains what tables, row
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/sql-createtable.html","prompt":"Report the page's <title>, whether it loaded (not a 404 or redirect to a home page), and whether it documents CREATE TAB
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-basics.html (HTTP 200 OK, text/html, 8086 characters).
+The text inside the <fetched-web-content> t
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-default.html","prompt":"Report the page's <title>, whether it loaded (not a 404 or redirect to a home page), and whether it explains column default 
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-default.html (HTTP 200 OK, text/html, 5405 characters).
+The text inside the <fetched-web-content> 
+TOOL WebFetch {"url":"https://neon.com/docs/get-started/query-with-neon-sql-editor","prompt":"Report the page's <title>, whether it loaded (not a 404 or redirect to a home page), and whether it explains how to run 
+RESULT ERR  Claude requested permissions to use WebFetch, but you haven't granted it yet.
+RESULT  Fetched https://www.postgresql.org/docs/current/sql-createtable.html (HTTP 200 OK, text/html, 79832 characters, truncated to the first 39931, then a m
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TEXT: ## Antes de seguir: el repo no coincide con el progreso
+
+El archivo marca los pasos 1 y 2 como hechos (última actualización: 2026-10-13), pero aquí no veo ese trabajo:
+
+| El archivo dice | En el repo |
+|---|---|
+| `.env` con la connection string | No existe |
+| `src/pages/api/likes.ts` con `SELECT 1` | No existe y nunca estuvo en git; `src/index.ts` solo tiene `// TODO: /api/likes` |
+| Cliente de Neon en uso | Está en `package.json`, pero no hay `node_modules` |
+
+No puedo comprobar si tu proyecto de Neon sigue existiendo. Además, `.gitignore` no incluye `.env`; lo añado cuando decidas, para que tu contraseña no acabe en git.
+
+**¿Dónde está ese código?**
+- **A. En otro sitio** (otra máquina o carpeta): lo traes y seguimos.
+- **B. Ya no está** (recomendada si no lo encuentras): hacemos el paso 3 ahora en el SQL Editor de Neon, porque no necesita código. Rehacemos la conexión antes del paso 4. Solo necesitas que el proyecto de Neon siga vivo.
+
+## Dónde estamos
+
+**El panorama:** construimos un botón de like para c12z.io, para que aprendas bases de datos. Al hacer clic, el contador sube y sigue igual tras recargar la página.
+
+- **Hecho, según el archivo:** proyecto de Neon y conexión desde la API. Con eso, tu app ya hablaba con la base de datos, pero esta aún no tenía dónde guardar nada.
+- **Ahora:** paso 3, la tabla `likes`.
+- **Después:** insertar un like, contar likes por post y conectar el botón.
+
+**El problema:** Ana da like al post `hola-mundo`. Si tu API ejecuta un `INSERT` ahora, Postgres responde `relation "likes" does not exist`, porque la tabla no existe.
+
+**La idea:** una *tabla* es como una hoja de cálculo con columnas fijas, y cada *columna* tiene nombre y tipo. El *schema* es esa definición de tablas y columnas. Aquí, cada like es una *fila*:
+
+```
+post_id      created_at
+hola-mundo   2026-11-04 10:00     ← like de Ana
+hola-mundo   2026-11-04 10:05     ← like de Luis
+otro-post    2026-11-04 10:07     ← like de Marta
+```
+
+Los likes de `hola-mundo` son 2, porque hay 2 filas con ese `post_id`. Ese recuento será el paso 5.
+
+**Por qué así:** lo obvio sería una sola columna `likes` que suma 1 en cada post. Es más simple, pero solo guarda el total. No sabrías cuándo llegó cada like ni de quién era, así que tampoco podrías impedir después los likes duplicados. Con una fila por like, conservas esos datos.
+
+**Qué nos da:** los pasos 4 y 5 ya tendrán dónde escribir y qué contar. Lo sabrás cuando esta consulta en Neon devuelva una fila por cada columna que hayas diseñado:
+
+```sql
+SELECT column_name, data_type
+FROM information_schema.columns
+WHERE table_name = 'likes';
+```
+
+**Cómo:**
+
+```
+[Botón] ──clic──▶ [API /api/likes] ──query──▶ [Neon: tabla likes]
+   yo                   yo                    TÚ  ← estás aquí
+```
+
+1. Decides las columnas y sus tipos, incluido si `user_id` hace falta.
+2. Escribes el `CREATE TABLE`.
+3. Lo ejecutas en Neon.
+4. Lanzas la consulta de arriba. Yo la dejo lista y guardo tu SQL en el repo.
+
+Si quieres profundizar por tu cuenta, estas páginas explican lo que vas a hacer (la documentación de Neon no la pude comprobar, así que no la incluyo):
+- [Conceptos básicos de tablas](https://www.postgresql.org/docs/current/ddl-basics.html)
+- [Valores por defecto](https://www.postgresql.org/docs/current/ddl-default.html)
+- [`CREATE TABLE`](https://www.postgresql.org/docs/current/sql-createtable.html)
+
+**¿A o B? ¿Te queda claro y empezamos a escribir código?**
+RESULT_FINAL success 18 0.443284745

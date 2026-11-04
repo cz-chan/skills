@@ -1,0 +1,70 @@
+TOOL Bash {"command":"git status --short; ls schema.sql 2>/dev/null || echo 'no schema.sql'; which psql pg_ctl initdb postgres docker 2>/dev/null || echo 'no local postgres tools'; ls /opt/homebrew/opt 2>/dev/n
+RESULT ERR  This Bash command contains multiple operations. The following part requires approval: git status --short; ls schema.sql || echo 'no schema.sql'; which
+TOOL Glob {"pattern":"*.sql"}
+RESULT  No files found
+TOOL Bash {"command":"git status --short","description":"Show working tree status"}
+TOOL Bash {"command":"which psql","description":"Check whether psql is installed"}
+RESULT ERR  Exit code 1
+psql not found
+RESULT   M .code-mentor/memory/databases/0001-neon-likes-progress.md
+TOOL Write {"file_path":"<sandbox>/schema.sql","content":"-- Una fila por like. El total de un post se obtiene contando sus filas (paso 5).\nCREATE TABLE likes (\n  post_id    text        NOT NULL,              
+RESULT  File created successfully at: <sandbox>/schema.sql (file state is current in your context — no need to Read it back)
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Next: learner picks anonymous likes vs. one like per visitor (recommended: per\nvis
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: He creado `schema.sql` con la opción B, la que recomendé, porque no habías elegido. **Aún no se ha ejecutado**, ni en Neon ni en local, así que el SQL está sin probar.
+
+```sql
+-- Una fila por like. El total de un post se obtiene contando sus filas (paso 5).
+CREATE TABLE likes (
+  post_id    text        NOT NULL,               -- p. ej. 'hola-mundo'
+  user_id    text        NOT NULL,               -- id anónimo de la cookie (lo pone la API)
+  created_at timestamptz NOT NULL DEFAULT now(), -- lo rellena la base de datos
+
+  -- Un visitante solo puede dar un like a cada post: la DB rechaza el duplicado.
+  PRIMARY KEY (post_id, user_id)
+);
+```
+
+## Por qué cada parte
+- **`text`:** los ids son cadenas como `hola-mundo` o `abc`.
+- **`NOT NULL`:** un like sin post o sin visitante no significa nada, así que la DB lo rechaza. `PRIMARY KEY` ya lo exige en sus dos columnas; lo dejo escrito para que se lea mejor.
+- **`timestamptz`:** guarda un instante exacto, así que no depende de la zona horaria de cada servidor.
+- **`DEFAULT now()`:** la hora la pone la DB al insertar. Así hay un solo reloj y tu `INSERT` no tiene que enviarla.
+- **`PRIMARY KEY (post_id, user_id)`:** es la pieza clave. Lo que debe ser único es la pareja, no cada columna por separado:
+
+| Insert | Resultado | Motivo |
+|---|---|---|
+| `(hola-mundo, abc)` | Aceptado | Primera vez |
+| `(hola-mundo, xyz)` | Aceptado | Mismo post, otro visitante |
+| `(neon-intro, abc)` | Aceptado | Mismo visitante, otro post |
+| `(hola-mundo, abc)` | **Rechazado** | Esa pareja ya existe |
+
+Con esta clave no hace falta una columna `id` aparte, porque la pareja ya identifica cada fila.
+
+## Cómo encaja con lo siguiente
+- **Paso 4 (insertar):** un doble click provoca un error de clave duplicada, y tu `INSERT` tendrá que contemplarlo.
+- **Paso 5 (contar):** contarás las filas por `post_id`. La clave también acelera esa búsqueda, porque crea un índice que empieza por `post_id`.
+
+## Tu parte: ejecutarlo
+1. Abre el **SQL Editor** de tu proyecto en Neon. Te sirve porque `psql` no está instalado en esta máquina, así que el comando que te di antes no funcionaría aquí.
+2. Pega el contenido de `schema.sql` y ejecútalo. Solo se puede ejecutar una vez: la segunda da error porque la tabla ya existe.
+3. Comprueba que la tabla quedó bien:
+
+```sql
+SELECT column_name, data_type, is_nullable
+FROM information_schema.columns
+WHERE table_name = 'likes';
+```
+
+Debe devolver estas 3 filas (el orden puede variar):
+
+| column_name | data_type | is_nullable |
+|---|---|---|
+| `post_id` | `text` | `NO` |
+| `user_id` | `text` | `NO` |
+| `created_at` | `timestamp with time zone` | `NO` |
+
+Progreso guardado: el paso 3 sigue abierto hasta que lo ejecutes.
+
+Pégame la salida o el error que te dé y lo cerramos. ¿Te queda clara la clave compuesta, o prefieres que te la explique de otra forma?
+RESULT_FINAL success 7 0.8183098949999998

@@ -1,0 +1,58 @@
+TOOL Skill {"skill":"code-mentor","args":"quiero aprender cómo funciona Redis por dentro construyendo uno desde cero"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  No files found
+TOOL Bash {"command":"git status --short; git log -5 --oneline; ls -a; cat package.json 2>/dev/null; cat PLAN.md 2>/dev/null; which node go rustc python3 redis-cli gcc","description":"Show repo state, files and
+RESULT ERR  Exit code 1
+319479b fixture: initial state
+.
+..
+.claude
+.git
+.gitignore
+AGENTS.md
+package.json
+reset.sh
+runs
+src
+{
+  "name": "c12z-demo",
+  "type": "m
+TEXT: Modo proyecto guiado: tú escribes lo que enseña Redis por dentro y yo te doy el resto en la consola. Antes de empezar necesito cerrar 5 cosas. Responde, por ejemplo, `1b 2a 3a 4: ... 5b`.
+
+**1. ¿Hasta dónde quieres llegar?**
+- a) Básico: `PING`, `ECHO`, `GET`, `SET` y RESP (el protocolo de Redis), usando `redis-cli` real
+- b) Lo anterior + expiración (`SET EX`, `TTL`) y listas o hashes *(recomendado)*
+- c) Lo anterior + persistencia en disco (AOF/RDB)
+- d) Lo anterior + replicación o pub/sub
+
+**2. ¿En qué lenguaje?** Aquí tienes Node 24 y gcc; Go y Rust no están instalados.
+- a) TypeScript/Node: es tu stack, pero Node ya trae el event loop y no lo programarías tú *(recomendado si quieres centrarte en protocolo y estructuras)*
+- b) C: programas el event loop y la memoria, como el Redis real, pero cuesta bastante más
+- c) Go: requiere instalarlo, y sus goroutines también ocultan el event loop
+- d) Rust: requiere instalarlo, y sumarías la curva del lenguaje
+
+**3. ¿Dónde lo creamos?** Este repo es una app Hono y no tiene relación con Redis.
+- a) Repo nuevo y separado *(recomendado)*
+- b) Carpeta `redis/` dentro de este repo
+
+**4. ¿Quién hace cada parte?** Mi propuesta:
+
+| Parte | Quién |
+|---|---|
+| Parser y serializador RESP | Tú |
+| Almacén y comandos | Tú |
+| Expiración | Tú |
+| Servidor TCP y event loop | Tú, con guía |
+| Setup, tests y scripts | Yo te doy el código |
+
+¿Te vale o cambiarías algo? Si eliges 1c o 1d, persistencia y replicación serían tuyas, con guía.
+
+**5. ¿Qué nivel tienes en sockets y protocolos de red?**
+- a) Nunca he usado sockets ni TCP directamente
+- b) Sé qué es TCP, pero apenas he programado con sockets
+- c) He hecho servidores TCP y sé qué es un buffer parcial
+- d) He escrito parsers de protocolos binarios o de red
+
+**Progreso:** lo guardaré en `.code-mentor/memory/databases/0001-build-redis-progress.md`, en la raíz del proyecto, porque las escrituras en `.claude/` y `.agents/` están bloqueadas. ¿Lo creo y añado `.code-mentor/` a `.gitignore` para dejarlo fuera de git?
+RESULT_FINAL success 5 0.2737614

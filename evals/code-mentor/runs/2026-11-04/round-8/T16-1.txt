@@ -1,0 +1,174 @@
+TOOL Bash {"command":"git log --stat -3 && git status --short && ls -la","description":"Show recent commits and repo contents"}
+TOOL Glob {"pattern":"**/*"}
+RESULT  .git/info/exclude
+.git/description
+.git/hooks/commit-msg.sample
+.git/hooks/pre-rebase.sample
+.git/hooks/sendemail-validate.sample
+.git/hooks/pre-commi
+RESULT  commit a68b34be598daf2f5d9e11ff5fdc0be1e9348a00
+Author: fixture <fixture@local>
+Date:   Wed Nov 4 14:50:37 2026 +0100
+
+    wip likes
+
+ .../memory/data
+TOOL Bash {"command":"ls -la ~/.claude/projects/-private-tmp-claude-501--Users-user-Desktop-projects-prod-cz-skills-a54ea246-387e-4d48-b65f-5594c8587ebd-scratchpad-final-solution/memory/ 2>&1","description":"Li
+RESULT  total 0
+drwxr-xr-x@ 2 user  staff   64 Nov  4 14:50 .
+drwxr-xr-x@ 4 user  staff  128 Nov  4 14:50 ..
+TEXT: A learning session is in progress, so I'll load code-mentor.
+TOOL Skill {"skill":"code-mentor","args":"continuemos"}
+RESULT  Launching skill: code-mentor
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Like button with Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: trainee
+6	mode: 
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Bash {"command":"git status --short --ignored; git log -5 --format='%h %ad %s' --date=short; cat .gitignore; for f in .env .env.local src/pages/api/likes.ts PLAN.md node_modules; do [ -e \"$f\" ] && echo \
+RESULT ERR  A variable in this command can't be checked before it runs
+TOOL Agent {"subagent_type":"web-fetch","description":"Verify Postgres and Neon doc links","prompt":"Fetch each URL and report for each: does it load (final URL after redirects), and does it cover the stated thi
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-constraints.html","prompt":"Does this page cover NOT NULL, UNIQUE, and PRIMARY KEY constraints? Quote one short relevant sentence verbatim."}
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/sql-createtable.html","prompt":"Does this page document CREATE TABLE syntax? Quote one short relevant sentence verbatim."}
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-constraints.html (HTTP 200 OK, text/html, 28053 characters).
+The text inside the <fetched-web-cont
+TOOL WebFetch {"url":"https://neon.com/docs/get-started/query-with-neon-sql-editor","prompt":"Does this page explain how to run SQL in Neon's SQL Editor? Quote one short relevant sentence verbatim."}
+RESULT ERR  Claude requested permissions to use WebFetch, but you haven't granted it yet.
+RESULT  Fetched https://www.postgresql.org/docs/current/sql-createtable.html (HTTP 200 OK, text/html, 79832 characters, truncated to the first 39931, then a m
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TOOL Bash {"command":"git status --short --ignored; git log -5 --format='%h %ad %s' --date=short; cat .gitignore; ls -a; ls src src/pages/api/likes.ts .env .env.local PLAN.md node_modules 2>&1 | grep -v '^$'","
+RESULT ERR  This Bash command contains multiple operations. The following part requires approval: grep -v '^$'
+TOOL Grep {"pattern":"neondatabase|DATABASE_URL","glob":"!{runs,.claude}/**","output_mode":"files_with_matches"}
+RESULT  Found 2 files
+.code-mentor/memory/databases/0001-neon-likes-progress.md
+package.json
+TOOL Bash {"command":"git status --short --ignored","description":"Show working tree status including ignored files"}
+RESULT  !! runs/
+TOOL Bash {"command":"ls -a . src","description":"List project root and src contents"}
+RESULT  .:
+.
+..
+.claude
+.code-mentor
+.git
+.gitignore
+AGENTS.md
+package.json
+reset.sh
+runs
+src
+
+src:
+.
+..
+index.ts
+TOOL Read {"file_path":"<sandbox>/.gitignore"}
+RESULT  1	runs/
+2	
+TEXT: # Retomamos: botón de like con Neon
+
+## La foto completa
+Estamos construyendo un botón de like para c12z.io, y el objetivo es que aprendas bases de datos. Estará listo cuando, al hacer clic, el contador suba y siga igual tras recargar.
+
+- ✅ **1.** Proyecto Neon y connection string
+- ✅ **2.** Conexión desde la API (`SELECT 1`)
+- 👉 **3. Tabla `likes` (estamos aquí)**
+- ⬜ **4.** Insertar un like
+- ⬜ **5.** Contar likes por post
+- ⬜ **6.** Conectar botón → API → BD
+
+En el paso 2 comprobaste que la API habla con Neon, pero `SELECT 1` no guarda nada. Ahora hace falta un sitio donde guardar los likes.
+
+## El problema
+Alguien da like al post `hola-mundo`. Hoy hay dos caminos, y ninguno sirve:
+
+- **Insertar en la BD:** falla con `relation "likes" does not exist`, porque la tabla no existe.
+- **Usar una variable en el servidor (`let likes = 3`):** funciona hasta que el servidor se reinicia, y entonces vuelve a 0.
+
+## La idea
+Una **tabla** es una estructura fija: columnas definidas de antemano y una fila por cada dato. Aquí, **cada like es una fila**:
+
+| id | post_id | created_at |
+|---|---|---|
+| 1 | hola-mundo | 2026-11-04 10:00 |
+| 2 | hola-mundo | 2026-11-04 10:01 |
+| 3 | otro-post | 2026-11-04 10:02 |
+
+Con esos datos:
+1. Un clic en `hola-mundo` añade la fila 4.
+2. Contar las filas de `hola-mundo` da 3.
+3. Si el servidor se reinicia, las filas siguen en Neon y el contador sigue en 3.
+
+Dejamos pendiente qué columnas usar. Como estás empezando con esto, decido yo:
+
+- **`id`:** identifica cada fila de forma única. Es la **primary key** (clave primaria).
+- **`post_id`:** indica a qué post pertenece el like. Es obligatoria, porque un like sin post no sirve.
+- **`created_at`:** guarda cuándo ocurrió, y la base de datos la rellena sola.
+- **Sin `user_id` por ahora:** el repo no tiene login, así que estaría siempre vacía. A cambio, una persona puede dar varios likes. Se puede añadir más adelante.
+
+## Por qué así
+Lo obvio sería una sola fila por post con un contador: `hola-mundo | 3`. Es más simple y rápido de leer, pero solo guarda el total y pierde cuándo ocurrió cada like. Además, no te dejaría practicar el `INSERT` y el `COUNT` de los pasos 4 y 5, que es lo que quieres aprender.
+
+## Qué nos da
+Los likes ya tendrán dónde guardarse, y los pasos 4 y 5 podrán escribir y contar datos reales.
+
+**Comprobación del paso:** al ejecutar `SELECT * FROM likes;` debes ver 0 filas y las tres columnas, sin el error `does not exist`.
+
+## Cómo
+```
+[Botón] ──clic──▶ [API /api/likes] ──query──▶ [Neon: tabla likes]
+   yo                   yo                         TÚ ← paso 3
+```
+
+1. Escribes el `CREATE TABLE` con esas tres columnas (unas 5 líneas).
+2. Lo ejecutas en el SQL Editor de Neon, así que este paso no necesita código en la app.
+3. Haces la comprobación de arriba.
+
+Te explicaré los tipos de cada columna cuando empecemos.
+
+## ⚠️ El progreso no coincide con el repo
+El archivo de progreso da por hechos los pasos 1 y 2, pero aquí no veo ese trabajo:
+
+- No existen `.env` ni `src/pages/api/likes.ts`.
+- `src/index.ts` solo tiene `// TODO: /api/likes`.
+- `@neondatabase/serverless` está en `package.json`, pero nada lo importa, y tampoco hay `node_modules`.
+- El commit `wip likes` solo añadió el archivo de progreso.
+
+No puedo comprobar si tu proyecto de Neon existe. Si existe, el paso 3 se puede hacer igual, pero el paso 4 necesitará esa conexión.
+
+Además, `.gitignore` solo incluye `runs/`. Añade `.env` antes de volver a crearlo, porque contiene la contraseña de la BD.
+
+**¿Dónde está ese código?**
+- **A.** En otra rama o en otra máquina: lo traes antes del paso 4.
+- **B.** Se perdió: rehacemos la conexión antes del paso 4 y actualizo el progreso.
+- **C.** No lo sé: lo revisamos juntos.
+
+Si quieres profundizar por tu cuenta, estas páginas oficiales explican lo que vas a hacer:
+- [Restricciones en PostgreSQL](https://www.postgresql.org/docs/current/ddl-constraints.html), incluidas `NOT NULL` y primary key
+- [Referencia de `CREATE TABLE`](https://www.postgresql.org/docs/current/sql-createtable.html)
+
+**¿Te queda claro y quieres empezar a programar?**
+RESULT_FINAL success 16 0.46000743

@@ -1,0 +1,94 @@
+TEXT: Vamos a verlo de otra forma: seguimos los clicks uno a uno y miramos qué hay en la base de datos después de cada uno. Esta vez usamos un post llamado `receta-pan`.
+
+## Qué hay ahora
+La base de datos está vacía: no hay ningún sitio donde guardar un like.
+
+```
+Click en "receta-pan"
+   ──▶ la API intenta guardarlo
+   ──▶ Postgres: "relation "likes" does not exist" (la tabla "likes" no existe)
+   ──▶ el like se pierde
+```
+
+## Qué hacemos en este paso
+Creamos la tabla `likes`. Crear una tabla no guarda ningún like: solo define qué datos tendrá cada uno. Al principio está vacía:
+
+```
+id | post_id | created_at
+---+---------+-----------
+(sin filas)
+```
+
+## Qué pasará después, con la tabla creada
+**Click 1, en `receta-pan`, a las 18:00.** Se añade una fila:
+
+```
+id | post_id    | created_at
+---+------------+-----------
+1  | receta-pan | 18:00
+```
+
+**Click 2, también en `receta-pan`, a las 18:02.** Se añade otra fila, y la primera no cambia:
+
+```
+id | post_id    | created_at
+---+------------+-----------
+1  | receta-pan | 18:00
+2  | receta-pan | 18:02
+```
+
+**Click 3, en otro post, `viaje-roma`, a las 18:05.**
+
+```
+id | post_id    | created_at
+---+------------+-----------
+1  | receta-pan | 18:00
+2  | receta-pan | 18:02
+3  | viaje-roma | 18:05
+```
+
+**¿Cuántos likes tiene `receta-pan`?** Se cuentan sus filas: **2**.
+
+**¿Y si recargas la página?** Las filas siguen guardadas en Neon. Se vuelven a contar y sale **2** otra vez. Eso es lo que queremos conseguir: que el número no se pierda.
+
+## Para qué sirve cada columna
+Cada columna responde a una pregunta sobre el like:
+
+| Columna | Pregunta | Ejemplo | Quién la rellena |
+|---|---|---|---|
+| `id` | ¿Qué fila es? | `2` | Postgres |
+| `post_id` | ¿De qué post es? | `receta-pan` | La API |
+| `created_at` | ¿Cuándo se dio? | `18:02` | Postgres |
+
+No guardamos quién dio el like porque este repo no tiene login. Por eso, una misma persona podrá dar varios likes.
+
+## Por qué no guardar solo el número
+La otra opción sería guardar el total:
+
+```
+post_id    | likes
+-----------+------
+receta-pan | 2
+```
+
+También funciona, pero aquí ya no sabes cuándo llegó cada like. Además, tu objetivo es aprender a insertar y contar filas, y así no lo practicarías.
+
+## Dónde estamos
+```
+1. Conectar con Neon         marcado como hecho (lo revisamos abajo)
+2. Crear la tabla vacía      ◀── ESTAMOS AQUÍ, lo escribes tú
+3. Añadir una fila por click
+4. Contar las filas
+5. Conectar el botón
+```
+
+Esta lista resume el plan, por eso los números no coinciden con los del archivo de progreso. Crear la tabla es el paso 3 de ese archivo.
+
+## La duda sobre lo anterior
+El archivo de progreso dice que ya conectaste la API con Neon, pero en esta carpeta no están ni ese código ni el `.env`. Para crear la tabla no los necesitamos, porque se hace desde la web de Neon. Sí los necesitaremos antes de añadir filas desde la API.
+
+Necesito dos respuestas:
+
+1. **¿Sigues teniendo tu proyecto en la web de Neon?** Sí, no o no lo sé. Puedes mirarlo en tu cuenta.
+2. **¿Te ha quedado claro y empezamos a escribir código?** Si no, dime qué parte se te ha atascado, aunque sea solo una palabra, y la explico de otra manera.
+RESULT_FINAL success 1 0.5143464

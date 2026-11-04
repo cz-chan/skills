@@ -1,0 +1,50 @@
+TOOL Bash {"command":"for t in node npm npx bun deno tsx psql postgres pg_ctl sqlite3 docker; do printf '%s: ' \"$t\"; command -v \"$t\" || echo no; done; node -v 2>/dev/null; ls node_modules 2>/dev/null | head
+RESULT ERR  A variable in this command can't be checked before it runs
+TOOL Read {"file_path":"<sandbox>/.claude/skills/code-mentor/references/memory-example.md"}
+RESULT  1	# Memory file examples
+2	
+3	Examples of how to write files in `.code-mentor/memory/` (see section 6 of `SKILL.md`).
+4	This file is a reference only 
+TOOL Bash {"command":"command -v node npm npx bun deno tsx psql postgres pg_ctl sqlite3 docker","description":"Find which runtimes and database tools are installed"}
+RESULT ERR  This command requires approval
+TOOL Bash {"command":"node -v","description":"Show Node version"}
+TOOL Bash {"command":"ls -a node_modules/@neondatabase node_modules/hono","description":"Check whether dependencies are installed"}
+RESULT ERR  Exit code 1
+ls: node_modules/@neondatabase: No such file or directory
+ls: node_modules/hono: No such file or directory
+RESULT  v24.22.1
+TOOL Bash {"command":"node --no-warnings -e \"const {DatabaseSync}=require('node:sqlite');const d=new DatabaseSync(':memory:');console.log(d.prepare('select sqlite_version() v').get());d.exec('create table t(id
+RESULT ERR  This command requires approval
+TEXT: Sin instalar nada ni tener Neon no podemos probar la app completa aquí: faltan `node_modules` (`hono` y el driver de Neon) y la base de datos. Node 24 sí está, y debería traer SQLite integrado (`node:sqlite`), pero mi prueba quedó sin permiso, así que falta confirmarlo.
+
+Por tus respuestas, empezamos en nivel **trainee**: te explico cada paso con un ejemplo y escribes 10–20 líneas por paso.
+
+**1. ¿Cómo seguimos?**
+- **a) SQLite ahora, Neon después (recomendada):** aprendes tablas, queries y por qué se pierden likes, y lo pruebas todo aquí. SQLite no es Postgres, así que en el paso a Neon habrá que ajustar la conexión y quizá algo de SQL.
+- **b) Escribir ya para Neon, sin ejecutarlo:** es el código final, pero no verías ningún resultado hasta tener Neon. Para aprender es mucho peor.
+- **c) Esperar:** lo hacemos cuando estés en un equipo con Neon y puedas instalar.
+
+**2. ¿Te vale este acuerdo?** (con la opción a)
+
+```
+Goal: botón de likes con contador global, para aprender bases de datos.
+Tú, con mi guía: esquema, queries; luego, Neon + DATABASE_URL + conexión.
+Yo (código en la consola, tú lo pegas): ruta /api/likes, botón.
+Done aquí: un script suma likes y el total sigue tras volver a ejecutarlo.
+Done final: clic → el contador sube y sigue igual al recargar, en Neon.
+```
+
+```
+AHORA (aquí)
+[script de prueba] ──▶ [tus queries] ──▶ [SQLite en un archivo]
+       yo                   TÚ                    TÚ
+
+DESPUÉS (con Neon y permiso para instalar)
+[Botón] ──clic──▶ [/api/likes] ──▶ [tus queries] ──▶ [Neon]
+   yo                  yo               TÚ             TÚ
+```
+
+**3. ¿Añado `.code-mentor/` a `.gitignore`?** Guardaré tu progreso en `.code-mentor/memory/databases/0001-neon-likes-progress.md`, en la raíz del proyecto porque la escritura en `.claude/` y `.agents/` está bloqueada. Responder sí o no aquí no cambia lo del archivo: si no lo quieres, dímelo y no lo creo.
+
+Responde, por ejemplo: `1a, 2 sí, 3 sí`.
+RESULT_FINAL success 7 0.4499212

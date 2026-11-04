@@ -1,0 +1,140 @@
+TOOL Skill {"skill":"code-mentor","args":"seguimos"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  .code-mentor/memory/databases/0001-neon-likes-progress.md
+TOOL Bash {"command":"git status && git log -5 --stat --format='%h %ad %s' --date=iso","description":"Show working tree status and recent commits"}
+TOOL Glob {"pattern":"PLAN.md"}
+RESULT  No files found
+RESULT  On branch main
+nothing to commit, working tree clean
+f9a3995 2026-11-04 14:51:27 +0100 wip likes
+
+ .../memory/databases/0001-neon-likes-progress.md   
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Like button with Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: junior
+6	mode: g
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Bash {"command":"ls -la; ls src; test -f .env && echo \".env exists\" || echo \"no .env\"; cat .gitignore","description":"List project files and check for env file"}
+RESULT  total 32
+drwxr-xr-x@ 11 user  wheel  352 Nov  4 14:51 .
+drwxr-xr-x@  9 user  wheel  288 Nov  4 14:50 ..
+drwxr-xr-x@  3 user  wheel   96 Nov  4 14:50 .
+TOOL Bash {"command":"git branch -a; git stash list; git worktree list | wc -l; test -n \"$DATABASE_URL\" && echo \"DATABASE_URL set\" || echo \"DATABASE_URL unset\"; test -d node_modules && echo \"node_modules
+RESULT ERR  A variable in this command can't be checked before it runs
+TOOL Agent {"description":"Verify Postgres docs links","subagent_type":"web-fetch","prompt":"Fetch these pages and report for each: does it load (final URL, any redirect), and does it cover the stated thing? Quo
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/sql-createtable.html","prompt":"Does this page load and cover CREATE TABLE syntax? Quote one short sentence from the page that shows the CREATE TABLE sy
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-constraints.html","prompt":"Does this page load and cover NOT NULL, primary key, and unique constraints? Quote one short sentence from the page that
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-constraints.html (HTTP 200 OK, text/html, 28053 characters).
+The text inside the <fetched-web-cont
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/datatype-datetime.html","prompt":"Does this page load and cover timestamptz / timestamp with time zone? Quote one short sentence about timestamp with ti
+RESULT  Fetched https://www.postgresql.org/docs/current/datatype-datetime.html (HTTP 200 OK, text/html, 34470 characters).
+The text inside the <fetched-web-co
+RESULT  Fetched https://www.postgresql.org/docs/current/sql-createtable.html (HTTP 200 OK, text/html, 79832 characters, truncated to the first 39931, then a m
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TOOL Bash {"command":"git branch -a; git stash list; git log --all --oneline -- src/pages .env; ls node_modules >/dev/null 2>&1 && echo \"node_modules yes\" || echo \"node_modules no\"; printenv DATABASE_URL >/
+RESULT ERR  This Bash command contains multiple operations. The following part requires approval: printenv DATABASE_URL
+TOOL Bash {"command":"git branch -a; git stash list; git log --all --oneline -- src/pages .env; ls node_modules >/dev/null 2>&1 && echo \"node_modules yes\" || echo \"node_modules no\"","description":"Look for 
+RESULT  * main
+node_modules no
+TEXT: **Antes de seguir: el progress file no coincide con el repo.** Dice que los pasos 1 y 2 están hechos, pero aquí no veo ese trabajo:
+
+| El archivo dice | En el repo |
+|---|---|
+| Connection string en `.env` | No hay `.env` |
+| Ruta en `src/pages/api/likes.ts` con `SELECT 1` | No existe. `src/index.ts:7` sigue con `// TODO: /api/likes` |
+
+- **Dónde más miré:** no hay otras ramas ni stash, y el commit `wip likes` solo añade el progress file.
+- **Dependencias:** `@neondatabase/serverless` está en `package.json`, pero no hay `node_modules`.
+- **Sin comprobar:** si tu proyecto de Neon existe, y si tienes `DATABASE_URL` en tu shell.
+- **Riesgo:** `.gitignore` solo tiene `runs/`. Si creas `.env` ahora, tu contraseña podría acabar en git.
+
+## Dónde estamos
+
+**El cuadro completo:** estamos haciendo un botón de like para c12z.io, para que aprendas bases de datos. Tú escribes lo de la base de datos; yo te doy la UI, el cableado de la ruta y los tests.
+
+```
+1. Neon + .env          ✓ según el archivo, no está en este repo
+2. Conectar desde API   ✓ según el archivo, no está en este repo
+3. Tabla likes          ← aquí
+4. Insertar un like
+5. Contar likes por post
+6. Botón → API → DB
+```
+
+El paso 2 solo comprobaba que Postgres responde con `SELECT 1`. Ahora necesitas un sitio donde guardar datos.
+
+**El problema:** alguien da like a `hola-mundo` y el contador pasa de 4 a 5. Recarga la página y vuelve a 4, porque el 5 solo vivía en memoria. Una base de datos vacía tampoco lo arregla: sin tabla, el `INSERT` falla con `relation "likes" does not exist`.
+
+**La idea:** una tabla es una lista de filas con columnas fijas, y el esquema define esas columnas. Cada like es una fila:
+
+```
+post_id      created_at
+hola-mundo   2026-11-04 10:00
+hola-mundo   2026-11-04 10:05
+otro-post    2026-11-04 10:07
+```
+
+Para saber cuántos likes tiene `hola-mundo`, Postgres cuenta sus filas: 2. Un clic más añade una fila y el total pasa a 3. Las filas siguen en Neon aunque recargues o reinicies la app.
+
+**Por qué así:** lo obvio sería una columna `count` por post, a la que sumas 1 en cada clic. Es más simple y sirve si solo quieres el número. Pero solo guarda el total, así que nunca sabrás cuándo llegó cada like ni quién lo dio. Tampoco podrías impedir que alguien dé like dos veces. Con una fila por like, esa información se conserva.
+
+**Qué nos da:** los pasos 4 y 5 tendrán dónde escribir y qué contar. Al terminar, esta comprobación debe mostrar tus columnas con su tipo:
+
+```
+psql "$DATABASE_URL" -c '\d likes'
+```
+
+Si no tienes `psql`, ejecuta en el SQL Editor de Neon una consulta a `information_schema.columns` filtrando por `table_name = 'likes'`.
+
+**Cómo:**
+
+```
+[Botón] ──clic──▶ [API /likes] ──query──▶ [tabla likes en Neon]
+   yo                  yo                      TÚ (este paso)
+```
+
+1. Decides las columnas: `post_id`, `created_at` y si hace falta `user_id`.
+2. Eliges el tipo de cada una y si puede quedar vacía.
+3. Escribes el `CREATE TABLE` y lo ejecutas en Neon.
+4. Lo verificas con la comprobación de arriba.
+
+Si quieres adelantarte, esto explica lo que vas a usar:
+- [CREATE TABLE](https://www.postgresql.org/docs/current/sql-createtable.html)
+- [Constraints: NOT NULL, UNIQUE, PRIMARY KEY](https://www.postgresql.org/docs/current/ddl-constraints.html)
+- [Tipos de fecha y hora](https://www.postgresql.org/docs/current/datatype-datetime.html)
+
+## Dos preguntas
+
+**1. ¿Qué hacemos con los pasos 1 y 2?** Después ajusto el progress file a lo que elijas.
+- **a)** El código está en otra carpeta o máquina y lo traes.
+- **b)** Los rehacemos ahora, que ya los conoces y debería ser rápido.
+- **c)** Hacemos ya el paso 3 en el SQL Editor de Neon y rehacemos la conexión antes del paso 4. Solo sirve si tu proyecto de Neon sigue existiendo.
+
+Recomiendo **c** si el proyecto existe: el paso 3 no necesita código local y no pierdes el hilo. Si no existe, **b**.
+
+**2. ¿Te queda claro y empezamos a escribir código?**
+RESULT_FINAL success 14 0.413576275

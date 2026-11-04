@@ -1,0 +1,148 @@
+TOOL Bash {"command":"git log --stat -n 5; git status --short --branch; ls -la","description":"Show recent commits, status, and files"}
+TOOL Glob {"pattern":"**/*"}
+RESULT  .git/info/exclude
+.git/description
+.git/hooks/commit-msg.sample
+.git/hooks/pre-rebase.sample
+.git/hooks/sendemail-validate.sample
+.git/hooks/pre-commi
+RESULT  commit 1c14d28c236e1fc832bfa047b2c37bdd8a2f0402
+Author: fixture <fixture@local>
+Date:   Wed Nov 4 19:27:30 2026 +0100
+
+    wip
+
+ .../memory/databases/
+TOOL Bash {"command":"ls -la ~/.claude/projects/-private-tmp-claude-501--Users-user-Desktop-projects-prod-cz-skills-a54ea246-387e-4d48-b65f-5594c8587ebd-scratchpad-final-console/memory/ 2>&1","description":"Lis
+RESULT  total 0
+drwxr-xr-x@ 2 user  staff   64 Nov  4 14:50 .
+drwxr-xr-x@ 7 user  staff  224 Nov  4 19:27 ..
+TEXT: A learning session is in progress, so I'll load code-mentor.
+TOOL Skill {"skill":"code-mentor","args":"continuemos"}
+RESULT  Launching skill: code-mentor
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Like button with Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: junior
+6	mode: g
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Bash {"command":"for f in .env src/pages/api/likes.ts node_modules; do [ -e \"$f\" ] && echo \"$f: exists\" || echo \"$f: missing\"; done; cat .gitignore; git ls-files src; grep -rlE \"neondatabase|sslmode
+RESULT ERR  A variable in this command can't be checked before it runs
+TOOL Bash {"command":"ls -a . src; ls src/pages/api 2>&1; cat .gitignore; git ls-files src","description":"List project files and ignore rules"}
+RESULT  .:
+.
+..
+.claude
+.code-mentor
+.git
+.gitignore
+AGENTS.md
+package.json
+reset.sh
+runs
+src
+
+src:
+.
+..
+index.ts
+ls: src/pages/api: No such file or directory
+TOOL Grep {"pattern":"neondatabase|sslmode|DATABASE_URL","path":"src"}
+RESULT  No files found
+TEXT: Retomamos **botón de like con Neon**, paso 3 (última actualización: 2026-10-13).
+
+## ⚠️ El repo no coincide con el progreso
+El archivo marca los pasos 1 y 2 como hechos, pero aquí no están:
+- **Faltan:** `.env`, `src/pages/api/likes.ts` y `node_modules`.
+- **`src/`:** solo tiene `index.ts`, con `// TODO: /api/likes`, y ninguna referencia a Neon.
+- **Commits:** el único posterior a esa fecha (`wip`) solo añade el archivo de progreso.
+
+No puedo comprobar desde aquí si tu proyecto de Neon existe.
+
+## Visión general
+Construimos un botón de like para c12z.io, y el objetivo es que aprendas bases de datos. Tú escribes lo de la base de datos y yo te doy el botón, la ruta y los tests.
+
+- **Hecho, según el archivo:** proyecto Neon + `.env` y conexión desde la API (`SELECT 1`).
+- **Ahora:** 3. Crear la tabla `likes`.
+- **Después:** 4. Insertar un like → 5. Contar likes por post → 6. Conectar botón, API y base de datos.
+
+El paso 2 demostró que puedes hablar con la base de datos, pero aún no hay dónde guardar nada.
+
+## El problema
+Alguien hace clic en like en el post `hola-mundo`. La API intenta guardarlo y Postgres responde:
+
+```
+ERROR: relation "likes" does not exist
+```
+
+Una tabla es una estructura con columnas definidas, y hay que crearla antes de guardar datos. Por eso no podemos hacer el paso 4 sin este.
+
+## La idea
+Cada like es **una fila**, y el total es **el número de filas** de ese post:
+
+| Evento | `post_id` | `created_at` |
+|---|---|---|
+| Clic a las 10:00 | `hola-mundo` | 10:00 |
+| Clic a las 10:05 | `hola-mundo` | 10:05 |
+| Clic a las 10:07 | `otro-post` | 10:07 |
+
+Contar las de `hola-mundo` da **2**. Si recargas la página, sigue dando 2, porque las filas están en Neon y no en el navegador ni en la memoria del servidor.
+
+## Por qué así
+La alternativa obvia es guardar un solo número por post: `hola-mundo → 2`. Es más simple, pero solo sabes el total. No sabes cuándo llegó cada like ni quién lo dio, así que tampoco podrías evitar duplicados por usuario.
+
+Con una fila por like, esos datos quedan guardados. El contador sigue siendo válido cuando hay muchísimo tráfico, pero aquí no hace falta.
+
+## Qué nos da
+Tendrás dónde guardar likes y los pasos 4 y 5 ya tendrán tabla sobre la que trabajar.
+
+**Comprobación final**, en el SQL Editor de Neon:
+
+```sql
+SELECT * FROM likes;
+```
+
+Debe devolver 0 filas, sin error.
+
+## Cómo
+
+```
+[Botón] ──clic──▶ [API /likes] ──query──▶ [Neon: tabla likes]
+   yo                 yo                     TÚ ← ahora
+```
+
+Este paso es todo tuyo:
+1. **Decidir las columnas:** `post_id`, `created_at` y quizá `user_id`. Sobre esta última te daré dos opciones y una recomendación.
+2. **Elegir los tipos de cada columna:** definen qué datos acepta cada una.
+3. **Escribir y ejecutar `CREATE TABLE`:** el SQL Editor de Neon te sirve aunque aquí falte el `.env`, si el proyecto existe.
+4. **Pasar la comprobación final.**
+
+## Antes de empezar
+1. **¿Qué pasó con los pasos 1 y 2?**
+   - **A)** Están en otra copia o rama: me dices dónde y seguimos.
+   - **B)** Se perdieron: los rehacemos primero, y actualizo el progreso.
+   - **C)** Tienes el proyecto en Neon: hacemos ya el paso 3 en su SQL Editor y dejamos la conexión para después.
+2. **¿Te queda claro el plan y empezamos a programar?**
+RESULT_FINAL success 12 0.38057080000000004

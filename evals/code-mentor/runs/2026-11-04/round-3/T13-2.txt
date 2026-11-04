@@ -1,0 +1,102 @@
+TOOL Read {"file_path":"<sandbox>/.gitignore"}
+RESULT  1	runs/
+2	
+TOOL Bash {"command":"node -v; npm -v; npm view @hono/node-server version peerDependencies engines --json; npm view tsx version engines --json; npm view @neondatabase/serverless@0.10.0 version engines --json","
+RESULT ERR  This Bash command contains multiple operations. The following parts require approval: npm -v, npm view @hono/node-server version peerDependencies engi
+TOOL Agent {"subagent_type":"web-fetch","description":"Verify Neon and Postgres doc links","prompt":"Fetch each URL and for each report: final URL after redirects, whether it loaded (not 404 / not redirected to 
+TOOL WebFetch {"url":"https://neon.com/docs/get-started/signing-up","prompt":"Report the final URL, whether the page loaded as real documentation (not a 404 or home page redirect), and summarize in 1-2 sentences wh
+RESULT ERR  Claude requested permissions to use WebFetch, but you haven't granted it yet.
+TOOL WebFetch {"url":"https://neon.com/docs/connect/connect-from-any-app","prompt":"Report the final URL, whether the page loaded as real documentation (not a 404 or home page redirect), and summarize in 1-2 senten
+RESULT ERR  Claude requested permissions to use WebFetch, but you haven't granted it yet.
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/tutorial-concepts.html","prompt":"Report the final URL, whether the page loaded as real documentation (not a 404 or home page redirect), and summarize i
+RESULT  Fetched https://www.postgresql.org/docs/current/tutorial-concepts.html (HTTP 200 OK, text/html, 4845 characters).
+The text inside the <fetched-web-con
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.gitignore","old_string":"runs/\n","new_string":"runs/\n.code-mentor/\n.env\nnode_modules/\n"}
+RESULT  The file <sandbox>/.gitignore has been updated successfully. (file state is current in your context — no need to Read it back)
+TOOL Write {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","content":"---\nstatus: in-progress\ntopic: Like button with Neon\nconcepts: [postgres, neon, sql-schema, sql-queries
+RESULT  File created successfully at: <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md (file state is current in your context — no need to 
+TEXT: He añadido `.code-mentor/`, `.env` y `node_modules/` a `.gitignore`. Los dos últimos no me los pediste: `.env` guardará tu contraseña y no debe llegar a git. Tu progreso está en `.code-mentor/memory/databases/0001-neon-likes-progress.md`, en la raíz, porque las escrituras en `.claude/` y `.agents/` se bloquean.
+
+No respondiste a cuánto SQL sabes, así que empiezo desde cero. Si ya sabes algo, dímelo y voy más rápido.
+
+## Por qué hace falta una base de datos
+
+Imagina que guardas el contador en una variable del servidor:
+
+```ts
+let likes = 0
+```
+
+| Acción | Valor de `likes` |
+|---|---|
+| Arranca el servidor | 0 |
+| 3 clics | 3 |
+| Recargas la página | 3 (el servidor sigue vivo) |
+| Se reinicia el servidor | **0: se perdieron los likes** |
+
+La variable vive en la memoria del proceso y desaparece con él. Una **base de datos** es otro programa que guarda los datos en disco, separado de tu app. Tu app se reinicia y los datos siguen allí.
+
+**Postgres** es esa base de datos, y **Neon** te da un servidor Postgres en la nube, así que no tienes que instalar nada.
+
+Para hablar con Postgres se usa **SQL**, un lenguaje con el que le pides cosas a la base de datos. Los datos se guardan en **tablas**: filas y columnas, con el tipo de dato de cada columna fijado. Por ejemplo, esta tabla no es de tu proyecto:
+
+```
+usuarios
+ id | nombre
+----+-------
+  1 | Ana
+  2 | Luis
+```
+
+## El plan
+
+```
+[Botón] ──clic──▶ [Ruta /api/likes] ──conexión──▶ [Neon: queries + tabla]
+   yo                    yo                yo            TÚ
+```
+
+1. **Tú:** creas el proyecto en Neon y guardas la connection string. ← ahora
+2. **Yo:** instalo las dependencias y compruebo la conexión.
+3. **Tú:** escribes el esquema (la tabla).
+4. **Tú:** escribes la query que suma un like.
+5. **Tú:** escribes la query que lee el contador.
+6. **Yo:** conecto el botón, la ruta y tus queries, y probamos que el contador sobrevive a una recarga.
+
+## Paso 1: tu proyecto en Neon
+
+La **connection string** es una URL con todo lo necesario para conectarse. Este ejemplo es inventado:
+
+```
+postgresql://ana:****@ep-ejemplo-123.eu-central-1.aws.neon.tech/neondb?sslmode=require
+             │   │       │                                         │      │
+          usuario │     host: la dirección del servidor       base de    conexión
+              contraseña                                       datos     cifrada
+```
+
+Contiene tu contraseña: quien la tenga puede leer y borrar tus datos. Por eso va en `.env`, un archivo fuera de git que solo lee el servidor.
+
+**Qué tienes que hacer:**
+
+1. Entra en [console.neon.tech](https://console.neon.tech) y crea una cuenta, si no tienes.
+2. Crea un proyecto, con la región más cercana a ti.
+3. Pulsa **Connect** y copia la connection string. La interfaz puede haber cambiado un poco, porque esto lo escribo de memoria.
+4. Crea un archivo `.env` en la raíz del proyecto con una sola línea, usando tu string real:
+   ```
+   DATABASE_URL=postgresql://...
+   ```
+5. Comprueba que está bien con este comando, que no muestra el secreto:
+   ```sh
+   grep -c '^DATABASE_URL=postgres' .env
+   ```
+   Debe imprimir `1`.
+
+No pegues la string en el chat.
+
+Si quieres profundizar por tu cuenta en tablas y filas, está [Conceptos de PostgreSQL](https://www.postgresql.org/docs/current/tutorial-concepts.html) (oficial, en inglés y algo técnico). No te enlazo la documentación de Neon porque no pude abrirla para comprobarla.
+
+## Dos cosas que necesito de ti
+
+1. **¿Me dejas instalar las dependencias?** Haría `npm install` para las que ya están en `package.json`, y añadiría `@hono/node-server` (ejecuta Hono en Node) y `tsx` (ejecuta TypeScript), ambas con versión exacta. No pude consultar las versiones porque `npm view` necesita tu aprobación, así que apruébalo también cuando te lo pida.
+2. **¿Te queda claro el paso 1?** Avísame cuando `grep` imprima `1`, o dime dónde te atascas.
+RESULT_FINAL success 6 0.525275485

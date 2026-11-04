@@ -1,0 +1,111 @@
+TOOL Bash {"command":"git log --stat -3 && git show HEAD && git status --short && ls -a","description":"Show recent commits, last diff and files"}
+RESULT  commit 23d5ac2b8bfaf0ef1b2ca16be61153468ef6d898
+Author: fixture <fixture@local>
+Date:   Wed Nov 4 14:19:24 2026 +0100
+
+    wip likes
+
+ .../memory/data
+TOOL Glob {"pattern":"**/*","path":"~/.claude/projects/-private-tmp-claude-501--Users-user-Desktop-projects-prod-cz-skills-a54ea246-387e-4d48-b65f-5594c8587ebd-scratchpad-sol-2/memory"}
+RESULT  No files found
+TOOL Grep {"pattern":"TODO|FIXME|WIP|likes","-i":true,"output_mode":"content","glob":"!node_modules"}
+RESULT  src/index.ts:7:// TODO: /api/likes
+.claude/skills/code-mentor/SKILL.md:137:[Button] ──click──▶ [API /likes] ──query──▶ [Neon DB]
+.claude/skills/code-m
+TEXT: This is a code-mentor session in progress, so I'm loading the skill.
+TOOL Skill {"skill":"code-mentor","args":"continuemos"}
+RESULT  Launching skill: code-mentor
+TOOL Bash {"command":"git status --short; git log -5 --format='%h %ad %s' --date=short; echo ---; cat src/index.ts; echo ---; cat package.json; echo ---; cat .gitignore; echo ---; cat reset.sh; echo ---; ls -R 
+RESULT  23d5ac2 2026-11-04 wip likes
+932c06f 2026-11-04 fixture: initial state
+---
+import { Hono } from 'hono'
+
+const app = new Hono()
+
+app.get('/', (c) => c.
+TOOL Bash {"command":"git branch -a; git stash list | wc -l; git remote -v; git tag","description":"List branches, stashes, remotes and tags"}
+RESULT  * main
+       0
+fixture-initial
+TOOL Agent {"subagent_type":"web-fetch","description":"Verify Postgres docs links","prompt":"Fetch these two pages and for each report: whether it loads (no 404/redirect to a home page), its page title, and whet
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-basics.html","prompt":"Report the page title. Does the page explain creating a table with CREATE TABLE and column data types? Summarize in 1-2 lines
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-default.html","prompt":"Report the page title. Does the page explain column default values, including a timestamp default such as CURRENT_TIMESTAMP?
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-basics.html (HTTP 200 OK, text/html, 8086 characters).
+The text inside the <fetched-web-content> t
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-default.html (HTTP 200 OK, text/html, 5405 characters).
+The text inside the <fetched-web-content> 
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TEXT: Retomamos el botón de likes (`.code-mentor/memory/databases/0001-neon-likes-progress.md`, actualizado el 2026-10-13). Vas por el paso 3: la tabla `likes`.
+
+## ⚠️ El archivo no coincide con el repo
+
+El archivo marca los pasos 1 y 2 como hechos, pero aquí no veo ese trabajo:
+- No existe `.env`.
+- No existe `src/pages/api/likes.ts`, y `src/index.ts` solo tiene `// TODO: /api/likes`.
+- No hay `node_modules`, ni otras ramas, ni stashes, ni remoto.
+- El único commit posterior (`wip likes`) solo añade el archivo de progreso.
+
+No he cambiado nada. Si creas el `.env` aquí, ten en cuenta que no está en `.gitignore`. Hay que añadirlo antes de cualquier commit, porque contiene tu contraseña.
+
+## Dónde estamos
+
+**El panorama:** construimos un botón de likes para c12z.io, para que aprendas bases de datos. Tú haces la parte de Neon y yo la interfaz, la ruta de la API y los tests. Terminamos cuando un clic sube el contador y el número sigue ahí tras recargar.
+
+```
+[x] 1. Proyecto Neon + .env        → la base de datos existe
+[x] 2. Conectar desde la API       → la API puede hablar con ella (SELECT 1)
+[ ] 3. Tabla likes       ← AQUÍ    → hay dónde guardar los datos
+[ ] 4. Insertar un like
+[ ] 5. Contar likes por post
+[ ] 6. Botón → API → BD
+```
+
+Con `SELECT 1` comprobaste que la conexión funciona, pero esa consulta no guarda nada. Por eso ahora toca crear la tabla: sin ella, los pasos 4 y 5 no tienen dónde escribir ni qué leer.
+
+**El problema:** alguien abre el post `hola-mundo` y hace clic, y el contador pasa a 1. Hoy, si recarga, ese 1 se pierde porque no está guardado en ningún sitio. Una base de datos solo guarda datos en tablas con una forma definida de antemano. Esa forma se llama **esquema**: qué columnas hay y de qué tipo es cada una.
+
+**La idea:** cada like es una fila. Tres clics, dos en un post y uno en otro, quedan así:
+
+| id | post_id | created_at |
+|---|---|---|
+| 1 | `hola-mundo` | 2026-11-04 10:00 |
+| 2 | `hola-mundo` | 2026-11-04 10:05 |
+| 3 | `sobre-mi` | 2026-11-04 10:07 |
+
+- `id`: identifica cada fila. Lo genera la base de datos.
+- `post_id`: dice a qué post pertenece el like.
+- `created_at`: dice cuándo se dio. También lo rellena la base de datos.
+
+Para saber cuántos likes tiene `hola-mundo`, se cuentan sus filas y salen 2. Ese es el paso 5.
+
+**`user_id`, decidido: no lo ponemos.** El repo no tiene login, así que no habría ningún usuario que guardar. La consecuencia es que una misma persona puede dar varios likes. Si algún día hay login, se añade la columna.
+
+**Por qué así:** lo obvio sería una tabla con una fila por post y una columna `likes` que suba de 1 en 1. Es más simple, pero solo guarda el total, así que perderías cuándo se dio cada like. Tampoco podrías añadir después "un like por persona", porque no hay nada que distinguir. Con una fila por like conservas ese detalle, y además aprendes a insertar y a contar, que es lo que querías practicar.
+
+**Qué nos da:** los likes podrán sobrevivir a una recarga, y los pasos 4 y 5 tendrán sobre qué trabajar. La comprobación es esta: insertas a mano una fila con solo `post_id`, la lees, y `id` y `created_at` aparecen rellenos solos.
+
+**Cómo:**
+```
+[Botón] ──clic──▶ [API /likes] ──consulta──▶ [Neon: tabla likes]
+   yo                  yo                          TÚ
+```
+1. Eliges el tipo de dato de cada columna.
+2. Escribes el `CREATE TABLE`.
+3. Lo ejecutas en el editor SQL de Neon.
+4. Pasas la comprobación.
+
+Si quieres adelantarte, esto explica lo que vas a hacer (opcional):
+- [Crear tablas y tipos](https://www.postgresql.org/docs/current/ddl-basics.html)
+- [Valores por defecto](https://www.postgresql.org/docs/current/ddl-default.html)
+
+## Dos preguntas
+
+**1. ¿Dónde están los pasos 1 y 2?**
+- **a)** En otra carpeta o máquina: los traes aquí.
+- **b)** Se perdieron, pero el proyecto Neon sigue existiendo: creas el `.env` y yo rehago la ruta de conexión.
+- **c)** Se perdió todo: rehacemos los pasos 1 y 2.
+- **d)** Otra cosa: cuéntame.
+
+**2. ¿Te queda claro el plan y empezamos a programar?**
+RESULT_FINAL success 9 0.389804315

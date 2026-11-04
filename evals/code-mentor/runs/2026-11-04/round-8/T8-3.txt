@@ -1,0 +1,53 @@
+TEXT: Empezamos con la tabla. La escribes tú y se ejecuta en la web de Neon, así que no hace falta tocar ningún archivo.
+
+## Qué hacer
+1. Abre tu proyecto en la consola de Neon. Si ya no existe, para y dímelo, porque primero habría que crearlo.
+2. Entra en el **SQL Editor**, que es donde se ejecuta SQL directamente contra tu base de datos.
+3. Escribe un `CREATE TABLE` para la tabla `likes`, con las columnas `id`, `post_id` y `created_at`. Es la orden que crea la tabla vacía.
+
+## La forma de la orden
+```
+CREATE TABLE nombre_tabla (
+  columna_1 tipo piezas,
+  columna_2 tipo piezas
+);
+```
+
+- Cada columna va en su línea: primero el nombre, luego el tipo y al final las piezas que necesite.
+- Las columnas se separan con coma, pero la última no lleva. Si la pones, da error.
+- La orden termina en `;`.
+
+## Las piezas que necesitas
+Tienes que decidir qué piezas lleva cada columna, según lo que debe guardar:
+
+| Lo que necesitas | Pieza |
+|---|---|
+| Número entero grande | `bigint` |
+| Texto | `text` |
+| Un instante exacto en el tiempo | `timestamptz` |
+| Que Postgres genere el número solo | `GENERATED ALWAYS AS IDENTITY` |
+| Que identifique cada fila sin repetirse | `PRIMARY KEY` |
+| Que el valor sea obligatorio | `NOT NULL` |
+| Que, si nadie da un valor, se use la hora actual | `DEFAULT now()` |
+
+Para decidir, vuelve a mirar la tabla de antes: la API solo envía `post_id`, y Postgres rellena `id` y `created_at`. Por eso esas dos columnas necesitan piezas que generen el valor.
+
+## Comprobación
+Cuando se ejecute sin error, lanza esta consulta:
+
+```sql
+SELECT column_name, data_type, is_nullable
+FROM information_schema.columns
+WHERE table_name = 'likes';
+```
+
+Debe devolver estas 3 filas:
+
+```
+id         | bigint                   | NO
+post_id    | text                     | NO
+created_at | timestamp with time zone | NO
+```
+
+No puedo ver tu base de datos, así que **pégame aquí tu `CREATE TABLE` y lo que te devuelva la consulta, o el error si falla**. No hace falta tu connection string: no la pegues.
+RESULT_FINAL success 1 0.5774699999999999

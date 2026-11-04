@@ -1,0 +1,70 @@
+TOOL Read {"file_path":"<sandbox>/.claude/skills/code-mentor/references/memory-example.md"}
+RESULT  1	# Memory file examples
+2	
+3	Examples of how to write files in `.code-mentor/memory/` (see section 6 of `SKILL.md`).
+4	This file is a reference only 
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","offset":1,"limit":33}
+RESULT  1	---
+2	status: in-progress
+3	topic: Like button with Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: trainee
+6	mode: 
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Step 3: design the `likes` table. Next: decide the columns\n(`post_id`, `created_at
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"updated: 2026-10-13","new_string":"updated: 2026-11-04"}
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: Vale, nos centramos en la tabla. He anotado en el progreso que el código de los pasos 1 y 2 está en tu otra máquina.
+
+## Cómo se define una tabla
+`CREATE TABLE` le dice a Postgres qué columnas tendrá la tabla. Cada columna lleva un nombre, un tipo y, si hace falta, reglas:
+
+```sql
+CREATE TABLE nombre_tabla (
+  columna_1  tipo  reglas,
+  columna_2  tipo  reglas      -- la última va sin coma
+);
+```
+
+El **tipo** indica qué dato cabe en la columna. Las **reglas** indican qué se permite y qué rellena Postgres por ti.
+
+## Las piezas que necesitas
+**Tipos**
+
+| Tipo | Qué guarda | Ejemplo |
+|---|---|---|
+| `bigint` | número entero grande | `1` |
+| `text` | texto de cualquier longitud | `hola-mundo` |
+| `timestamptz` | fecha y hora, con zona horaria | `2026-11-04 10:00:00+01` |
+
+**Reglas**
+
+| Regla | Qué hace |
+|---|---|
+| `GENERATED ALWAYS AS IDENTITY` | Postgres asigna 1, 2, 3… por su cuenta |
+| `PRIMARY KEY` | identifica la fila: el valor no se puede repetir ni estar vacío |
+| `NOT NULL` | el valor es obligatorio |
+| `DEFAULT now()` | si no das valor, usa la fecha y hora actuales |
+
+Una columna puede llevar varias reglas seguidas, separadas por espacios.
+
+## Qué debe pasar con tu tabla
+Así deben comportarse las columnas cuando lleguemos al paso 4:
+
+| Insertas | Resultado |
+|---|---|
+| `post_id = 'hola-mundo'` | fila con `id = 1` y `created_at` = ahora |
+| `post_id = 'hola-mundo'` otra vez | fila con `id = 2`: otro like, misma fila no |
+| `post_id = 'otro-post'` | fila con `id = 3` |
+| sin `post_id` | error `null value in column "post_id"`, no se guarda nada |
+
+Fíjate en que solo envías `post_id`: Postgres rellena las otras dos columnas.
+
+## Qué hacer ahora
+1. **Elige tipo y reglas para cada columna (`id`, `post_id`, `created_at`).** Usa la tabla anterior para decidir: cada fila te dice qué debe hacer la columna.
+2. **Escribe el `CREATE TABLE` para la tabla `likes`.** Así la estructura queda definida antes de guardar datos.
+3. **Ejecútalo en el SQL Editor de Neon.** Es donde vive la tabla, así que no toca código de la app.
+4. **Comprueba el resultado con `SELECT * FROM likes;`.** Debes ver 0 filas y las tres columnas, sin error.
+
+Pégame aquí tu `CREATE TABLE` y lo que te devuelva Neon, aunque sea un error.
+RESULT_FINAL success 5 0.64340323

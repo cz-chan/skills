@@ -1,0 +1,58 @@
+TOOL Read {"file_path":"<sandbox>/db/schema.sql"}
+RESULT  1	-- Esquema de la DB. Los pasos 4 y 5 insertarán y contarán sobre esta tabla.
+2	-- Escribe aquí tu CREATE TABLE likes:
+3	
+4	
+TEXT: Cambiamos de método: esta vez no toques el archivo. Primero mira cómo viaja un dato por una tabla, y luego solo eliges letras.
+
+## Ejemplo: una tabla `mensajes`
+
+```sql
+CREATE TABLE mensajes (
+  id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  texto      text NOT NULL,
+  enviado_en timestamptz NOT NULL DEFAULT now()
+);
+```
+
+Sigamos tres envíos:
+
+| Lo que envías | `id` | `texto` | `enviado_en` | Resultado |
+|---|---|---|---|---|
+| `texto = 'hola'` a las 10:00 | 1 | hola | 10:00 | Guardado |
+| `texto = 'adiós'` a las 10:05 | 2 | adiós | 10:05 | Guardado |
+| Nada | - | - | - | **Error**: `texto` tiene `NOT NULL` y nadie lo puso |
+
+Solo enviaste `texto`. La DB rellenó `id` y `enviado_en`.
+
+La pregunta que decide cada línea es: **¿quién conoce este valor en el momento de guardar?**
+
+## Tu turno: solo letras
+Piensa en un like al post `hola-mundo`.
+
+**1. ¿Qué tipo le va a `post_id`, cuyo valor es `hola-mundo`?**
+- A) `integer`
+- B) `text`
+- C) `timestamptz`
+- D) `bigint`
+
+**2. ¿Qué reglas lleva `post_id`, si un like sin post no se puede contar?**
+- A) Ninguna
+- B) `NOT NULL`
+- C) `DEFAULT now()`
+- D) `PRIMARY KEY`
+
+**3. ¿Qué tipo le va a `created_at`, cuyo valor es `2026-11-04 10:00`?**
+- A) `text`
+- B) `integer`
+- C) `timestamptz`
+- D) `bigint`
+
+**4. ¿Quién pone el valor de `created_at`?**
+- A) El navegador, y hay que enviarlo siempre
+- B) La DB, con `DEFAULT now()`
+- C) Nadie, se queda vacío
+- D) Tú, a mano en cada like
+
+Responde solo así: `1? 2? 3? 4?`. Si dudas en alguna, pon `no sé` en esa. Con eso veré dónde está el bloqueo, y con tus respuestas escribiremos las líneas de tu tabla.
+RESULT_FINAL success 2 0.881617985

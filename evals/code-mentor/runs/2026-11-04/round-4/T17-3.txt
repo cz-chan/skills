@@ -1,0 +1,40 @@
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","offset":29,"limit":16}
+RESULT  29	## Current step
+30	
+31	Step 3: design the `likes` table.
+32	Problem: the API connects, but nothing stores a like, so a reload loses the count.
+33	W
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Next: learner writes `CREATE TABLE likes` (post_id, user_id, created_at, all\nrequi
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: Aquí tienes el SQL de la tabla. No lo he ejecutado, porque aquí no hay `.env` ni conexión a Neon:
+
+```sql
+CREATE TABLE likes (
+  post_id    text        NOT NULL,
+  user_id    text        NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+```
+
+## Por qué así
+
+- **`CREATE TABLE likes (...)`:** crea la tabla, y cada línea de dentro define una columna con su nombre, tipo y reglas.
+- **`text`:** guarda texto de cualquier longitud. Sirve para `hola-mundo` y para el ID del visitante sin tener que fijar un máximo.
+- **`NOT NULL`:** hace que Postgres rechace la fila si falta ese valor. Así la regla está en la base de datos y se cumple aunque la API tenga un bug.
+- **`timestamptz`:** guarda un instante exacto, sin depender de la zona horaria de quien da el like.
+- **`DEFAULT now()`:** si el `INSERT` no trae `created_at`, Postgres pone la hora actual.
+
+## Qué pasará con valores reales
+
+| Datos que recibe la tabla | Resultado |
+|---|---|
+| `hola-mundo`, `ana` | Crea la fila y `created_at` se rellena solo |
+| `hola-mundo`, `NULL` | Error: `user_id` es obligatorio |
+| `hola-mundo`, `ana` otra vez | **Crea otra fila**: Ana ya cuenta como 2 likes |
+
+La última fila es el hueco que falta cerrar, y lo haremos con la regla contra duplicados. Con la tabla así, el contador aún se puede inflar.
+
+Encaja con tu paso 4 así: tu `INSERT` solo tendrá que enviar `post_id` y `user_id`.
+
+**Ahora ejecútalo en el SQL Editor de Neon y dime qué responde.** Si te da un error, pégamelo tal cual.
+RESULT_FINAL success 3 0.6655584299999999

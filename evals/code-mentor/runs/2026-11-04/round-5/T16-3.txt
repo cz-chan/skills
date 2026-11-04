@@ -1,0 +1,45 @@
+TEXT: Sin problema: era mucho de golpe. Lo hacemos más pequeño, una línea cada vez, y antes lo vemos en otra tabla distinta.
+
+## Mismo patrón, otro problema
+
+Imagina una tabla de libros, descrita igual que la nuestra:
+
+| Columna | Tipo | Reglas |
+|---|---|---|
+| `isbn` | `text` | `PRIMARY KEY` |
+| `titulo` | `text` | `NOT NULL` |
+| `paginas` | `integer` | `NOT NULL`, `DEFAULT 0` |
+
+Cada fila de esa descripción se convierte en una línea de SQL. Solo hay que leerla de izquierda a derecha:
+
+```sql
+CREATE TABLE libros (
+  isbn text PRIMARY KEY,
+  titulo text NOT NULL,
+  paginas integer NOT NULL DEFAULT 0
+);
+```
+
+Fíjate en dos cosas:
+- **Varias reglas:** van seguidas, separadas por espacios, como en `NOT NULL DEFAULT 0`.
+- **Las comas:** separan columnas, así que la última columna no lleva coma.
+
+Con esta tabla, los datos se comportarían así:
+
+| Insertas | Resultado |
+|---|---|
+| `isbn = '978'`, `titulo = 'Dune'` | Fila guardada con `paginas = 0`, por el `DEFAULT` |
+| `isbn = '979'`, sin `titulo` | **Error** por `NOT NULL` |
+
+## Tu turno: solo una línea
+
+Escribe únicamente la línea de `post_id`, sin el `CREATE TABLE` alrededor. Es la más fácil porque tiene una sola regla, y si te sale, las otras dos siguen el mismo patrón.
+
+Vuelve a mirar nuestra tabla de antes:
+
+| Columna | Tipo | Reglas |
+|---|---|---|
+| `post_id` | `text` | `NOT NULL` |
+
+Pégala aquí, aunque no estés seguro. Si te atascas en algo concreto, dime en qué.
+RESULT_FINAL success 1 0.617098715

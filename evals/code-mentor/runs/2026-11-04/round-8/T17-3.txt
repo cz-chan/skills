@@ -1,0 +1,58 @@
+TOOL Write {"file_path":"<sandbox>/db/schema.sql","content":"-- Un like por fila: el total de un post se calcula contando sus filas.\nCREATE TABLE likes (\n  post_id    text        NOT NULL,\n  created_at timest
+RESULT  File created successfully at: <sandbox>/db/schema.sql (file state is current in your context — no need to Read it back)
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","offset":29,"limit":12}
+RESULT  29	## Current step
+30	
+31	Step 3: design the `likes` table.
+32	Problem: the API connects, but nothing stores a like, so a reload loses the count.
+33	W
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Next: learner proposes columns and types for the `CREATE TABLE`, reviewed before\nr
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: Te he creado `db/schema.sql`, pero **aún no se ha ejecutado**: no tengo acceso a tu Neon, así que la tabla todavía no existe.
+
+```sql
+-- Un like por fila: el total de un post se calcula contando sus filas.
+CREATE TABLE likes (
+  post_id    text        NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+```
+
+## Cómo funciona
+
+- **`post_id text`:** guarda valores como `hola-mundo`. Es texto porque tus posts se identifican así en nuestro ejemplo.
+- **`created_at timestamptz`:** guarda el instante exacto del like, sin ambigüedad de zona horaria.
+- **`NOT NULL`:** si falta el valor, Postgres rechaza la fila. Sin esto, un like sin post se guardaría y no contaría para ningún post.
+- **`DEFAULT now()`:** si el `INSERT` no indica la hora, Postgres pone la actual. Así la API solo tiene que enviar `post_id`.
+
+## Cómo conecta con el resto
+
+- **Paso 4:** insertar un like solo necesitará `post_id`.
+- **Paso 5:** contar las filas de un `post_id` dará el total.
+- **Paso 6:** la API usará esas dos queries.
+
+**Limitación:** la tabla no tiene clave primaria, es decir, una columna que identifique cada fila. Para contar no hace falta, pero sí para borrar un like concreto.
+
+## Ejecútalo y compruébalo
+
+Pega esto en el SQL Editor de Neon:
+
+```sql
+CREATE TABLE likes (
+  post_id    text        NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+INSERT INTO likes (post_id) VALUES ('prueba');
+
+SELECT * FROM likes;
+```
+
+Deberías ver una fila con `prueba` y la hora actual en `created_at`. Si es así, borra la fila de prueba para que no cuente como like:
+
+```sql
+DELETE FROM likes WHERE post_id = 'prueba';
+```
+
+**Pégame lo que devuelve el `SELECT`** y cierro el paso 3.
+RESULT_FINAL success 5 0.75118786

@@ -1,0 +1,55 @@
+TOOL Read {"file_path":"<sandbox>/.claude/skills/code-mentor/references/memory-example.md"}
+RESULT  1	# Memory file examples
+2	
+3	Examples of how to write files in `.code-mentor/memory/` (see section 6 of `SKILL.md`).
+4	This file is a reference only 
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Like button with Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: trainee
+6	mode: 
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Step 3: design the `likes` table. Next: decide the columns\n(`post_id`, `created_at
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully. (file state is current in your context — n
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- `src/pages/api/likes.ts`, `.env`\n\n## Assets\n\n- Neon — Connect from any app: <
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully. (file state is current in your context — n
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"updated: 2026-10-13","new_string":"updated: 2026-11-04"}
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully. (file state is current in your context — n
+TEXT: Hecho: he anotado en el progreso que los pasos 1 y 2 están en otra máquina. Vamos con la tabla.
+
+## Cómo se define una columna
+
+`CREATE TABLE` crea una tabla vacía y define sus columnas. Cada columna lleva un nombre, un tipo y, si hace falta, reglas:
+
+```sql
+CREATE TABLE nombre_tabla (
+  columna1 tipo reglas,
+  columna2 tipo reglas
+);
+```
+
+Estas son las piezas para cada columna:
+
+| Columna | Tipo | Reglas | Por qué |
+|---|---|---|---|
+| `id` | `bigint` | `GENERATED ALWAYS AS IDENTITY`, `PRIMARY KEY` | La base de datos genera 1, 2, 3… y no se repite ninguno. `bigint` admite números muy grandes. |
+| `post_id` | `text` | `NOT NULL` | Guarda textos como `hola-mundo`. `NOT NULL` impide un like sin post. |
+| `created_at` | `timestamptz` | `NOT NULL`, `DEFAULT now()` | Es un instante exacto, con zona horaria. `DEFAULT` lo rellena si no le das valor. |
+
+## Qué pasa al insertar
+
+| Insertas | Resultado |
+|---|---|
+| `post_id = 'hola-mundo'` | Fila con `id = 1`, `post_id = 'hola-mundo'` y `created_at` = la hora actual |
+| `post_id = 'hola-mundo'` otra vez | Fila nueva con `id = 2`: es otro like del mismo post |
+| Sin `post_id` | **Error** por `NOT NULL`: no se guarda nada |
+
+Por eso, en el paso 4, tu insert solo tendrá que enviar `post_id`.
+
+## Tu turno
+
+1. Escribe el `CREATE TABLE likes` con las tres columnas.
+2. Coloca las piezas de cada fila de la tabla en el orden `nombre tipo reglas`, y separa las columnas con comas.
+3. **Pégalo aquí sin ejecutarlo todavía.** Lo revisamos antes, porque esto se crea en tu base de datos real.
+RESULT_FINAL success 6 0.567236315

@@ -1,0 +1,74 @@
+TOOL Skill {"skill":"code-mentor","args":"quiero hacer un botón de likes con Neon para aprender bases de datos. soy principiante: yo escribo el esquema y las queries y tú el resto. explícamelo con detalle y con 
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  No files found
+TOOL Bash {"command":"git status --short --ignored; git log -5 --oneline; ls -la; cat package.json 2>/dev/null; cat .gitignore 2>/dev/null; git ls-files | grep -v '^.claude/' | head -50","description":"Show rep
+TOOL Glob {"pattern":"**/PLAN.md"}
+RESULT  No files found
+RESULT  !! runs/
+87a5b92 fixture: initial state
+total 32
+drwxr-xr-x@ 10 user  wheel  320 Nov  4 11:52 .
+drwx------@  9 user  wheel  288 Nov  4 11:50 ..
+drwxr-
+TOOL Read {"file_path":"<sandbox>/.claude/skills/code-mentor/references/memory-example.md"}
+RESULT  1	# Memory file examples
+2	
+3	Examples of how to write files in `.code-mentor/memory/` (see section 6 of `SKILL.md`).
+4	This file is a reference only 
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Bash {"command":"cat reset.sh; ls -a; ls node_modules 2>/dev/null | head -5; test -f .env && echo \".env exists\" || echo \"no .env\"; ls runs","description":"Inspect reset script and check for env and dep
+RESULT  #!/bin/sh
+# Copied into the sandbox by setup.sh. Back to the initial commit, no memory.
+# Refuses to run anywhere else: it discards uncommitted work.
+
+TEXT: Antes de empezar, confirma el reparto y responde a estas preguntas. La explicación detallada, con ejemplos, empieza en cuanto me digas que sí.
+
+```
+Objetivo: botón de likes en la página / de c12z, para aprender bases de datos.
+Tú: esquema (tabla) y queries (sumar un like, leer el contador).
+Yo: conexión a Neon, ruta /api/likes, botón, tests.
+Hecho: clic → el contador sube y sigue igual al recargar.
+Explicaciones: con detalle y con ejemplos.
+```
+
+```
+[Botón] ──clic──▶ [Ruta /api/likes] ──conexión──▶ [Neon: queries + tabla]
+   yo                    yo                yo            TÚ
+```
+
+**Alcance:** sin login, así que cada clic suma un like, también si viene de la misma persona. Lo propongo porque controlar quién dio like añade usuarios y sesiones, que no son lo que quieres aprender ahora.
+
+**1. ¿Te encaja el reparto y el alcance?**
+- a) Sí
+- b) Sí, pero quiero cambiar algo (dime qué)
+
+**2. ¿Cuánto SQL sabes?**
+- a) Nunca he escrito SQL
+- b) He visto algún `SELECT`, pero no sabría escribirlo solo
+- c) Sé hacer `SELECT` e `INSERT` sencillos
+- d) También he creado tablas
+
+**3. ¿Qué tienes ya en Neon?** Yo me encargo de la conexión, pero la cuenta tiene que ser tuya, porque no puedo crearla por ti.
+- a) Nada, ni cuenta
+- b) Cuenta, pero sin proyecto
+- c) Proyecto y connection string (la URL con la contraseña para conectarse)
+- d) No sé qué tengo
+
+Si ya tienes la connection string, no la pegues en el chat: te diré cómo guardarla en `.env`.
+
+**4. ¿Añado `.code-mentor/` a `.gitignore`?** Si aceptas el reparto, guardaré tu progreso entre sesiones en `.code-mentor/memory/databases/0001-neon-likes-progress.md`.
+- a) Sí, que quede fuera de git
+- b) No, quiero versionarlo
+- c) No quiero ese archivo
+RESULT_FINAL success 9 0.305228

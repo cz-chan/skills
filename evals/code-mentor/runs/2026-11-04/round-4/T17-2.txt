@@ -1,0 +1,36 @@
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","offset":29,"limit":4}
+RESULT  29	## Current step
+30	
+31	Step 3: design the `likes` table. Next: decide the columns
+32	(`post_id`, `created_at`, `user_id`?).
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Step 3: design the `likes` table. Next: decide the columns\n(`post_id`, `created_at
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: Vale, nos centramos en la tabla. Anoté en el progreso que los pasos 1 y 2 están en tu otra máquina.
+
+## Decisión: `user_id` sin login
+
+La app no tiene login, así que hay dos opciones:
+
+- **A. ID anónimo de visitante (recomendada):** la API genera un ID, lo guarda en una cookie y lo manda a la tabla. Esa parte la hago yo. Permite detectar likes repetidos, aunque quien borre las cookies podrá volver a votar. Para este proyecto es suficiente.
+- **B. Sin `user_id`:** es más simple, pero nada distingue a Ana de Luis, así que no se pueden bloquear los duplicados.
+
+Sigo con la A. Si prefieres la B, dímelo.
+
+## Tu tarea
+
+Escribe un `CREATE TABLE likes` con estas tres columnas, todas obligatorias:
+
+| Columna | Qué guarda | Tipo de dato |
+|---|---|---|
+| `post_id` | Post que recibe el like, p. ej. `hola-mundo` | Texto |
+| `user_id` | ID anónimo del visitante | Texto |
+| `created_at` | Cuándo se dio el like | Fecha y hora con zona horaria |
+
+1. **Marca las tres como obligatorias:** un like sin post, visitante o fecha no sirve, y sin esa regla Postgres acepta `NULL` (valor vacío) en esas columnas.
+2. **Haz que `created_at` se rellene sola:** así la fecha la pone la base de datos y la API no tiene que enviarla.
+3. **Deja fuera la regla contra duplicados:** la añadimos justo después, cuando la tabla base esté bien.
+
+En las dos páginas de Postgres que te pasé están `NOT NULL` y `DEFAULT`. El tipo de `created_at` lo puedes buscar como `timestamptz`.
+
+**Pégame aquí el SQL antes de ejecutarlo en Neon** y lo revisamos.
+RESULT_FINAL success 3 0.55673443

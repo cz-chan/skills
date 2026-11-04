@@ -1,0 +1,146 @@
+TOOL Bash {"command":"git log --stat -3; git status --short; ls -la","description":"Show recent commits and project files"}
+RESULT  commit 1c14d28c236e1fc832bfa047b2c37bdd8a2f0402
+Author: fixture <fixture@local>
+Date:   Wed Nov 4 19:27:30 2026 +0100
+
+    wip
+
+ .../memory/databases/
+TOOL Glob {"pattern":"**/*","path":"~/.claude/projects/-private-tmp-claude-501--Users-user-Desktop-projects-prod-cz-skills-a54ea246-387e-4d48-b65f-5594c8587ebd-scratchpad-final-solution/memory"}
+RESULT  No files found
+TOOL Grep {"pattern":"TODO|FIXME|WIP|next step|progress|learning|mentor","-i":true,"glob":"!node_modules/**","output_mode":"content","head_limit":40}
+RESULT  src/index.ts:7:// TODO: /api/likes
+reset.sh:6:if ! git rev-parse -q --verify refs/tags/fixture-initial >/dev/null || [ ! -f .claude/skills/code-mentor
+TEXT: Sesión de aprendizaje en curso detectada → cargo code-mentor.
+TOOL Skill {"skill":"code-mentor","args":"continuemos"}
+RESULT  Launching skill: code-mentor
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Like button with Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: junior
+6	mode: g
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Bash {"command":"git log -5 --format='%h %ad %s' --date=iso; git status; ls runs | head -30; ls .code-mentor/memory; ls PLAN.md 2>/dev/null","description":"Check git state, runs folder, and plan file"}
+RESULT ERR  Exit code 1
+1c14d28 2026-11-04 19:27:30 +0100 wip
+17d2edd 2026-11-04 14:50:37 +0100 fixture: initial state
+On branch main
+nothing to commit, working t
+TOOL Bash {"command":"ls -a src; find . -path ./node_modules -prune -o -path ./.git -prune -o -path ./runs -prune -o \\( -name '.env*' -o -name 'likes*' \\) -print; [ -d node_modules ] && echo node_modules:yes 
+RESULT  .
+..
+index.ts
+node_modules:no
+runs/
+TOOL Agent {"description":"Verify Postgres table docs link","subagent_type":"web-fetch","prompt":"Fetch https://www.postgresql.org/docs/current/ddl-basics.html and report: does it load without redirecting to ano
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-basics.html","prompt":"Report: the page title; whether the page content loaded directly (any redirect noted); and whether it explains what tables, r
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-basics.html (HTTP 200 OK, text/html, 8086 characters).
+The text inside the <fetched-web-content> t
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TEXT: Retomamos el botón de likes con Neon, en el paso 3. Antes hay un problema: el archivo de progreso no coincide con el repo.
+
+## ⚠️ Progreso vs. repo
+
+El archivo marca los pasos 1 y 2 como hechos (12 y 13 de octubre), pero aquí no están:
+
+- No hay `.env`.
+- No existe `src/pages/api/likes.ts`, ni aparece en el historial de git.
+- `src/index.ts` solo tiene `// TODO: /api/likes`, sin conexión a la DB.
+- `node_modules` no existe, así que las dependencias no están instaladas.
+
+No puedo comprobar si tu proyecto de Neon sigue existiendo.
+
+## Dónde estamos
+
+**Qué construimos:** un botón de likes en c12z.io para aprender bases de datos. Tú haces la parte de Neon y yo te doy la UI, el cableado de la API y los tests.
+
+```
+[x] 1. Neon + .env              ⚠️ no está en este repo
+[x] 2. Conectar desde la API    ⚠️ no está en este repo
+[ ] 3. Tabla likes              ← estamos aquí
+[ ] 4. Insertar un like
+[ ] 5. Contar likes por post
+[ ] 6. Botón → API → DB
+```
+
+**Cómo llegamos aquí:** en el paso 2 hiciste un `SELECT 1`, que demuestra que la API llega a la DB. Pero la DB sigue vacía y no tiene dónde guardar nada.
+
+## El problema
+
+Alguien da like al post `hola-mundo` y la API intenta guardarlo. Sin tabla, Postgres responde:
+
+```
+ERROR: relation "likes" does not exist
+```
+
+Guardarlo en una variable del servidor tampoco sirve: `count = 3`, el servidor se reinicia y `count = 0`. Nuestra meta es que el contador sobreviva a una recarga.
+
+## La idea
+
+Una **tabla** es una estructura fija: las **columnas** dicen qué datos guarda cada registro y cada **fila** es un registro. El **esquema** es esa definición de tablas y columnas.
+
+Guardamos **un like por fila**:
+
+| Paso | `post_id` | `created_at` | Likes de `hola-mundo` |
+|---|---|---|---|
+| Clic a las 10:00 | `hola-mundo` | 10:00 | 1 |
+| Clic a las 10:05 | `hola-mundo` | 10:05 | 2 |
+| Clic a las 10:07 | `otro-post` | 10:07 | 2 (es de otro post) |
+
+Al recargar, la API cuenta las filas de `hola-mundo` y salen 2. Las filas siguen en Neon, así que el número no se pierde.
+
+## Por qué así
+
+Lo obvio sería una tabla con una fila por post y una columna `count` que suba con cada clic. Funciona y es simple, pero solo guarda el total: no sabes cuándo fue cada like ni de quién, y no podrías evitar likes duplicados. Con una fila por like, esa información se conserva y el total se calcula cuando lo necesitas.
+
+## Qué nos da
+
+Los pasos 4 y 5 ya tendrán dónde escribir y qué contar.
+
+**Prueba de que está hecho:** la tabla aparece en Neon con sus columnas, y un `INSERT` de prueba hecho a mano devuelve la fila.
+
+## Cómo
+
+```
+[Botón] ──clic──▶ [API /likes] ──query──▶ [Neon: tabla likes]
+   yo                 yo                      TÚ
+```
+
+1. **Decides las columnas** (tú). `post_id` y `created_at` están claras. Falta decidir si incluimos `user_id`, y te ayudo a elegir.
+2. **Eliges el tipo de cada columna** (tú).
+3. **Escribes el `CREATE TABLE`** (tú) y lo ejecutas en Neon.
+4. **Haces el `INSERT` de prueba** (tú), y yo te digo qué comprobar.
+
+Si quieres adelantar por tu cuenta, esto explica lo que vamos a hacer: [PostgreSQL: Table Basics](https://www.postgresql.org/docs/current/ddl-basics.html).
+
+## Antes de empezar
+
+**1. ¿Dónde está el trabajo de los pasos 1 y 2?**
+- **a)** En otra rama, carpeta o máquina: lo traes aquí y seguimos.
+- **b)** Se perdió o nunca estuvo aquí: rehacemos los dos pasos y corrijo el archivo de progreso. Es lo que recomiendo si no lo encuentras, porque el paso 4 necesita la conexión.
+- **c)** Da igual por ahora: hacemos la tabla en el SQL Editor de Neon, si el proyecto sigue vivo, y restauramos la conexión antes del paso 4.
+
+**2. ¿Te queda clara la idea y empezamos a programar?**
+RESULT_FINAL success 12 0.42666965999999995

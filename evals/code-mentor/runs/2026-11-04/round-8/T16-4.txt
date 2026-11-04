@@ -1,0 +1,42 @@
+TEXT: Vamos a construir una línea palabra por palabra y ver qué cambia con cada una. Después solo tendrás que elegir una opción.
+
+## Una línea se construye por partes
+Imagina una tabla de pedidos con la columna `cantidad`:
+
+**1. El nombre.** Solo con esto la línea no está completa, porque Postgres exige saber qué tipo de dato guarda:
+```sql
+cantidad
+```
+
+**2. Añades el tipo.** Ahora Postgres sabe qué datos aceptar:
+```sql
+cantidad integer
+```
+| Insertas | Resultado |
+|---|---|
+| `3` | se guarda |
+| `'hola'` | error: `'hola'` no es un número |
+| nada | se guarda vacía (`NULL`) |
+
+La última fila es un problema, porque un pedido sin cantidad no tiene sentido.
+
+**3. Añades la regla.** Ahora el valor es obligatorio:
+```sql
+cantidad integer NOT NULL
+```
+| Insertas | Resultado |
+|---|---|
+| `3` | se guarda |
+| nada | error: falta un valor obligatorio |
+
+Por tanto, una línea es: **nombre + qué dato cabe + qué se permite**. Cada palabra que añades cierra una puerta a los datos incorrectos.
+
+## Tu turno: una sola decisión
+Vamos con el primer hueco de `post_id`. Tiene que aceptar valores como `hola-mundo`. ¿Qué tipo le pones?
+
+- **A.** `bigint`: números enteros, como `1`
+- **B.** `text`: texto, como `hola-mundo`
+- **C.** `timestamptz`: fecha y hora, como `2026-11-04 10:00:00+01`
+
+Respóndeme solo con la letra, y la regla la vemos después. Si lo que te bloquea es otra cosa, como una palabra que no entiendes o qué es una columna, dime cuál y empezamos por ahí.
+RESULT_FINAL success 1 0.7523210300000001

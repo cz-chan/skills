@@ -1,0 +1,139 @@
+TOOL Skill {"skill":"code-mentor","args":"seguimos"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  .code-mentor/memory/databases/0001-neon-likes-progress.md
+TOOL Bash {"command":"git status && git log -5 --stat --format='%h %ad %s' --date=iso","description":"Show working tree status and recent commits"}
+TOOL Glob {"pattern":"PLAN.md"}
+RESULT  No files found
+RESULT  On branch main
+nothing to commit, working tree clean
+ce7a3c9 2026-11-04 14:52:34 +0100 add likes table
+
+ src/schema.sql | 5 +++++
+ 1 file changed, 5 i
+TOOL Read {"file_path":"<sandbox>/.claude/skills/code-mentor/references/memory-example.md"}
+RESULT  1	# Memory file examples
+2	
+3	Examples of how to write files in `.code-mentor/memory/` (see section 6 of `SKILL.md`).
+4	This file is a reference only 
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Like button with Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: junior
+6	mode: g
+TOOL Read {"file_path":"<sandbox>/src/schema.sql"}
+RESULT  1	CREATE TABLE likes (
+2	  id serial PRIMARY KEY,
+3	  post_id text NOT NULL,
+4	  created_at timestamptz NOT NULL DEFAULT now()
+5	);
+6	
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Bash {"command":"git log -p -1 --format='%h %s' -- src/schema.sql; ls -a; test -f .env && echo \".env exists\" || echo \"no .env\"","description":"Show schema commit, list root, check env file exists"}
+RESULT  ce7a3c9 add likes table
+
+diff --git a/src/schema.sql b/src/schema.sql
+new file mode 100644
+index 0000000..3fb4711
+--- /dev/null
++++ b/src/schema.sql
+@
+TOOL Bash {"command":"ls -a src; echo '--- gitignore'; cat .gitignore; echo '--- env var set?'; test -n \"$DATABASE_URL\" && echo yes || echo no","description":"List source folder, show ignore rules, check DB v
+RESULT ERR  A variable in this command can't be checked before it runs
+TOOL Bash {"command":"ls -a src; cat .gitignore","description":"List source folder and show ignore rules"}
+RESULT  .
+..
+index.ts
+schema.sql
+runs/
+TEXT: # Seguimos: botón de like con Neon
+
+## Lo que no cuadra
+El progreso guardado es del 10-10 y sigue en el paso 3, pero el repo no coincide:
+
+- **Tabla ya escrita:** el commit `ce7a3c9` añade `src/schema.sql` con `id`, `post_id` y `created_at`, sin `user_id`.
+- **Paso 2 sin rastro:** el log dice que hiciste `SELECT 1` desde `src/pages/api/likes.ts` con `.env`, pero aquí no existe ninguno de los dos. `src/index.ts` solo tiene `// TODO: /api/likes`.
+- **Sin dependencias:** no hay `node_modules`.
+- **Riesgo:** `.gitignore` solo tiene `runs/`. Si creas `.env`, tu contraseña de Neon podría acabar en un commit.
+
+No sé si la tabla existe en Neon, porque no he consultado la base de datos.
+
+## El panorama
+Construimos un botón de like para c12z.io con el que aprendes bases de datos. Tú haces la parte de Neon y las consultas; yo te doy la UI, la ruta y los tests.
+
+- **Hecho según el log:** proyecto en Neon y conexión.
+- **A medias:** la tabla `likes`. El archivo está, pero falta decidir `user_id` y confirmar que existe en Neon.
+- **Falta:** insertar un like, contar likes y conectar botón → API → base de datos.
+
+La conexión del paso 2 solo demostraba que la API llega a Neon, pero sin tabla no hay dónde guardar nada.
+
+## El problema
+Un visitante hace clic en like en el post `hola-mundo`. Hoy el contador solo podría vivir en memoria, así que al recargar o reiniciar el servidor vuelve a 0.
+
+Y si `schema.sql` nunca se ejecutó en Neon, el primer `INSERT` fallará con `relation "likes" does not exist`. Un archivo `.sql` en el repo no crea nada hasta que lo ejecutas.
+
+## La idea
+Cada like es una fila, y el contador es el número de filas de ese post:
+
+| Acción | Fila nueva | Likes de `hola-mundo` |
+|---|---|---|
+| Clic en `hola-mundo` | `id=1, post_id=hola-mundo` | 1 |
+| Clic en `hola-mundo` | `id=2, post_id=hola-mundo` | 2 |
+| Clic en `otro-post` | `id=3, post_id=otro-post` | 2 |
+| Recargar la página | ninguna | 2 |
+
+El contador sobrevive a la recarga porque las filas están en Neon, no en la memoria del servidor.
+
+## Por qué así
+Lo obvio sería una columna `likes` en una tabla de posts, sumando 1 en cada clic. Es simple, pero solo guarda un total: no sabes cuándo ocurrió cada like, ni puedes deshacer el de una persona o impedir que repita. Con una fila por like, todo eso sigue siendo posible.
+
+**Lo que falta decidir:** sin `user_id`, una persona puede dar like diez veces y cuenta como diez. El proyecto no tiene login, así que para evitarlo haría falta otra forma de identificar al visitante, como una cookie anónima. Lo vemos en cuanto empecemos.
+
+## Qué nos da
+Con la tabla en Neon, los pasos 4 y 5 ya tienen dónde escribir y leer. Para cerrar el paso 3, esta consulta debe devolver `id`, `post_id` y `created_at` (más `user_id` si lo añades):
+
+```sql
+SELECT column_name FROM information_schema.columns WHERE table_name = 'likes';
+```
+
+## Cómo
+```
+[Botón] ──clic──▶ [API /api/likes] ──consulta──▶ [Neon: tabla likes]
+   yo                   yo                             TÚ
+```
+
+1. **Tú:** decides sobre `user_id` y dejas `schema.sql` como corresponda.
+2. **Tú:** ejecutas la tabla en Neon y haces la comprobación de arriba.
+3. **Tú:** escribes el `INSERT` de un like.
+4. **Tú:** escribes el conteo de likes por post.
+5. **Yo:** te doy el botón, la ruta y un test para que los pegues.
+
+## Antes de empezar
+1. ¿Actualizo el archivo de progreso con el commit de la tabla y lo que falta?
+2. ¿La tabla ya existe en Neon, o no ejecutaste `schema.sql`?
+3. ¿El código del paso 2 y tu `.env` están en otra rama o máquina, o hay que rehacerlos?
+
+¿Te queda claro el plan? ¿Empezamos a programar?
+RESULT_FINAL success 14 0.39398500000000003

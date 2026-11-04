@@ -1,0 +1,110 @@
+TOOL Bash {"command":"git status --short; echo \"--- gitignore\"; cat .gitignore; echo \"--- check-ignore\"; git check-ignore .env && echo ignored || echo NOT_IGNORED; echo \"--- tracked?\"; git ls-files .env; 
+RESULT ERR  This Bash command contains multiple operations. The following part requires approval: git status --short; echo "--- gitignore"; cat .gitignore; echo "
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Read {"file_path":"<sandbox>/.gitignore"}
+RESULT  1	runs/
+2	.code-mentor/
+3	
+TOOL Bash {"command":"git check-ignore .env","description":"Check whether git ignores the env file"}
+RESULT ERR  This command requires approval
+TOOL Grep {"pattern":"^DATABASE_URL=\"?postgres(ql)?://","path":"<sandbox>/.env","output_mode":"count"}
+RESULT ERR  Path does not exist: <sandbox>/.env. Note: your current working directory is <sandbox>.
+TOOL Bash {"command":"git status --short","description":"Show working tree status"}
+TOOL Glob {"pattern":"node_modules/hono/package.json"}
+RESULT  No files found
+RESULT   M .gitignore
+TOOL Glob {"pattern":"**/.env*"}
+RESULT  No files found
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Next: user adds `.env` to `.gitignore`, creates the Neon project, and saves `DATABA
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully. (file state is current in your context — n
+TEXT: Aquí tienes la ruta, pero **no encuentro tu `.env`** en la raíz del proyecto, y `.gitignore` todavía no incluye `.env`. No he ejecutado este código: aún no están instaladas las dependencias.
+
+## Antes de pegar nada
+1. Añade esta línea a `.gitignore`, para que tu contraseña no acabe en git:
+   ```
+   .env
+   ```
+2. Mueve o crea `.env` en la raíz, junto a `package.json`. Si ya lo tienes en otra carpeta, la app no lo encontraría cuando la arranquemos desde la raíz.
+
+## Mi parte: las rutas
+Sustituye `// TODO: /api/likes` en `src/index.ts` y añade el `import` arriba:
+
+```ts
+import { addLike, getLikeCount } from './likes'
+
+// Al cargar la página: solo lee el contador
+app.get('/api/likes', async (c) => {
+  return c.json({ count: await getLikeCount() })
+})
+
+// Al pulsar el botón: guarda el like y devuelve el contador nuevo
+app.post('/api/likes', async (c) => {
+  await addLike()
+  return c.json({ count: await getLikeCount() })
+})
+```
+
+**Por qué hay dos rutas:** leer y modificar son acciones distintas. `GET` solo lee, así que recargar la página no suma likes. `POST` cambia datos, y solo se llama al hacer clic.
+
+Por ejemplo, si la base de datos ya tiene 3 likes:
+
+| Acción | Petición | Qué hace | Respuesta |
+|---|---|---|---|
+| Abres la página | `GET` | lee | `{ "count": 3 }` |
+| Haces clic | `POST` | guarda un like y lee | `{ "count": 4 }` |
+| Recargas | `GET` | lee | `{ "count": 4 }` |
+
+## Tu parte: el archivo de las queries
+Crea `src/likes.ts`. Yo te dejo la conexión y las funciones vacías, y tú las rellenarás en los pasos 4 y 5:
+
+```ts
+import { neon } from '@neondatabase/serverless'
+
+// Abre la conexión con la cadena de tu .env
+const sql = neon(process.env.DATABASE_URL!)
+
+export async function addLike(): Promise<void> {
+  // TU QUERY (paso 4): guarda un like
+  throw new Error('addLike: falta tu query')
+}
+
+export async function getLikeCount(): Promise<number> {
+  // TU QUERY (paso 5): devuelve cuántos likes hay, como número
+  throw new Error('getLikeCount: falta tu query')
+}
+```
+
+**Cómo encaja con las rutas:** las rutas no saben nada de SQL, solo llaman a estas dos funciones. Así puedes cambiar tus queries sin tocar las rutas.
+
+**Qué esperar por ahora:** hasta que escribas las queries, las dos rutas fallarán con un error 500. Es normal: el `throw` te indica qué función falta.
+
+**Cómo se usa `sql`:** escribes la consulta entre comillas invertidas y te devuelve una lista de filas. Por ejemplo:
+
+```ts
+const rows = await sql`SELECT 1 AS n`
+// rows es [{ n: 1 }]
+```
+
+## Siguiente paso
+Cuando hayas hecho todo lo anterior, escríbeme **"listo"**. Comprobaré `.env` sin mostrar su contenido y te propondré qué instalar para arrancar la app, con las versiones exactas. Después diseñarás tu tabla.
+RESULT_FINAL success 11 0.7247339250000001

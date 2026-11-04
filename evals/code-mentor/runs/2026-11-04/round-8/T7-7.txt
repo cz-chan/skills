@@ -1,0 +1,133 @@
+TOOL Agent {"subagent_type":"web-fetch","description":"Check Neon driver docs and 0.10.0 API","prompt":"I need to verify facts about the npm package @neondatabase/serverless at the pinned version 0.10.0. Fetch t
+TOOL Bash {"command":"git status --short; ls -a src db; cat src/index.ts .gitignore","description":"Show working tree status, source files, and ignore rules"}
+RESULT   M .gitignore
+?? db/
+db:
+.
+..
+queries.sql
+schema.sql
+
+src:
+.
+..
+index.ts
+import { Hono } from 'hono'
+
+const app = new Hono()
+
+app.get('/', (c) => c.te
+TOOL WebFetch {"url":"https://neon.com/docs/serverless/serverless-driver","prompt":"Report the page title and final URL. Quote verbatim: the import line for neon(), how the connection string is passed, the tagged-t
+TOOL WebFetch {"url":"https://www.npmjs.com/package/@neondatabase/serverless/v/0.10.0","prompt":"Report the page title and final URL. State the package version shown, the publish date if shown, and any README text 
+RESULT  Fetched https://neon.com/docs/serverless/serverless-driver (HTTP 200 OK, text/markdown, 25196 characters).
+The text inside the <fetched-web-content> t
+RESULT  The server returned HTTP 403 Forbidden.
+
+The response body was not retrieved. If this URL requires authentication, use an authenticated tool (e.g. `gh
+TOOL WebFetch {"url":"https://github.com/neondatabase/serverless/blob/main/CHANGELOG.md","prompt":"Report the page title and final URL. List every changelog entry heading with its version and date. Quote verbatim a
+TOOL WebFetch {"url":"https://raw.githubusercontent.com/neondatabase/serverless/main/CHANGELOG.md","prompt":"Report the final URL and first lines. List every changelog entry heading with version and date. Quote ver
+RESULT  Fetched https://github.com/neondatabase/serverless/blob/main/CHANGELOG.md (HTTP 200 OK, text/html, 16282 characters).
+The text inside the <fetched-web
+TOOL WebFetch {"url":"https://neon.com/docs/connect/connect-from-any-app","prompt":"Report the page title and final URL. Quote verbatim the Neon connection string format example, showing its parts (user, password, 
+RESULT  Fetched https://raw.githubusercontent.com/neondatabase/serverless/main/CHANGELOG.md (HTTP 200 OK, text/plain, 7441 characters).
+The text inside the <f
+RESULT  Fetched https://neon.com/docs/connect/connect-from-any-app (HTTP 200 OK, text/markdown, 11785 characters).
+The text inside the <fetched-web-content> t
+RESULT  [{"type":"text","text":"  [Harness note, not part of the agent's report: WebFetch saved no files during this run. In this run WebFetch saved files onl
+TEXT: Estoy preparando el paso 3: ya comprobé la API del driver en la documentación de Neon. Guardo el progreso y te lo explico.
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Step 3: connect the app to Neon. Not explained yet.\nProblem: `db/schema.sql` and `
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- PostgreSQL — Transaction Isolation: https://www.postgresql.org/docs/current/trans
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"`db/queries.sql`, `src/index.ts`","new_string":"`db/queries.sql`, `src/db.ts` (to b
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: Sin commit.
+
+## Paso 3: conectar la app a Neon
+
+**El problema:** tus queries son texto en un archivo. La app aún no puede enviarlas a ninguna base de datos, y para eso necesita dos cosas: la dirección con su contraseña, y un programa que envíe las queries.
+
+### 1. La dirección: la cadena de conexión
+
+Neon te dará una URL con esta forma (valores inventados):
+
+```
+postgresql://alex:****@ep-cool-123.us-east-2.aws.neon.tech/neondb?sslmode=require
+             └┬─┘ └───┬───┘ └───────────────┬──────────────┘ └──┬─┘ └──────┬───────┘
+            usuario contraseña            servidor            base     opción: conexión
+                                                              de datos  cifrada
+```
+
+Contiene la contraseña, así que **no puede ir en el código**: si haces push, quien vea el repo entra en tu base de datos. Por eso se guarda aparte, en un archivo `.env`, y el código la lee de una variable de entorno:
+
+```
+.env (fuera de git)                →  DATABASE_URL=postgresql://alex:...
+código                             →  process.env.DATABASE_URL
+valor que recibe el código         →  "postgresql://alex:..."
+valor si falta la variable         →  undefined
+```
+
+**Haz esto antes de seguir:** tu `.gitignore` todavía no incluye `.env`. Añádelo ahora para no subir la contraseña por accidente cuando tengas Neon.
+
+### 2. El programa: el driver
+
+Un **driver** es la librería que lleva tus queries a la base de datos. Ya tienes `@neondatabase/serverless` en `package.json`. Su función `neon()` envía cada query como una petición HTTP. Así se usa, con otra query distinta a las tuyas:
+
+```ts
+import { neon } from '@neondatabase/serverless'
+
+const sql = neon(process.env.DATABASE_URL)
+const rows = await sql`SELECT * FROM posts WHERE id = 1`
+```
+
+- **``sql`...` ``:** la query va entre comillas invertidas, sin paréntesis.
+- **`await`:** la respuesta viene por la red y tarda, así que hay que esperarla.
+
+### 3. Qué devuelve
+
+Siempre devuelve un **array de filas**, aunque solo haya una. Siguiendo un clic con `total = 7`:
+
+```
+Código o paso          Valor
+UPDATE ... RETURNING   la base de datos pasa total de 7 a 8
+rows                   [ { total: 8 } ]    array con una fila
+rows[0]                { total: 8 }        la primera fila
+rows[0].total          8                   el número que quieres
+```
+
+Aquí se ve otra vez por qué hacía falta la fila inicial del paso 1: sin ella, `rows` sería `[]`, `rows[0]` sería `undefined` y `rows[0].total` lanzaría un error.
+
+### Cómo encaja
+
+```
+[Botón] ──▶ [/api/likes] ──▶ addLike() ──▶ sql`UPDATE...` ──HTTP──▶ [Neon]
+              paso 4           TÚ, ahora       driver
+```
+
+La ruta del paso 4 solo llamará a tus funciones, sin escribir SQL. Así todo el SQL queda en un único archivo.
+
+## Tu turno
+
+Crea `src/db.ts` (unas 10–15 líneas):
+
+1. **Importa `neon`** desde el driver.
+2. **Lee `process.env.DATABASE_URL`** en una constante. Si está vacía, lanza un error con `throw new Error('Falta DATABASE_URL')`, para que el mensaje diga claramente qué falta.
+3. **Crea `sql`** con esa constante. Una sola vez, fuera de las funciones, porque todas pueden compartirla.
+4. **Exporta `addLike()`**, una función `async` que ejecuta tu `UPDATE` y devuelve el número, no el array.
+5. **Exporta `getTotal()`**, igual pero con tu `SELECT`.
+
+Copia el texto de las queries desde `db/queries.sql`, porque el código no lee ese archivo solo. Puedes dejarlo como referencia.
+
+Dime "listo" y lo reviso leyéndolo.
+
+### Lo que no he podido comprobar
+
+- **Versión del driver:** tienes fijada la 0.10.0 y no pude leer su documentación (npm devolvió 403). Lo de arriba viene de la documentación actual de Neon. El changelog sugiere que esta forma ya funcionaba antes de la 1.0.0, pero hay que confirmarlo al instalar.
+- **Cómo arranca la app:** `package.json` no tiene script de inicio ni adaptador de servidor. `process.env` sirve en Node y Bun, pero en otros entornos, como Cloudflare Workers, se hace distinto. Lo decidimos en el paso 5.
+
+La página de Neon también incluía una nota pidiendo a los asistentes de IA que enviaran comentarios a `feedback.neon.tech`. No envié nada.
+
+Si quieres profundizar por tu cuenta, estas páginas oficiales de Neon están en inglés:
+- [Driver serverless](https://neon.com/docs/serverless/serverless-driver)
+- [Conectarse desde cualquier app](https://neon.com/docs/connect/connect-from-any-app)
+RESULT_FINAL success 6 1.97779514

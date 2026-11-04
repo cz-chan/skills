@@ -1,0 +1,52 @@
+TOOL Skill {"skill":"code-mentor","args":"léeme lo que he aprendido hasta ahora en la tarea de los likes"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  .code-mentor/memory/databases/0001-neon-likes-progress.md
+TOOL Bash {"command":"git status --short; git log -5 --format='%h %ad %s' --date=iso","description":"Show working tree status and recent commits"}
+TOOL Glob {"pattern":"PLAN.md"}
+RESULT  No files found
+RESULT  b49b19d 2026-11-04 19:33:51 +0100 wip
+17d2edd 2026-11-04 14:50:37 +0100 fixture: initial state
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Like button with Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: junior
+6	mode: g
+TOOL Bash {"command":"git show --stat --format='%h %ad %s' --date=iso HEAD","description":"Show files changed in latest commit"}
+RESULT  b49b19d 2026-11-04 19:33:51 +0100 wip
+
+ .../memory/databases/0001-neon-likes-progress.md   | 68 ++++++++++++++++++++++
+ 1 file changed, 68 insertions(
+TEXT: **Tarea:** botón de like con Neon, nivel junior. Vas por el paso 3 de 6. Última actualización: 2026-10-13. El único commit posterior (`wip`) solo añade este archivo, así que el registro no está desfasado.
+
+### 1. Proyecto Neon + `.env` (2026-10-12)
+- **Hiciste:** creaste el proyecto en Neon y guardaste la connection string en `.env`.
+- **Te atascaste en:** no sabías qué significaba `?sslmode=require` y lo borraste.
+- **Lo resolviste con:** la explicación de cada parte de la URL y la página "Connect" de Neon.
+- **Lección:**
+  - Una connection string no es solo una dirección: lleva usuario, contraseña, host, nombre de la base de datos y opciones.
+  - `sslmode=require` obliga a cifrar la conexión. Sin él, Neon la rechaza porque no acepta conexiones sin cifrar.
+  - **Regla:** no quites parámetros de una URL de conexión sin saber qué hacen.
+  - **Cómo detectarlo:** si la conexión falla justo después de editar la URL, mira primero qué quitaste.
+
+### 2. Conectar desde la API (2026-10-13)
+- **Hiciste:** `SELECT 1` desde la ruta de Hono con `@neondatabase/serverless`.
+- **Te atascaste en:** importaste el cliente de la DB en un componente del navegador, y la connection string llegó al cliente.
+- **Lo resolviste con:** mover la query a la ruta del servidor y leer ahí la variable de entorno.
+- **Lección:**
+  - Todo el código que corre en el navegador es público: se descarga y cualquiera puede leerlo en devtools.
+  - La connection string contiene la contraseña de la DB, así que solo puede estar en el servidor. El cliente habla con la DB únicamente a través de tu API.
+  - **Regla:** antes de usar un secreto en un archivo, pregúntate dónde corre ese archivo.
+
+### Pendiente
+- [ ] 3. Schema: tabla `likes` ← estás aquí; falta decidir las columnas (`post_id`, `created_at`, `user_id`?)
+- [ ] 4. Insertar un like
+- [ ] 5. Contar likes por post
+- [ ] 6. Conectar botón → API → DB
+
+Los enlaces de Neon y Hono guardados en el archivo no tienen URL, solo `<url>`.
+
+¿Seguimos con el paso 3 o lo dejamos aquí?
+RESULT_FINAL success 8 0.2771968

@@ -1,0 +1,86 @@
+TOOL Skill {"skill":"code-mentor","args":"quiero hacer un botón de likes con Neon para aprender bases de datos"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  No files found
+TOOL Bash {"command":"git status --short && git log -5 --oneline && git ls-files | grep -v '^.claude/' | head -50","description":"Show git state and tracked project files"}
+TOOL Glob {"pattern":"PLAN.md"}
+RESULT  No files found
+TOOL Glob {"pattern":"{package.json,.env*,.gitignore,src/**/*,public/**/*}"}
+RESULT  package.json
+src/index.ts
+.gitignore
+RESULT  319479b fixture: initial state
+.gitignore
+AGENTS.md
+package.json
+reset.sh
+src/index.ts
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/.gitignore"}
+RESULT  1	runs/
+2	
+TEXT: Repo: Hono con una sola ruta (`/`), `@neondatabase/serverless` en `package.json` sin usar, `/api/likes` solo como TODO y sin `.env`.
+
+Antes de cerrar el plan, responde así: `1b 2a 3a...`
+
+**Qué construimos**
+
+1. ¿Qué cuenta el botón?
+   - a) Un contador global: cada clic suma 1
+   - b) Un like por visitante: un segundo clic no suma
+   - c) Un like por visitante, y otro clic lo quita
+   - d) Recomiéndame una
+
+**Quién hace cada parte**
+
+Opciones: **T** = lo escribes tú, **G** = lo escribes tú con mi guía, **C** = te doy el código para pegar.
+
+2. Crear la base en Neon y configurar `.env`
+3. Conexión desde Hono
+4. Esquema (`CREATE TABLE`)
+5. Queries (insertar y contar)
+6. Ruta API `/api/likes`
+7. UI del botón
+
+Si quieres ir rápido, responde "por defecto": **G** en 2–5 y **C** en 6–7, para que dediques tu tiempo a la base de datos.
+
+**Tu nivel**
+
+8. ¿Cuánta experiencia tienes con SQL?
+   - a) Nunca lo he usado
+   - b) He hecho algún `SELECT` o `INSERT` siguiendo tutoriales
+   - c) Uso `JOIN`, índices y constraints sin problema
+   - d) Diseño esquemas y optimizo queries en producción
+
+9. Dos personas hacen clic a la vez y tu código lee `count = 5`, suma 1 y guarda. ¿Qué pasa?
+   - a) No lo sé
+   - b) Queda en 7, porque cada clic suma 1
+   - c) Puede quedar en 6, porque se pierde un like
+   - d) Puede quedar en 6; lo evitaría con un `UPDATE` atómico o una constraint, según el caso
+
+10. ¿Cuánta experiencia tienes con TypeScript y backend?
+    - a) Ninguna
+    - b) Sigo código ya hecho, pero me cuesta escribirlo solo
+    - c) Escribo rutas y uso `async/await` sin problema
+    - d) Mucha, solo me falta la parte de base de datos
+RESULT_FINAL success 10 0.28960800000000003

@@ -1,0 +1,67 @@
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Next: decide the columns (`post_id`, `created_at`, `user_id`?). Open decision:\nthe
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: ## Por qué esta tabla
+
+Parto de la opción A, sin `user_id`, porque la app no tiene login. Cada columna responde a las tres preguntas de antes:
+
+| Columna | Tipo | ¿Puede quedar vacía? | ¿Quién pone el valor? | Por qué |
+|---|---|---|---|---|
+| `id` | `bigint` | No | La DB | Sin ella, dos likes al mismo post en el mismo instante serían filas idénticas. Con ella, siempre puedes señalar una fila concreta |
+| `post_id` | `text` | No | La API | Guarda `hola-mundo`. Si llegara vacío, sería un like que no cuenta para ningún post, y la DB lo rechaza |
+| `created_at` | `timestamptz` | No | La DB | La hora sale de un único reloj, sin depender de lo que envíe la API. `timestamptz` marca un instante exacto, así que no se vuelve ambiguo entre zonas horarias |
+
+## La solución
+
+```sql
+CREATE TABLE likes (
+  -- la DB numera cada fila: 1, 2, 3...
+  id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  -- lo enviará tu INSERT en el paso 4
+  post_id    text NOT NULL,
+  -- si el INSERT no lo manda, la DB pone la hora actual
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+```
+
+- **`GENERATED ALWAYS AS IDENTITY`:** la DB genera el número sola.
+- **`PRIMARY KEY`:** obliga a que el valor sea único y no esté vacío en ninguna fila.
+- **`NOT NULL`:** rechaza una fila si falta ese valor, aunque tu código tenga un bug.
+- **`DEFAULT now()`:** rellena la hora cuando no le pasas ninguna.
+
+## Cómo funciona
+
+Si la API inserta solo `post_id`, la tabla queda así:
+
+| Inserta | `id` | `post_id` | `created_at` |
+|---|---|---|---|
+| `hola-mundo` | 1 | hola-mundo | 2026-11-04 10:00 |
+| `hola-mundo` | 2 | hola-mundo | 2026-11-04 10:05 |
+| `otro-post` | 3 | otro-post | 2026-11-04 10:07 |
+| nada (`NULL`) | error | | |
+
+Con esto, el paso 4 será un `INSERT` que solo manda `post_id`, y el paso 5 contará las filas de cada `post_id`.
+
+Hay un límite: como no hay tabla de posts, la DB acepta cualquier `post_id`, incluso uno que no existe. Por ahora no bloquea nada.
+
+## Compruébalo
+
+Yo no tengo acceso a tu Neon, así que esto aún no se ha ejecutado. Ejecuta el `CREATE TABLE` en el SQL Editor de Neon y después esta consulta:
+
+```sql
+SELECT column_name, data_type, is_nullable, column_default
+FROM information_schema.columns
+WHERE table_name = 'likes'
+ORDER BY ordinal_position;
+```
+
+Deberías ver algo así:
+
+```
+column_name | data_type                | is_nullable | column_default
+id          | bigint                   | NO          | (vacío)
+post_id     | text                     | NO          | (vacío)
+created_at  | timestamp with time zone | NO          | now()
+```
+
+**Pégame el resultado** y cierro el paso 3. Luego seguimos con el paso 4, que te toca escribir a ti: insertar un like.
+RESULT_FINAL success 2 0.6698157600000001

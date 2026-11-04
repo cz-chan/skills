@@ -1,0 +1,162 @@
+TOOL Bash {"command":"git log --stat -3; git status --short; ls -a","description":"Show recent commits and repo contents"}
+RESULT  commit f78522e8c61a16dd7d979560687185b01a43a290
+Author: fixture <fixture@local>
+Date:   Wed Nov 4 14:35:17 2026 +0100
+
+    wip likes
+
+ .../memory/data
+TOOL Bash {"command":"ls -la ~/.claude/projects/-private-tmp-claude-501--Users-user-Desktop-projects-prod-cz-skills-a54ea246-387e-4d48-b65f-5594c8587ebd-scratchpad-con-1/memory/ 2>&1","description":"List saved 
+RESULT  total 0
+drwxr-xr-x@ 2 user  staff   64 Nov  4 14:33 .
+drwxr-xr-x@ 6 user  staff  192 Nov  4 14:35 ..
+TOOL Grep {"pattern":"TODO|FIXME|WIP|likes","-i":true,"output_mode":"content","glob":"!node_modules"}
+RESULT  src/index.ts:7:// TODO: /api/likes
+.claude/skills/code-mentor/SKILL.md:139:[Button] ──click──▶ [API /likes] ──query──▶ [Neon DB]
+.claude/skills/code-m
+TOOL Skill {"skill":"code-mentor"}
+RESULT  Launching skill: code-mentor
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Like button with Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: junior
+6	mode: g
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Bash {"command":"test -f src/pages/api/likes.ts && echo \"likes.ts: yes\" || echo \"likes.ts: no\"; test -f .env && echo \".env: yes\" || echo \".env: no\"; test -d node_modules && echo \"node_modules: yes
+RESULT  likes.ts: no
+.env: no
+node_modules: no
+--- src
+src/index.ts
+--- memory
+.code-mentor/memory/databases/0001-neon-likes-progress.md
+--- gitignore
+runs/
+-
+TOOL Agent {"subagent_type":"web-fetch","description":"Verify Postgres docs links","prompt":"Fetch each URL and for each report: did it load (no 404 or redirect to a home page), final URL, and whether the page e
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-basics.html","prompt":"Did this page load (not a 404 or home page redirect)? Does it explain creating tables with CREATE TABLE and columns? Briefly 
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-constraints.html","prompt":"Did this page load (not a 404 or home page redirect)? Does it explain table constraints including NOT NULL, primary keys
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-basics.html (HTTP 200 OK, text/html, 8086 characters).
+The text inside the <fetched-web-content> t
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-constraints.html (HTTP 200 OK, text/html, 28053 characters).
+The text inside the <fetched-web-cont
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-default.html","prompt":"Did this page load (not a 404 or home page redirect)? Does it explain column default values? Briefly summarize how defaults 
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-default.html (HTTP 200 OK, text/html, 5405 characters).
+The text inside the <fetched-web-content> 
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/datatype-datetime.html","prompt":"Did this page load (not a 404 or home page redirect)? Does it explain timestamp types, including timestamp and timesta
+RESULT  Fetched https://www.postgresql.org/docs/current/datatype-datetime.html (HTTP 200 OK, text/html, 34470 characters).
+The text inside the <fetched-web-co
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TEXT: # Retomamos: botón de likes con Neon
+
+**Antes de seguir: el progreso no coincide con el repo**
+
+El archivo de progreso marca los pasos 1 y 2 como hechos, pero en esta copia no aparecen:
+- No hay `.env`.
+- No hay `src/pages/api/likes.ts`.
+- No hay ninguna query: `src/index.ts` solo tiene `// TODO: /api/likes`.
+- Tampoco hay `node_modules`.
+- El último commit (`f78522e`) solo añade el archivo de progreso.
+
+Además, `.env` no está en `.gitignore`. Cuando lo crees aquí, añádelo, porque contiene la contraseña de la DB.
+
+## El panorama
+
+Construimos un botón de likes en c12z.io para que aprendas bases de datos. Estará terminado cuando un clic suba el contador y el número siga igual al recargar.
+
+```
+[1] Neon + .env          ✅ según el archivo
+[2] Conectar desde la API ✅ según el archivo
+[3] Tabla likes          ◀ estás aquí
+[4] Insertar un like
+[5] Contar likes por post
+[6] Botón → API → DB
+```
+
+En el paso 2 comprobaste con `SELECT 1` que la API llega a la DB. Ahora la DB tiene que poder guardar algo, y para eso necesita una tabla. Sin ella, los pasos 4 y 5 no tienen dónde escribir ni qué leer.
+
+## El problema
+
+Ana y Luis dan like a `hola-mundo`, y Ana a `otro-post`. La página tiene que mostrar 2 y 1. Mañana esos números deben seguir ahí, aunque el servidor se reinicie. Una variable en memoria se perdería en ese reinicio, así que los datos tienen que vivir en la DB.
+
+## La idea
+
+Una **tabla** es una lista de datos con forma fija: las **columnas** dicen qué se guarda y cada **fila** es un dato. El **schema** es esa definición de la forma.
+
+Aquí, **cada like es una fila**:
+
+| post_id | created_at |
+|---|---|
+| hola-mundo | 2026-11-04 10:00 |
+| hola-mundo | 2026-11-04 10:05 |
+| otro-post | 2026-11-04 10:07 |
+
+Para saber los likes de un post, se cuentan sus filas:
+- `hola-mundo` → 2 filas → muestra 2
+- `otro-post` → 1 fila → muestra 1
+- Llega otro like a `otro-post` → se añade una fila → muestra 2
+
+## Por qué así
+
+Lo más obvio sería una columna `likes` con un contador en una tabla de posts, y sumarle 1 en cada clic. Es simple, pero solo guarda el total: `likes = 3` no dice quién dio like ni cuándo. Tampoco permite evitar que alguien vote dos veces, ni quitar un like concreto.
+
+Con una fila por like conservas esa información y puedes calcular el total cuando quieras. Además, esta app aún no tiene tabla de posts, así que una tabla `likes` basta para empezar.
+
+## Qué nos da
+
+Tendrás dónde escribir (paso 4) y qué contar (paso 5).
+
+**Comprobación final del paso:** en Neon, `\d likes` o el panel de tablas muestra `likes` con las columnas y tipos que elijas.
+
+## Cómo
+
+```
+[Botón] ──clic──▶ [API /likes] ──query──▶ [Neon: tabla likes]
+   yo                 yo                    TÚ (este paso)
+```
+
+Este paso lo escribes tú, en SQL, desde el SQL Editor de Neon:
+1. Decidir las columnas: `post_id`, `created_at` y quizá `user_id`.
+2. Elegir el tipo de cada una, y cuáles son obligatorias o tienen valor por defecto. Un **valor por defecto** es el que pone la DB si no le pasas ninguno.
+3. Escribir el `CREATE TABLE` y ejecutarlo.
+4. Hacer la comprobación final.
+
+Hay una decisión importante en `user_id`: la app no tiene login, así que aún no hay ningún usuario que guardar. La veremos al empezar, con dos opciones y mi recomendación.
+
+Si quieres adelantarte, estas páginas de la documentación oficial de Postgres explican lo que vas a usar:
+- [Crear tablas](https://www.postgresql.org/docs/current/ddl-basics.html)
+- [Valores por defecto](https://www.postgresql.org/docs/current/ddl-default.html)
+- [Restricciones](https://www.postgresql.org/docs/current/ddl-constraints.html)
+- [Tipos de fecha](https://www.postgresql.org/docs/current/datatype-datetime.html)
+
+## Dos preguntas
+
+**1. ¿Dónde están los pasos 1 y 2?**
+- a) En otra rama o carpeta: dime cuál y sigo desde ahí.
+- b) Se perdieron o nunca llegaron aquí: los rehacemos rápido. El proyecto de Neon quizá siga existiendo.
+- c) No lo sé: lo miramos juntos.
+
+**2. ¿Te queda clara la idea de la tabla? ¿Empezamos a escribir código?**
+RESULT_FINAL success 11 0.3979933600000001

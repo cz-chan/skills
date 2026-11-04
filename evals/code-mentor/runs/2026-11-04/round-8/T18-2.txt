@@ -1,0 +1,99 @@
+TOOL Read {"file_path":"<sandbox>/.gitignore"}
+RESULT  1	runs/
+2	
+TOOL Bash {"command":"node -v; npm -v; which bun psql tsx; echo ---; npm view @hono/node-server version engines peerDependencies --json; npm view tsx version engines --json; echo ---; npm view @neondatabase/ser
+RESULT ERR  This Bash command contains multiple operations. The following parts require approval: npm -v, npm view @hono/node-server version engines peerDependenc
+TOOL Agent {"subagent_type":"web-fetch","description":"Verify docs links for lesson","prompt":"Fetch each URL and report for each: does it load (no 404 / no redirect to a home page), final URL, and in 1-2 lines 
+TOOL WebFetch {"url":"https://neon.com/docs/get-started/signing-up","prompt":"Report whether this page loaded (not a 404, not a redirect to a home page). Give the final URL. Does it explain creating a Neon project 
+RESULT ERR  Claude requested permissions to use WebFetch, but you haven't granted it yet.
+TOOL WebFetch {"url":"https://neon.com/docs/get-started-with-neon/query-with-neon-sql-editor","prompt":"Report whether this page loaded (not a 404, not a redirect to a home page). Give the final URL. Does it explai
+RESULT ERR  Claude requested permissions to use WebFetch, but you haven't granted it yet.
+TOOL WebFetch {"url":"https://neon.com/docs/connect/connect-from-any-app","prompt":"Report whether this page loaded (not a 404, not a redirect to a home page). Give the final URL. Does it explain the parts of a Neo
+RESULT ERR  Claude requested permissions to use WebFetch, but you haven't granted it yet.
+TOOL WebFetch {"url":"https://neon.com/docs/serverless/serverless-driver","prompt":"Report whether this page loaded (not a 404, not a redirect to a home page). Give the final URL. Quote verbatim how `neon()` and th
+RESULT ERR  Claude requested permissions to use WebFetch, but you haven't granted it yet.
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/tutorial-table.html","prompt":"Report whether this page loaded (not a 404, not a redirect to a home page). Give the final URL. Does it explain CREATE TA
+TOOL WebFetch {"url":"https://hono.dev/docs/getting-started/nodejs","prompt":"Report whether this page loaded (not a 404, not a redirect to a home page). Give the final URL. Quote verbatim the minimal serve() examp
+RESULT ERR  Claude requested permissions to use WebFetch, but you haven't granted it yet.
+RESULT  Fetched https://www.postgresql.org/docs/current/tutorial-table.html (HTTP 200 OK, text/html, 6261 characters).
+The text inside the <fetched-web-conten
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.gitignore","old_string":"runs/\n","new_string":"runs/\n.code-mentor/\n"}
+RESULT  The file <sandbox>/.gitignore has been updated successfully. (file state is current in your context — no need to Read it back)
+TOOL Write {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","content":"---\nstatus: in-progress\ntopic: Like button with Neon\nconcepts: [postgres, neon, sql-schema, sql-insert,
+RESULT  File created successfully at: <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md (file state is current in your context — no need to 
+TOOL Bash {"command":"node -v","description":"Show Node version"}
+RESULT  v24.22.1
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- [ ] 1. Neon project, SQL Editor, connection string in `.env` ← current\n- [ ] 2. 
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully. (file state is current in your context — n
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"concepts: [postgres, neon, sql-schema, sql-insert, sql-select, sql-update]","new_st
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully. (file state is current in your context — n
+TEXT: Ya he añadido `.code-mentor/` a `.gitignore` (sin commit) y he creado tu archivo de progreso. Como no respondiste a la pregunta de nivel, empiezo desde cero; si vas sobrado, lo ajustamos.
+
+## Por qué hace falta una base de datos
+
+Primero, la opción obvia: guardar el contador en una variable del servidor.
+
+```ts
+let likes = 0
+```
+
+Mira qué pasa con valores reales:
+
+| Acción | `likes` |
+|---|---|
+| 3 clics | 3 |
+| Recargas la página | 3 (el servidor sigue encendido) |
+| El servidor se reinicia | **0**: se pierde todo |
+
+La variable vive en la memoria (RAM), que se borra al apagar el programa. Una **base de datos** es otro programa, y guarda los datos en disco. **Neon** nos da una base de datos **Postgres** en la nube, así que tu app puede reiniciarse sin perder nada.
+
+## Cómo se organizan los datos
+
+- **Tabla:** datos con forma de cuadrícula, como una hoja de cálculo.
+- **Columna:** un dato que tiene cada fila, con un tipo fijo (número, fecha, texto).
+- **Fila:** un elemento guardado.
+- **Esquema:** la definición de tus tablas y columnas. No son los datos, sino su forma.
+- **Query:** una orden en **SQL**, el lenguaje con el que le hablas a la base de datos.
+
+## Cómo vamos a contar los likes
+
+He elegido **una fila por cada like**: el contador es el número de filas.
+
+```text
+Inicio    tabla likes: (vacía)            contador = 0
+Clic 1    añade una fila: [fila 1]        contador = 1
+Clic 2    añade otra:     [fila 1][fila 2] contador = 2
+Recarga   no añade nada, solo cuenta      contador = 2
+Reinicio  las filas siguen en Neon        contador = 2
+```
+
+La alternativa es una sola fila con una columna numérica que vas aumentando. También vale, pero antes tendrías que crear esa fila inicial. Añadir filas y contarlas es más sencillo para tus primeras queries, y además guarda cuándo ocurrió cada like si añades esa columna.
+
+Tus piezas serán estas:
+
+| Pieza | Qué hace | Cuándo se usa |
+|---|---|---|
+| Esquema | Crea la tabla | Una vez |
+| Query 1 | Añade una fila | En cada clic |
+| Query 2 | Cuenta las filas | En cada clic y al cargar la página |
+
+## Paso 1: crear el proyecto en Neon
+
+Vamos a probar SQL directamente en Neon, sin tocar todavía la app, para que veas cada resultado al momento. Todavía no necesitas tu clave de conexión.
+
+1. Entra en [neon.com](https://neon.com) y crea una cuenta.
+2. Crea un proyecto llamado `c12z-demo`, en la región más cercana a ti.
+3. Abre el **SQL Editor** en el menú del proyecto. Los nombres de la web pueden variar un poco.
+4. Ejecuta esta query:
+
+```sql
+SELECT 1 + 1;
+```
+
+`SELECT` significa "devuélveme este valor". Aquí no lee ninguna tabla: solo le pide a Postgres que calcule algo y te lo muestre. **Deberías ver una fila con el valor `2`**, lo que prueba que tu base de datos responde.
+
+Si quieres adelantarte, la [guía de Postgres para crear tablas](https://www.postgresql.org/docs/current/tutorial-table.html) explica lo que harás en el siguiente paso. Es opcional. No he podido comprobar los enlaces de la documentación de Neon, así que no te los paso todavía.
+
+**Cuando lo ejecutes, dime qué resultado te sale.** Si algo no coincide o te atascas, cuéntame en qué pantalla estás. Después pasamos a diseñar tu tabla.
+RESULT_FINAL success 9 0.604759615

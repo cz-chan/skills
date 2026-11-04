@@ -4,11 +4,9 @@ Examples of how to write files in `.code-mentor/memory/` (see section 6 of `SKIL
 This file is a reference only — never copy it into `.code-mentor/memory/` and never treat
 it as the learner's real progress.
 
-The rules (English headings, content in the user's language, length of each
-log field) are in section 6 of `SKILL.md`; these examples show them applied.
-The examples are written in English so anyone can read them. In real files,
-keep the headings and keys in English and write the content in the user's
-language.
+The rules (files in English, length of each log field) are in section 6 of
+`SKILL.md`; these examples show them applied. Write real files in English too,
+even if the user speaks another language.
 
 ---
 
@@ -30,7 +28,7 @@ updated: 2026-10-13
 
 Goal: like button on c12z.io, to learn databases.
 You: Neon setup, connection, schema, insert and count queries.
-Me: button UI, API route wiring, tests.
+Me (code in the console, you paste it): button UI, API route wiring, tests.
 Done: click → the count goes up and survives a reload.
 Explanations: more detail, with examples.
 

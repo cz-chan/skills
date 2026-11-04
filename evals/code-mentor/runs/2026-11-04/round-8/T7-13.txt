@@ -1,0 +1,130 @@
+TOOL Skill {"skill":"code-mentor","args":"seguimos"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  .code-mentor/memory/databases/0001-neon-likes-progress.md
+TOOL Bash {"command":"git status && git log -5 --format='%h %ad %s' --date=iso && git diff && ls -la && ls -la db src","description":"Show repo status, recent log, diff and files"}
+TOOL Glob {"pattern":"PLAN.md"}
+RESULT  No files found
+RESULT  On branch main
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard c
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Like button with Neon
+4	concepts: [postgres, neon, create-table, primary-key, not-null, default, sql-insert]
+5	le
+TOOL Read {"file_path":"<sandbox>/db/queries.sql"}
+RESULT  1	UPDATE likes SET total = total + 1 WHERE id = 1 RETURNING total;
+2	SELECT total FROM likes WHERE id = 1;
+3	
+TOOL Read {"file_path":"<sandbox>/db/schema.sql"}
+RESULT  1	CREATE TABLE likes (
+2	  id INTEGER PRIMARY KEY,
+3	  total INTEGER NOT NULL DEFAULT 0
+4	);
+5	
+6	INSERT INTO likes (id, total) VALUES (1, 0);
+7	
+TOOL Read {"file_path":"<sandbox>/src/db.ts"}
+RESULT  1	import { neon } from '@neondatabase/serverless'
+2	
+3	const url = process.env.DATABASE_URL
+4	if (!url) throw new Error('Falta DATABASE_URL')
+5	const 
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TEXT: # Retomamos: botón de likes con Neon
+
+El progreso guardado coincide con el repo: `src/index.ts` sigue sin cambios y no hay commits nuevos.
+
+## El cuadro completo
+Estamos haciendo un botón de likes con un contador global, compartido por todos los visitantes, para que aprendas bases de datos.
+
+```
+[x] 1. Esquema       db/schema.sql    la tabla likes y su fila inicial
+[x] 2. Queries       db/queries.sql   sumar un like y leer el total
+[x] 3. Conexión      src/db.ts        addLike() y getLikes()
+[ ] 4. Ruta + botón  src/index.ts     ← estamos aquí
+[ ] 5. Neon          crear el proyecto, DATABASE_URL, npm install y probar
+```
+
+El paso 3 dejó dos funciones que hablan con la base de datos, pero nadie las llama todavía. El paso 4 las conecta con la página.
+
+**Importante:** aún no hemos ejecutado nada. Los pasos 1 a 3 solo están revisados leyendo el código, así que todavía no sabemos si funcionan.
+
+## El problema
+Imagina que la tabla ya tiene `total = 7`. Al abrir `/`, solo verías el texto `c12z`, porque eso es lo único que hace hoy `src/index.ts`. No hay botón ni forma de ver el 7 o de sumar un like. `addLike` y `getLikes` existen, pero nadie las usa.
+
+## La idea
+Faltan dos piezas:
+
+- **Una ruta:** una URL del servidor con el código que responde a ella. Crearemos `/api/likes`.
+- **Un botón:** una página con un pequeño script que llama a esa ruta usando `fetch`, la función del navegador para hacer peticiones.
+
+La ruta responderá a dos métodos HTTP, que indican qué quiere hacer la petición:
+
+- **GET:** pedir datos, sin cambiar nada.
+- **POST:** enviar una acción que cambia algo.
+
+La respuesta será JSON, un formato de texto para intercambiar datos, como `{ "total": 7 }`.
+
+Con `total = 7`, pasaría esto:
+
+| Acción | Petición | Función | SQL | Respuesta | El botón muestra |
+|---|---|---|---|---|---|
+| Abrir la página | `GET /api/likes` | `getLikes()` | `SELECT`, total sigue en 7 | `{ "total": 7 }` | 7 |
+| Hacer clic | `POST /api/likes` | `addLike()` | `UPDATE`, total pasa a 8 | `{ "total": 8 }` | 8 |
+| Recargar | `GET /api/likes` | `getLikes()` | `SELECT`, total sigue en 8 | `{ "total": 8 }` | 8 |
+
+Recargar muestra 8, no 9, porque solo lee.
+
+## Por qué así
+- **Una sola ruta GET que sume y devuelva el total:** no sirve, porque cada recarga sumaría un like. Por eso GET solo lee y POST solo suma.
+- **SQL escrito dentro de la ruta:** funcionaría, pero repartiría el SQL por varios archivos. Así, la ruta solo llama a `getLikes()` o `addLike()`, y todo el SQL de la app sigue en `src/db.ts`.
+- **Sumar en el navegador con `total + 1`:** cada navegador tendría su propia cuenta y se perdería al recargar. Además, es el error que evitaste en el paso 2: el número lo calcula la base de datos con el `UPDATE`.
+
+## Qué nos da
+El código quedará completo de punta a punta, y solo faltará conectarlo a Neon.
+
+**Comprobación de este paso:** como aquí no hay Neon ni instalación, revisaré leyendo que `src/index.ts`:
+- importa `addLike` y `getLikes`;
+- tiene `GET /`, `GET /api/likes` y `POST /api/likes`.
+
+Eso no demostrará que funcione. La prueba real llega en el paso 5: haces clic, el contador sube y sigue igual al recargar.
+
+## Cómo
+```
+ navegador                     servidor                      base de datos
+[Botón + script] ──fetch──▶ [/api/likes] ──▶ [src/db.ts] ──▶ [Neon]
+   yo te lo doy              yo te lo doy        TÚ ✓         TÚ, paso 5
+   tú lo pegas               tú lo pegas
+```
+
+1. Te doy el código de la ruta y del botón en la consola, explicado.
+2. Lo pegas en `src/index.ts`, en lugar del `TODO` y del `GET /` actual.
+3. Lo reviso leyendo el archivo.
+4. El paso 5 queda pendiente hasta que tengas Neon y puedas instalar paquetes.
+
+¿Te queda claro? ¿Empezamos con el código?
+RESULT_FINAL success 12 0.3461638

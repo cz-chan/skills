@@ -1,0 +1,51 @@
+TEXT: Esta es la solución. Yo no la he ejecutado: lo comprobamos con tu resultado en Neon.
+
+```sql
+CREATE TABLE likes (
+  id          bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  post_id     text NOT NULL,                       -- lo único que enviará la API en el paso 4
+  created_at  timestamptz NOT NULL DEFAULT now()
+);
+```
+
+## Por qué es así
+Cada like es una fila, y cada columna evita un dato incorrecto.
+
+**`id`: distingue un like de otro**
+- `bigint` es un entero grande, para que no se quede corto si los likes crecen.
+- `GENERATED ALWAYS AS IDENTITY` hace que Postgres asigne 1, 2, 3…, así la API no tiene que calcular el siguiente número.
+- `PRIMARY KEY` impide que se repita o quede vacío. Dos likes al mismo post son dos filas, y el `id` las distingue.
+
+**`post_id`: dice a qué post pertenece el like**
+- `text` porque guarda valores como `hola-mundo`.
+- `NOT NULL` porque un like sin post no se podría contar en ninguno. Sin esta regla, un fallo en la API guardaría filas vacías sin avisar.
+- No tiene `PRIMARY KEY` ni `UNIQUE` porque debe poder repetirse: cada like a `hola-mundo` añade una fila con ese valor.
+
+**`created_at`: dice cuándo ocurrió**
+- `timestamptz` guarda el instante exacto, con zona horaria.
+- `DEFAULT now()` lo rellena si no envías valor, así que la hora la pone la base de datos y no el navegador de cada usuario.
+- `NOT NULL` es necesario además del `DEFAULT`, porque el `DEFAULT` solo actúa si omites la columna. Si alguien enviara `NULL` a propósito, sin esta regla se guardaría.
+
+## Cómo encaja con lo que sigue
+```
+Clic en hola-mundo
+      ▼
+Paso 4: la API inserta post_id = 'hola-mundo'
+      ▼
+Postgres añade id = 1 y created_at = ahora
+      ▼
+Paso 5: contar filas con post_id = 'hola-mundo' → 1
+```
+Como las filas viven en Neon, el contador sobrevive a recargas y reinicios, que es lo que pide el objetivo.
+
+## Qué hacer ahora
+1. Si llegaste a crear `prueba_libros`, bórrala con `DROP TABLE prueba_libros;`.
+2. Ejecuta el `CREATE TABLE` en el SQL Editor de Neon.
+3. Comprueba el resultado:
+   ```sql
+   SELECT * FROM likes;
+   ```
+   Debes ver **0 filas y las columnas `id`, `post_id` y `created_at`**, sin el error `does not exist`.
+
+Pégame lo que te devuelva Neon.
+RESULT_FINAL success 1 0.8737312300000001

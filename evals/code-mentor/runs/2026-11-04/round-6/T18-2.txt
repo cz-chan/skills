@@ -1,0 +1,74 @@
+TOOL Read {"file_path":"<sandbox>/.gitignore"}
+RESULT  1	runs/
+2	
+TOOL Agent {"subagent_type":"web-fetch","description":"Verify Neon docs links","prompt":"Fetch these two pages and report for each: final URL after redirects, whether it loads (not 404 / home-page redirect), and
+TOOL WebFetch {"url":"https://neon.com/docs/get-started/signing-up","prompt":"Report the page title and a short summary. Give the current steps to sign up and create the first project, and where in the console the 
+RESULT ERR  Claude requested permissions to use WebFetch, but you haven't granted it yet.
+TOOL WebFetch {"url":"https://neon.com/docs/connect/connect-from-any-app","prompt":"Report the page title and a short summary. Does it explain the parts of a Postgres connection string (user, password, host, databa
+RESULT ERR  Claude requested permissions to use WebFetch, but you haven't granted it yet.
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.gitignore","old_string":"runs/\n","new_string":"runs/\n.code-mentor/\n"}
+RESULT  The file <sandbox>/.gitignore has been updated successfully. (file state is current in your context — no need to Read it back)
+TOOL Write {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","content":"---\nstatus: in-progress\ntopic: Like button with Neon\nconcepts: [postgres, neon, connection-string, env-
+RESULT  File created successfully at: <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md (file state is current in your context — no need to 
+TEXT: Hecho: `.code-mentor/` ya está en `.gitignore` (sin commit) y tu progreso queda en `.code-mentor/memory/databases/0001-neon-likes-progress.md`. No me dijiste tu nivel de SQL, así que empiezo desde cero. Si algo te resulta obvio, dímelo y acelero.
+
+## Paso 1: crear la base de datos y guardar cómo conectarse
+
+### Por qué hace falta una base de datos
+Podríamos guardar el contador en una variable del servidor:
+
+```ts
+let likes = 0
+```
+
+Así se comportaría:
+
+| Acción | Valor de `likes` |
+|---|---|
+| Arrancas el servidor | 0 |
+| Clic | 1 |
+| Clic | 2 |
+| Recargas la página | 2 (el servidor sigue encendido) |
+| Reinicias el servidor | **0: likes perdidos** |
+
+La variable vive en la memoria del proceso y muere con él. Una **base de datos** es un programa aparte que guarda los datos en disco, así que sobreviven a los reinicios de tu servidor.
+
+**Postgres** es ese programa, y **Neon** te lo da ya instalado en la nube. Tu app se conecta a él por internet:
+
+```
+[Tu servidor Hono] ──internet──▶ [Postgres en Neon] ──▶ disco
+   se puede reiniciar                 los datos siguen aquí
+```
+
+### Qué es una cadena de conexión
+Es un texto con todo lo que tu app necesita para entrar en la base de datos. Este ejemplo es inventado:
+
+```
+postgresql://ana:****@ep-demo-123.eu-central-1.aws.neon.tech/neondb?sslmode=require
+             │   │      │                                      │      │
+           usuario      servidor                       base de datos  opciones
+                 contraseña                                         (conexión cifrada)
+```
+
+Incluye tu contraseña, así que quien la tenga puede leer y borrar tus datos. Por eso va en `.env`, un archivo con secretos que se queda en tu máquina si le dices a git que lo ignore.
+
+### Qué tienes que hacer
+1. **Protege el secreto primero:** añade esta línea a `.gitignore`. Así el archivo no acabará en git por accidente, porque ahora mismo no está ignorado.
+   ```
+   .env
+   ```
+2. **Crea el proyecto:** entra en [neon.com](https://neon.com), regístrate si hace falta y crea un proyecto. Elige la región más cercana a ti para que las consultas tarden menos.
+3. **Copia la cadena de conexión:** en el panel del proyecto, busca el botón **Connect**. Lo cito de memoria y no he podido comprobar la web de Neon, así que si no lo ves, dime qué te aparece.
+4. **Crea el archivo `.env`:** ponlo en la raíz del proyecto, junto a `package.json`, con tu cadena real:
+   ```
+   DATABASE_URL="postgresql://..."
+   ```
+
+No pegues la cadena en este chat ni le quites `?sslmode=require`: esa opción es la que pide la conexión cifrada.
+
+### Cómo sabremos que está bien
+Cuando me escribas **"listo"**, compruebo dos cosas sin mostrar el valor: que git ignora `.env` y que `DATABASE_URL` existe.
+
+En el paso 2 conectamos Hono a Neon y hacemos la primera consulta. Después ya te tocará diseñar tu tabla.
+RESULT_FINAL success 5 0.5052729250000001

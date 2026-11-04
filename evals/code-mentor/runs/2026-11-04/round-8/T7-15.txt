@@ -1,0 +1,97 @@
+TOOL Bash {"command":"git status --short && cat src/index.ts && ls node_modules 2>/dev/null | head -5; ls src","description":"Recheck repo state, current index file and installed modules"}
+RESULT   M .gitignore
+?? db/
+?? src/db.ts
+import { Hono } from 'hono'
+
+const app = new Hono()
+
+app.get('/', (c) => c.text('c12z'))
+
+// TODO: /api/likes
+
+expor
+TEXT: `src/index.ts` sigue sin cambios, así que puedes reemplazarlo entero.
+
+**Haz esto:** borra todo el contenido de `src/index.ts`, pega este código, guarda el archivo y avísame.
+
+```ts
+import { Hono } from 'hono'
+// Tus funciones del paso 3: aquí se conecta la ruta con src/db.ts
+import { addLike, getLikes } from './db'
+
+const app = new Hono()
+
+const page = `<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <title>c12z</title>
+  </head>
+  <body>
+    <button id="like" disabled>Cargando...</button>
+
+    <script>
+      const button = document.getElementById('like')
+
+      async function callLikes(method) {
+        button.disabled = true
+        try {
+          // Llama a las rutas de abajo
+          const res = await fetch('/api/likes', { method })
+          if (!res.ok) throw new Error('Error ' + res.status)
+
+          const data = await res.json()
+          button.textContent = '❤ ' + data.total
+        } catch {
+          button.textContent = 'Error, inténtalo de nuevo'
+        }
+        button.disabled = false
+      }
+
+      // Al abrir o recargar: solo lee el total
+      callLikes('GET')
+
+      // Al hacer clic: suma un like
+      button.addEventListener('click', () => callLikes('POST'))
+    </script>
+  </body>
+</html>`
+
+app.get('/', (c) => c.html(page))
+
+// GET solo lee: recargar nunca suma un like
+app.get('/api/likes', async (c) => c.json({ total: await getLikes() }))
+
+// POST suma uno: la base de datos calcula el total nuevo
+app.post('/api/likes', async (c) => c.json({ total: await addLike() }))
+
+export default app
+```
+
+## Cómo encaja con el clic
+Con el total en 41, cada parte del clic que vimos corresponde a esto:
+
+| Paso del clic | Código | Qué hace |
+|---|---|---|
+| 1. El navegador avisa | `button.addEventListener('click', () => callLikes('POST'))` | Al hacer clic, llama a `fetch` con `POST` |
+| 2. Llega al servidor | `app.post('/api/likes', ...)` | Hono recibe la petición y llama a `addLike()` |
+| 3. Neon suma | `addLike()`, en tu `src/db.ts` | Ejecuta tu `UPDATE`: el total pasa de 41 a 42 |
+| 4. El servidor contesta | `c.json({ total: await addLike() })` | Envía `{ "total": 42 }` |
+| 5. El botón se actualiza | `button.textContent = '❤ ' + data.total` | Muestra `❤ 42` |
+
+## Las partes nuevas
+- **`const page`:** guarda el HTML de la página como texto. Las comillas invertidas `` ` `` permiten escribirlo en varias líneas.
+- **`<script>`:** este código no corre en el servidor. Hono lo envía como texto y lo ejecuta el navegador.
+- **`app.get('/', (c) => c.html(page))`:** cuando alguien abre `/`, envía esa página. Sustituye al antiguo `c.text('c12z')`.
+- **`c`:** es el contexto de Hono, el objeto con el que la ruta lee la petición y crea la respuesta.
+- **`await`:** espera a que Neon responda antes de seguir. Sin él, enviarías una promesa sin resolver en lugar del número.
+- **`callLikes(method)`:** es una sola función para los dos casos, porque solo cambia el método. Así no repetimos el mismo código para `GET` y `POST`.
+- **`res.ok`:** `fetch` no falla cuando el servidor responde con un error como el 500, así que hay que comprobarlo a mano. Si no, intentaríamos mostrar un total que no existe.
+- **`button.disabled = true`:** bloquea el botón mientras espera la respuesta, para que un doble clic rápido no envíe dos likes.
+
+## Lo que aún no sabemos
+Este código **no se ha ejecutado**, porque aquí no hay Neon ni paquetes instalados. Cuando lo pegues, solo podré revisarlo leyendo.
+
+Además, `import ... from './db'` puede necesitar otra forma según dónde ejecutemos la app, por ejemplo `./db.js`. Lo decidiremos en el paso 5.
+RESULT_FINAL success 2 0.5177116

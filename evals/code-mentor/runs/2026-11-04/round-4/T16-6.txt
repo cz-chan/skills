@@ -1,0 +1,67 @@
+TOOL Read {"file_path":"<sandbox>/db/schema.sql"}
+RESULT  1	-- Esquema de la DB. Los pasos 4 y 5 insertarán y contarán sobre esta tabla.
+2	-- Escribe aquí tu CREATE TABLE likes:
+3	
+4	
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","offset":29,"limit":12}
+RESULT  29	## Current step
+30	
+31	Step 3: write the `likes` table in `db/schema.sql` and run it in Neon.
+32	Problem: the API connects, but nothing stores a li
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Next: the user writes `CREATE TABLE` (not written yet, not run yet).","new_string":
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: ## La solución
+
+```sql
+CREATE TABLE likes (
+  id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  post_id    text NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+```
+
+No la he ejecutado: aquí no tengo acceso a tu Neon.
+
+## Por qué es así
+La tabla guarda **una fila por cada like**, y cada columna depende de quién conoce su valor al guardar:
+
+| Columna | Quién conoce el valor | Por qué se escribe así |
+|---|---|---|
+| `id` | La DB | `IDENTITY` numera cada fila y `PRIMARY KEY` impide repetidos. `bigint` da margen para muchísimos likes. |
+| `post_id` | Tu API | Es `text` porque guarda valores como `hola-mundo`. `NOT NULL` hace que la DB rechace un like sin post. |
+| `created_at` | La DB | `DEFAULT now()` pone la hora actual y `timestamptz` guarda el instante exacto. |
+
+Si envías solo `post_id = 'hola-mundo'`, se guarda esto:
+
+| id | post_id | created_at |
+|---|---|---|
+| 1 | hola-mundo | 2026-11-04 10:00 |
+
+## Cómo conecta con lo siguiente
+- **Paso 4 (insertar):** tu query solo tendrá que enviar `post_id`, porque la DB rellena el resto.
+- **Paso 5 (contar):** contarás las filas de cada `post_id`.
+- **Paso 6 (botón):** el click llamará a la API, y la API hará esas dos queries.
+- **Límite actual:** sin `user_id`, una persona puede dar varios likes.
+
+## Qué hacer ahora
+1. Pega el `CREATE TABLE` en `db/schema.sql`, debajo del comentario.
+2. Pégalo también en el SQL Editor de Neon y ejecútalo. Si la tabla ya existe, dará error, así que avísame.
+3. Para comprobarlo, ejecuta esto en el mismo editor:
+
+   ```sql
+   SELECT column_name, data_type
+   FROM information_schema.columns
+   WHERE table_name = 'likes'
+   ORDER BY ordinal_position;
+   ```
+
+   Debe salir:
+
+   ```
+   id         | bigint
+   post_id    | text
+   created_at | timestamp with time zone
+   ```
+
+Pégame el resultado o el error que salga. Si coincide, cerramos el paso 3 y te pregunto si seguimos con el paso 4.
+RESULT_FINAL success 4 1.009445985

@@ -1,0 +1,58 @@
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","offset":29,"limit":12}
+RESULT  29	## Current step
+30	
+31	Step 3: design the `likes` table.
+32	Problem: the API connects, but nothing stores a like, so inserting fails and a
+33	reloa
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Next: user drafts `CREATE TABLE` (`id`, `post_id`, `created_at`; recommended no\n`u
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: ## Cómo funciona
+Cada columna tiene un **tipo**, que define qué datos acepta, y unas **reglas**, que Postgres aplica en cada escritura:
+
+| Columna | Tipo | Por qué |
+|---|---|---|
+| `id` | `bigint` | Es un entero grande. `GENERATED ALWAYS AS IDENTITY` hace que Postgres ponga 1, 2, 3… y `PRIMARY KEY` garantiza que cada valor sea único y no esté vacío. |
+| `post_id` | `text` | Guarda textos como `hola-mundo`, y un tipo numérico los rechazaría. `NOT NULL` impide un like sin post. |
+| `created_at` | `timestamptz` | Guarda un instante exacto y tiene en cuenta la zona horaria. Con `timestamp` a secas, sin zona, `10:00` no dice de qué zona es. `DEFAULT now()` pone la hora si no envías ninguna. |
+
+**Ejemplo:** cuando la API envíe solo `post_id = 'hola-mundo'`, Postgres completará el resto:
+
+| `id` | `post_id` | `created_at` |
+|---|---|---|
+| 1 | `hola-mundo` | 2026-11-04 10:00:00+00 |
+| 2 | `hola-mundo` | 2026-11-04 10:05:00+00 |
+| 3 | `otro-post` | 2026-11-04 10:07:00+00 |
+
+**Conexión con los siguientes pasos:**
+- **Paso 4:** tu `INSERT` solo tendrá que enviar `post_id`.
+- **Paso 5:** contarás las filas filtrando por `post_id`.
+
+## La solución
+
+```sql
+CREATE TABLE likes (
+  -- Postgres genera el valor; tú no lo envías
+  id         bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  -- el único dato que enviará la API (paso 4)
+  post_id    text NOT NULL,
+  -- si no envías la hora, Postgres pone la actual
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+```
+
+No la he ejecutado, porque desde aquí no tengo acceso a tu base de datos.
+
+## Comprobación
+1. Ejecuta el `CREATE TABLE` en el SQL Editor de Neon.
+2. Después, ejecuta esto:
+
+```sql
+SELECT * FROM likes;
+```
+
+Debe devolver 0 filas, sin error. Si en el editor ves las columnas `id`, `post_id` y `created_at`, mejor todavía.
+
+Si el `CREATE TABLE` responde `relation "likes" already exists`, ya tenías una tabla con ese nombre. No la borres, porque podría tener datos; pásame el error y lo vemos.
+
+Pégame lo que te devuelva y cerramos el paso 3.
+RESULT_FINAL success 3 0.711594695

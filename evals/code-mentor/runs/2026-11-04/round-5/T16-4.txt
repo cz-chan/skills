@@ -1,0 +1,28 @@
+TEXT: Vamos con algo más pequeño. No tienes que abrir Neon ni ejecutar nada: de momento solo escribes aquí, en el chat, y si te equivocas no pasa nada.
+
+Una línea de columna es una frase de tres partes que responde a tres preguntas. Míralo con una columna que no tiene nada que ver con likes, la edad de una persona:
+
+```
+¿Cómo se llama?     → edad
+¿Qué guarda?        → integer   (un número entero, como 30)
+¿Puede estar vacía? → no, así que NOT NULL
+```
+
+Luego se juntan las tres respuestas, en ese orden y separadas por espacios:
+
+```sql
+edad integer NOT NULL
+```
+
+Eso es todo: la línea solo dice "hay una columna `edad`, guarda enteros y no puede quedar vacía". Si alguien guarda `30`, se acepta. Si no da edad, la base de datos da un error.
+
+## Tu turno: tres respuestas
+
+Haz lo mismo para la columna que dice a qué post pertenece un like, por ejemplo `hola-mundo`:
+
+1. **¿Cómo se llama?** La llamamos `post_id`.
+2. **¿Qué guarda?** ¿Un número entero (`integer`) o un texto (`text`)? Fíjate en `hola-mundo`.
+3. **¿Puede estar vacía?** Piensa si tiene sentido un like que no pertenece a ningún post.
+
+Respóndeme solo las preguntas 2 y 3, aunque sea con una palabra cada una. Luego juntamos las piezas.
+RESULT_FINAL success 1 0.662089515

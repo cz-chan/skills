@@ -1,0 +1,75 @@
+TOOL Skill {"skill":"code-mentor","args":"Botón de likes con Neon (Postgres) en mini app Hono + TypeScript. Usuario principiante, quiere aprender bases de datos: el usuario escribe el esquema y las queries, Clau
+RESULT  Launching skill: code-mentor
+TOOL Bash {"command":"git status --short; git log -5 --oneline; ls -la; [ -d .code-mentor ] && find .code-mentor -type f; [ -f PLAN.md ] && cat PLAN.md; [ -f package.json ] && cat package.json; git ls-files | g
+TOOL Read {"file_path":"<sandbox>/.claude/skills/code-mentor/references/memory-example.md"}
+RESULT  2932822 fixture: initial state
+total 32
+drwxr-xr-x@ 10 user  wheel  320 Nov  4 14:33 .
+drwx------@ 12 user  wheel  384 Nov  4 14:33 ..
+drwxr-xr-x@  3 
+RESULT  1	# Memory file examples
+2	
+3	Examples of how to write files in `.code-mentor/memory/` (see section 6 of `SKILL.md`).
+4	This file is a reference only 
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Bash {"command":"cat reset.sh; echo ---; cat .gitignore; echo ---; ls runs runs/*; ls -a | grep -i env; ls node_modules 2>/dev/null | head -3","description":"Read reset script and check env, runs, dependen
+RESULT  #!/bin/sh
+# Copied into the sandbox by setup.sh. Back to the initial commit, no memory.
+# Refuses to run anywhere else: it discards uncommitted work.
+
+TEXT: Antes de empezar, confirmemos el reparto. Luego te explico cada paso con detalle y ejemplos.
+
+```
+Objetivo: botón de likes en c12z.io, para aprender bases de datos.
+Tú:       esquema (la tabla) y queries (sumar un like, leer el contador).
+Yo:       botón, rutas de Hono, conexión a Neon, config y pruebas.
+Hecho:    pulsas → el contador sube → recargas → sigue igual.
+```
+
+```
+[Botón] ──clic──▶ [POST /api/likes] ──tu query──▶ [Neon: tu tabla]
+  yo                     yo                            TÚ
+   ▲                                                    │
+   └──────────── { count } ◀────────────────────────────┘
+```
+
+**Cómo lo haremos**
+- **Código:** te doy mi parte en la consola, con su explicación, y tú la pegas. Si prefieres que la escriba yo en los archivos, dímelo.
+- **Neon:** te guío paso a paso, pero la cuenta y la conexión en `.env` las creas tú porque contienen tu contraseña. Ahora no hay `.env` en el proyecto.
+- **Sin login:** cada clic suma 1, así que una misma persona puede dar varios likes. Limitarlo a un like por persona sería otro paso.
+- **Dependencias:** aún no están instaladas (no hay `node_modules`). Te pediré permiso antes de instalar nada.
+
+**Responde así, por ejemplo: `1b, 2a, 3a, 4a`**
+
+**1. ¿Te encaja el reparto?**
+- a) Sí
+- b) Quiero cambiar algo (dime qué)
+
+**2. ¿Cuánto SQL sabes?**
+- a) Nada, nunca lo he escrito
+- b) He copiado algún `SELECT` o `INSERT` de un tutorial
+- c) Escribo consultas sencillas, pero nunca he diseñado una tabla
+- d) Diseño tablas y uso `JOIN` sin problema
+
+**3. ¿Tienes cuenta en Neon?**
+- a) Sí, con un proyecto creado
+- b) Sí, pero sin proyecto
+- c) No
+
+**4. ¿Guardo tu progreso entre sesiones?**
+
+Lo guardaría en `.code-mentor/memory/databases/0001-neon-likes-progress.md`, en la raíz del proyecto, porque las escrituras en `.claude/` y `.agents/` están bloqueadas.
+- a) Sí, y añade `.code-mentor/` a `.gitignore` para dejarlo fuera de git
+- b) Sí, y que quede en git
+- c) No lo guardes
+RESULT_FINAL success 7 0.33001020000000003

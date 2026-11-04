@@ -1,0 +1,43 @@
+TOOL Read {"file_path":"<sandbox>/db/schema.sql"}
+RESULT  1	-- Esquema de la DB. Los pasos 4 y 5 insertarán y contarán sobre esta tabla.
+2	-- Escribe aquí tu CREATE TABLE likes:
+3	
+4	
+TEXT: Normal: te di muchas piezas sueltas y ningún ejemplo armado. Aquí tienes uno completo con otra tabla, para una tienda:
+
+```sql
+CREATE TABLE productos (
+  id     bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  nombre text NOT NULL,
+  stock  integer NOT NULL DEFAULT 0
+);
+```
+
+Cada línea sigue el mismo orden: **nombre de la columna → tipo → opciones**.
+
+| Columna | ¿Quién pone el valor? | Por eso lleva |
+|---|---|---|
+| `id` | La DB numera sola | `GENERATED ALWAYS AS IDENTITY PRIMARY KEY` |
+| `nombre` | Quien inserta, y es obligatorio | `NOT NULL` |
+| `stock` | Quien inserta o, si no lo envía, la DB pone 0 | `NOT NULL DEFAULT 0` |
+
+Si insertas solo `nombre = 'taza'`, la fila queda así:
+
+| id | nombre | stock |
+|---|---|---|
+| 1 | taza | 0 |
+
+Tú pusiste `taza`. El `1` y el `0` los puso la DB.
+
+## Tu tabla, línea a línea
+Haz esto en `db/schema.sql`, debajo del comentario:
+
+1. **Copia la forma:** escribe `CREATE TABLE likes (` y, dos líneas más abajo, `);`.
+2. **Escribe `id`:** funciona igual que el `id` de `productos`, porque la DB también numera tus likes.
+3. **Escribe `post_id`:** compáralo con `nombre`. Lo pone quien inserta y no puede faltar, porque un like sin post no se puede contar.
+4. **Escribe `created_at`:** compáralo con `stock`. Si nadie envía valor, lo pone la DB. Cambian dos cosas: el tipo es `timestamptz` y el valor automático es la hora actual, `now()`, en lugar de `0`.
+
+Pon una coma al final de cada columna, salvo la última.
+
+No tiene que salir perfecto: guarda lo que tengas, aunque sea solo la línea de `id`, y avísame. Lo reviso antes de ejecutar nada.
+RESULT_FINAL success 2 0.680509985

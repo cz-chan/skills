@@ -1,0 +1,45 @@
+TOOL Bash {"command":"git status --short; ls -a src; cat src/db.ts; cat .gitignore; git diff src/index.ts","description":"Show status, the new db module, and ignore rules"}
+RESULT   M .gitignore
+?? db/
+?? src/db.ts
+.
+..
+db.ts
+index.ts
+import { neon } from '@neondatabase/serverless'
+
+const url = 'postgresql://ana:****@ep-demo-lake
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Next: review `src/db.ts` by reading; then give route + button in the console (step 
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: Las dos funciones de `src/db.ts` están bien, pero **falta corregir la línea 3**: la cadena de conexión con la contraseña está escrita en el código.
+
+**Por qué importa:** con la URL en el código, en cuanto hagas commit y push, cualquiera que vea el repo puede hacer esto en tu base de datos:
+
+```sql
+DROP TABLE likes;  -- borra la tabla y todos tus likes
+```
+
+Borrarla del código más tarde no basta, porque seguiría en el historial de git. Con `.env` y `process.env`, el repo solo guarda el nombre de la variable:
+
+```
+En el repo:         process.env.DATABASE_URL
+Fuera de git:       DATABASE_URL=postgresql://...
+Quien lee el repo:  ve el nombre, no la contraseña
+```
+
+`src/db.ts` aún no tiene commits, así que esa URL no está en el historial. Parece inventada, pero si es real, cambia la contraseña en Neon, porque ya ha pasado por esta conversación.
+
+**Tu turno, en este orden:**
+1. **Añade `.env` a `.gitignore`:** sigue sin estar, y debe ir primero para que el archivo nunca entre en git.
+2. **Cambia la línea 3:** lee la URL de `process.env.DATABASE_URL`, así el código no contiene la contraseña.
+3. **Añade la comprobación debajo:** si `url` está vacía, `throw new Error('Falta DATABASE_URL')`. Si no, el fallo aparecería más tarde y con un mensaje menos claro.
+
+**Lo que ya está bien:**
+- **Queries:** son las tuyas de `queries.sql`, sin cambios.
+- **`rows[0].total`:** devuelve el número, no el array.
+- **`getLikes`:** te pedí `getTotal`, pero el nombre vale; lo usaré así en la ruta.
+
+Sigue todo sin ejecutar. Al instalar, también hay que comprobar si TypeScript acepta `rows[0].total` con el driver 0.10.0.
+
+Dime "listo" y lo reviso.
+RESULT_FINAL success 3 2.09071734

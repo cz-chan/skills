@@ -36,7 +36,8 @@
 				"Loads the skill from a one-word prompt",
 				"Finds the -progress.md file and names topic, current step and date",
 				"Compares the file with the repo and reports differences",
-				"Gives the full resume briefing for a junior, then asks if it is clear and if they want to start"
+				"Gives the full resume briefing for a junior, then asks if it is clear and if they want to start",
+					"The progress file is in English, and the reply is in Spanish"
 			]
 		},
 		{
@@ -77,6 +78,7 @@
 				"Creates the progress file following references/memory-example.md",
 				"Asks before installing anything; exact versions only",
 				"Reads the learner's code from disk before reviewing it",
+					"Shows its own parts in the console and changes no project code or config, apart from the agreed .gitignore line and .code-mentor/",
 				"Shows the first problem first and does not give core code before hint 5",
 				"On 'no lo pillo', gives a traced example (a new one, another way, if the idea was already explained) and no core code",
 				"At each finished step: ticks the plan, adds a Log entry with a self-contained Lesson",
@@ -149,6 +151,105 @@
 			"state": "fixtures/product-PLAN.md committed as PLAN.md; scripts/run-scope.sh",
 			"prompt": "hazme este producto siguiendo PLAN.md",
 			"checks": ["Does NOT load the skill"]
+		},
+		{
+			"id": "T13",
+			"name": "new-memory-file-in-english",
+			"state": "clean; a Spanish-speaking learner accepts the agreement; can write (scripts/run-language.sh)",
+			"prompt": "quiero hacer un botón de likes con Neon para aprender bases de datos. soy principiante: yo escribo el esquema y las queries y tú el resto. explícamelo con detalle y con ejemplos. cuando pulse el botón, el contador debe subir y mantenerse al recargar",
+			"followups": ["sí, de acuerdo, y añade .code-mentor al .gitignore"],
+			"checks": [
+				"Replies to the learner in Spanish, including the agreement",
+				"Creates the progress file in English: topic, agreement, plan and current step",
+				"Records the request for detail as an Explanations line in English",
+				"Keeps code and identifiers as they are"
+			]
+		},
+		{
+			"id": "T14",
+			"name": "older-spanish-file-not-translated",
+			"state": "fixtures/neon-likes-progress-es.md committed; can write (scripts/run-language.sh)",
+			"prompt": "continuemos",
+			"followups": ["al final lo dejo por hoy, ya he decidido que las columnas son post_id, user_id y created_at. guarda dónde estamos"],
+			"checks": [
+				"Reads the Spanish file and replies in Spanish",
+				"Writes the new Current step in English",
+				"Does not translate the older content of the file"
+			]
+		},
+		{
+			"id": "T15",
+			"name": "learner-reads-memory-in-their-language",
+			"state": "fixtures/neon-likes-progress.md committed; read-only (scripts/run-language.sh)",
+			"prompt": "léeme lo que he aprendido hasta ahora en la tarea de los likes",
+			"checks": [
+				"Gives the lessons from the English file in Spanish",
+				"Changes no file"
+			]
+		},
+		{
+			"id": "T16",
+			"name": "stuck-is-not-asking-for-the-solution",
+			"state": "fixtures/neon-likes-progress.md with level: trainee, committed; can write (scripts/run-solution.sh)",
+			"prompt": "continuemos",
+			"followups": [
+				"sí, empecemos. el código de los pasos 1 y 2 está en otra máquina, tú céntrate en la tabla",
+				"no sé hacerlo",
+				"ayúdame, sigo sin saber",
+				"sigo sin saber hacerlo, ayúdame",
+				"dime la solución"
+			],
+			"checks": [
+				"On 'no sé hacerlo': gives guidelines with what to do and why, and no CREATE TABLE for likes",
+				"On each further 'ayúdame': explains another way, with no CREATE TABLE for likes and nothing to paste and rename",
+				"On 'dime la solución': gives the CREATE TABLE for likes",
+				"The solution comes with why this solution, how it works and how it connects to the rest"
+			]
+		},
+		{
+			"id": "T17",
+			"name": "do-it-for-me-gives-the-solution-with-the-why",
+			"state": "fixtures/neon-likes-progress.md with level: junior, committed; can write (scripts/run-solution.sh)",
+			"prompt": "continuemos",
+			"followups": [
+				"sí, empecemos. el código de los pasos 1 y 2 está en otra máquina, tú céntrate en la tabla",
+				"házmelo"
+			],
+			"checks": [
+				"On 'házmelo': writes the solution to a file right away, with no lecture about trying first",
+				"Changes only what that solution needs, apart from .code-mentor/",
+				"The solution comes with why this solution, how it works and how it connects to the rest"
+			]
+		},
+		{
+			"id": "T18",
+			"name": "only-the-user-touches-the-code",
+			"state": "clean; can write; a learner accepts the agreement and asks for the agent's part (scripts/run-console.sh)",
+			"prompt": "quiero hacer un botón de likes con Neon para aprender bases de datos. soy principiante: yo escribo el esquema y las queries y tú el resto. explícamelo con detalle y con ejemplos. cuando pulse el botón, el contador debe subir y mantenerse al recargar",
+			"followups": [
+				"sí, de acuerdo, y añade .code-mentor al .gitignore",
+				"ya tengo el proyecto de Neon y el .env. dame ya tu parte de la ruta /api/likes"
+			],
+			"checks": [
+				"The agreement says the agent's parts are code it shows, not code it writes to the project",
+				"Shows the route in the console, with why, how it works and how it connects to the rest",
+				"Changes no project code or config, apart from the .gitignore line that was asked for and .code-mentor/"
+			]
+		},
+		{
+			"id": "T19",
+			"name": "writes-only-when-asked",
+			"state": "fixtures/neon-likes-progress.md with level: junior, committed; can write (scripts/run-console.sh)",
+			"prompt": "continuemos",
+			"followups": [
+				"sí, empecemos. el código de los pasos 1 y 2 está en otra máquina, tú céntrate en la tabla",
+				"dame la solución",
+				"escríbela tú en db/schema.sql"
+			],
+			"checks": [
+				"On 'dame la solución': shows it in the console with the why, and changes no project file",
+				"On 'escríbela tú': writes only db/schema.sql, and explains it"
+			]
 		}
 	]
 }

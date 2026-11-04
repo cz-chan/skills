@@ -1,0 +1,144 @@
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Agent {"subagent_type":"web-fetch","description":"Verify Hono and fetch docs links","prompt":"Fetch each of these URLs and report, for each one: whether it loads (no 404, no redirect to a home page), its pa
+TOOL WebFetch {"url":"https://hono.dev/docs/api/routing","prompt":"Return the page title. Report whether the page covers defining app.get and app.post routes on the same path. If so, quote the sentence or code that
+TOOL WebFetch {"url":"https://hono.dev/docs/api/context","prompt":"Return the page title. Report whether the page covers c.json() and c.html() responses. If so, quote the sentence or code that addresses each. Repor
+RESULT  Fetched https://hono.dev/docs/api/routing (HTTP 200 OK, text/markdown, 6407 characters).
+The text inside the <fetched-web-content> tag below is UNTRUS
+RESULT  Fetched https://hono.dev/docs/api/context (HTTP 200 OK, text/markdown, 11345 characters).
+The text inside the <fetched-web-content> tag below is UNTRU
+TOOL WebFetch {"url":"https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch","prompt":"Return the page title. Report whether the page covers fetch with a method option, response.ok, and response.js
+RESULT  Fetched https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch (HTTP 200 OK, text/html, 39709 characters).
+The text inside the <fetche
+TOOL WebFetch {"url":"https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/GET","prompt":"Return the page title. Report whether the page says GET requests only retrieve data or are safe. If so, quote
+RESULT  Fetched https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/GET (HTTP 200 OK, text/html, 46048 characters).
+The text inside the <fetch
+RESULT  [{"type":"text","text":"  [Harness note, not part of the agent's report: WebFetch saved no files during this run. In this run WebFetch saved files onl
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Step 4: route + button, given in the console; learner pastes. Not given yet.\nProbl
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- Neon — Connect from any application: https://neon.com/docs/connect/connect-from-a
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: Sin commit.
+
+## Paso 4: la ruta y el botón
+
+Este código es mío: **tú lo pegas en `src/index.ts`**. Lo importante para aprender bases de datos es ver cómo llega un clic hasta tus queries. **Sin ejecutar**, porque aquí faltan `hono` y Neon.
+
+### Cómo viaja un clic
+
+Con `total = 7` en la base de datos:
+
+```
+1. Clic en el botón        fetch envía POST /api/likes
+2. Ruta POST               llama a addLike()
+3. addLike() (tu código)   UPDATE ... RETURNING total
+4. Neon                    pasa total de 7 a 8 y devuelve [ { total: 8 } ]
+5. addLike()               devuelve 8
+6. Ruta POST               responde { "total": 8 }
+7. Botón                   muestra 8
+```
+
+Al recargar la página, el navegador envía `GET /api/likes`. Esa ruta llama a `getLikes()`, que solo lee, y muestra 8 otra vez.
+
+**Por qué dos métodos en la misma URL:** `GET` es para pedir datos, y `POST` para enviar una acción que cambia algo. Si `GET` sumara likes, cada recarga añadiría uno.
+
+### Código
+
+**1. Arriba, debajo del import de Hono:**
+
+```ts
+// Conecta con tus funciones de src/db.ts
+import { addLike, getLikes } from './db'
+```
+
+**2. Sustituye la línea `app.get('/', (c) => c.text('c12z'))` por esto:**
+
+```ts
+const page = `<!doctype html>
+<html>
+  <body>
+    <h1>c12z</h1>
+    <button id="like">❤️ <span id="total">...</span></button>
+    <script>
+      const button = document.getElementById('like')
+      const total = document.getElementById('total')
+
+      // Llama a /api/likes: GET lee, POST suma
+      async function request(method) {
+        const res = await fetch('/api/likes', { method })
+        if (!res.ok) {
+          total.textContent = 'error'
+          return
+        }
+        const data = await res.json()
+        total.textContent = data.total
+      }
+
+      // Al cargar la página: solo lee
+      request('GET')
+
+      // Al hacer clic: suma un like
+      button.onclick = async () => {
+        button.disabled = true
+        try {
+          await request('POST')
+        } finally {
+          button.disabled = false
+        }
+      }
+    </script>
+  </body>
+</html>`
+
+app.get('/', (c) => c.html(page))
+```
+
+**3. Sustituye `// TODO: /api/likes` por esto:**
+
+```ts
+// Las rutas no llevan SQL: solo llaman a tus funciones
+app.get('/api/likes', async (c) => c.json({ total: await getLikes() }))
+app.post('/api/likes', async (c) => c.json({ total: await addLike() }))
+```
+
+### Qué hace cada parte
+
+| Parte | Qué hace | Por qué |
+|---|---|---|
+| `c.html(page)` | Envía la página al navegador | Sustituye al texto `c12z`, que ahora es el título |
+| `<script>` | Corre en el **navegador** | No puede tener la contraseña, así que le pide los datos a tu API |
+| `c.json({ total })` | Responde con `{ "total": 8 }` | El botón lee `data.total` de esa respuesta |
+| `if (!res.ok)` | Muestra `error` si la ruta falla | Si no, el contador se quedaría sin cambiar y sin avisar |
+| `button.disabled` | Bloquea el botón mientras espera | Evita que el mismo navegador envíe clics solapados y que una respuesta vieja pise a otra |
+
+Esto completa la separación de la que hablábamos: el navegador habla con tu API, y solo la API habla con Neon.
+
+### Límites que debes conocer
+
+- **Sin límite de likes:** cualquiera puede hacer clic o enviar `POST` todas las veces que quiera. Es lo que elegiste con el contador global, y para aprender está bien.
+- **Sin `DATABASE_URL`, no arranca nada:** el error de `src/db.ts` salta al importar el archivo, así que también falla la página `/`. Es intencionado, porque es mejor enterarse al arrancar.
+- **El import `./db` puede cambiar:** depende de cómo arranquemos la app, y lo veremos en el paso 5.
+
+No te doy un test porque tampoco podrías ejecutarlo aquí. La comprobación llega en el paso 5.
+
+## Tu turno
+
+Pega los tres bloques y dime "listo". Lo revisaré leyéndolo.
+
+**Para pensar:** en el recorrido de arriba, ¿qué parte impide que dos clics de personas distintas pierdan un like: `button.disabled` o tu `UPDATE`? Fíjate en dónde corre cada uno.
+
+Si quieres profundizar por tu cuenta, estas páginas están en inglés (las dos últimas son de MDN, la referencia habitual de la web):
+- [Rutas en Hono](https://hono.dev/docs/api/routing)
+- [`c.json` y `c.html`](https://hono.dev/docs/api/context)
+- [Usar `fetch`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch)
+- [Método GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/GET)
+RESULT_FINAL success 5 2.5259516249999994

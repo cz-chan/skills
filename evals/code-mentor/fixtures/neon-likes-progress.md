@@ -1,6 +1,6 @@
 ---
 status: in-progress
-topic: Botón de likes con Neon
+topic: Like button with Neon
 concepts: [postgres, neon, db-connection, env-vars, sql-insert]
 level: junior
 mode: guided-feature
@@ -9,55 +9,54 @@ updated: 2026-10-13
 
 ## Agreement
 
-Goal: botón de likes en c12z.io, para aprender bases de datos.
-You: setup de Neon, conexión, esquema, queries de insert y count.
-Me: UI del botón, cableado de la ruta API, tests.
-Done: click → el contador sube y se mantiene al recargar.
+Goal: like button on c12z.io, to learn databases.
+You: Neon setup, connection, schema, insert and count queries.
+Me: button UI, API route wiring, tests.
+Done: click → the count goes up and survives a reload.
 
-    [Botón] ──click──▶ [API /likes] ──query──▶ [Neon DB]
-       yo                  yo                     TÚ
+    [Button] ──click──▶ [API /likes] ──query──▶ [Neon DB]
+       me                  me                    YOU
 
 ## Plan
 
-- [x] 1. Proyecto en Neon + connection string en .env
-- [x] 2. Conectar desde la API
-- [ ] 3. Esquema: tabla `likes` ← current
-- [ ] 4. Insertar un like
-- [ ] 5. Contar likes por post
-- [ ] 6. Conectar botón → API → DB
+- [x] 1. Neon project + connection string in .env
+- [x] 2. Connect from the API
+- [ ] 3. Schema: `likes` table ← current
+- [ ] 4. Insert a like
+- [ ] 5. Count likes per post
+- [ ] 6. Wire button → API → DB
 
 ## Current step
 
-Paso 3: diseñar la tabla `likes`. Siguiente: decidir columnas
-(`post_id`, `created_at`, ¿`user_id`?).
+Step 3: design the `likes` table. Next: decide the columns
+(`post_id`, `created_at`, `user_id`?).
 
 ## Log
 
-### 1. Proyecto en Neon + .env — 2026-10-12
+### 1. Neon project + .env — 2026-10-12
 
-- Did: creó el proyecto en Neon y guardó la connection string en `.env`.
-- Stuck on: no sabía qué significaba `?sslmode=require` y lo borró.
-- Solved by: se explicó cada parte de la URL y leyó la página "Connect" de
-  Neon.
-- Lesson: la connection string no es solo una dirección: lleva usuario,
-  contraseña, host, nombre de la DB y opciones. `sslmode=require` obliga a
-  cifrar la conexión; sin él, Neon la rechaza porque no acepta conexiones
-  sin cifrar. Regla: no borres parámetros de una URL de conexión sin saber
-  qué hacen. Si la conexión falla justo después de editar la URL, revisa
-  primero lo que quitaste.
+- Did: created the Neon project and saved the connection string in `.env`.
+- Stuck on: did not know what `?sslmode=require` meant and deleted it.
+- Solved by: each part of the URL was explained; read Neon's "Connect" page.
+- Lesson: a connection string is not just an address: it holds the user,
+  password, host, database name and options. `sslmode=require` forces an
+  encrypted connection; without it Neon rejects the connection because it
+  does not accept unencrypted ones. Rule: do not remove parameters from a
+  connection URL without knowing what they do. If the connection fails right
+  after editing the URL, check first what you removed.
 
-### 2. Conectar desde la API — 2026-10-13
+### 2. Connect from the API — 2026-10-13
 
-- Did: `SELECT 1` desde la ruta de Hono con `@neondatabase/serverless`.
-- Stuck on: importó el cliente de la DB en un componente del navegador, así
-  que la connection string llegaba al cliente.
-- Solved by: movió la query a la ruta del servidor y leyó la variable de
-  entorno allí.
-- Lesson: todo el código que corre en el navegador es público: se descarga
-  y cualquiera puede leerlo en las devtools. La connection string contiene
-  la contraseña de la DB, así que solo puede vivir en el servidor, y el
-  cliente habla con la DB únicamente a través de tu API. Próxima vez: antes
-  de usar un secreto en un archivo, pregúntate dónde se ejecuta ese archivo.
+- Did: `SELECT 1` from the Hono route with `@neondatabase/serverless`.
+- Stuck on: imported the DB client in a browser component, so the
+  connection string reached the client.
+- Solved by: moved the query to the server route and read the environment
+  variable there.
+- Lesson: all code that runs in the browser is public: it gets downloaded
+  and anyone can read it in devtools. The connection string contains the DB
+  password, so it can only live on the server, and the client talks to the
+  DB only through your API. Next time: before using a secret in a file, ask
+  yourself where that file runs.
 
 ## Where it lives in the repo
 

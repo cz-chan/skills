@@ -1,0 +1,76 @@
+TOOL Bash {"command":"ls -la; git log --stat -3; ls -la ~/.claude/projects/-private-tmp-claude-501--Users-user-Desktop-projects-prod-cz-skills-a54ea246-387e-4d48-b65f-5594c8587ebd-scratchpad-final-resume/memory
+TOOL Glob {"pattern":"**/*"}
+RESULT  .git/info/exclude
+.git/description
+.git/hooks/commit-msg.sample
+.git/hooks/pre-rebase.sample
+.git/hooks/sendemail-validate.sample
+.git/hooks/pre-commi
+RESULT ERR  Exit code 1
+total 32
+drwxr-xr-x@ 11 user  wheel  352 Nov  4 14:52 .
+drwxr-xr-x@  9 user  wheel  288 Nov  4 14:50 ..
+drwxr-xr-x@  3 user  wheel   96 No
+TOOL Skill {"skill":"code-mentor"}
+RESULT  Launching skill: code-mentor
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Like button with Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: senior
+6	mode: g
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Bash {"command":"git status --short --ignored; git log -5 --all --format='%h %ad %s' --date=short; git branch -a; git stash list; echo '--- gitignore'; cat .gitignore; echo '--- check-ignore .env'; git che
+RESULT ERR  This Bash command contains multiple operations. The following part requires approval: git check-ignore -v .env
+TOOL Bash {"command":"git status --short --ignored; git log -5 --all --format='%h %ad %s' --date=short; git branch -a; git stash list; echo '--- gitignore'; cat .gitignore; echo '--- files'; ls src; test -e .en
+RESULT  !! runs/
+f3425da 2026-11-04 wip likes
+319479b 2026-11-04 fixture: initial state
+* main
+--- gitignore
+runs/
+--- files
+index.ts
+no .env
+no likes.ts
+no n
+TEXT: **Dónde estamos:** botón de likes en c12z.io para aprender bases de datos. Tú haces Neon, conexión, esquema y queries; yo, UI, cableado de la ruta y tests. Según el progreso (13-oct), pasos 1-2 hechos (`.env`, `SELECT 1` desde Hono). Toca el paso 3: tabla `likes`. Luego vienen insert, conteo por post y conectar el botón.
+
+**Problema:** el esquema decide qué puede responder la DB. Si guardas solo `post_id` y `created_at`, un usuario que hace 100 clics en `post_id = 7` suma 100 likes, y la DB no puede evitarlo.
+
+**Por qué una tabla y no un contador:** con `posts.likes = likes + 1` el conteo es trivial, pero pierdes quién dio like y cuándo, así que no puedes deduplicar. El coste de una fila por like es tener que hacer `COUNT`. Tú decides columnas y constraints.
+
+**Done check:** dos inserts iguales dejan el resultado que hayas diseñado, comprobado con `\d likes` y un `SELECT`.
+
+**⚠️ El progreso no cuadra con este repo:**
+- No hay `.env` ni `src/pages/api/likes.ts`, ni rastro de ellos en el historial de git.
+- `src/index.ts:7` sigue con `// TODO: /api/likes`.
+- `node_modules` no está instalado.
+- El único commit posterior (`f3425da`, "wip likes") solo añade el archivo de progreso.
+- `.gitignore` solo tiene `runs/`. Añade `.env` antes de crearlo, o la contraseña puede acabar en un commit.
+
+**Preguntas:**
+1. ¿Pasos 1-2 están en otra copia sin subir, o los rehacemos aquí? Sin conexión podrás diseñar la tabla, pero no crearla ni pasar el done check. Si los rehacemos, actualizo el progreso.
+2. ¿Está claro y empezamos a programar?
+RESULT_FINAL success 10 0.3605124

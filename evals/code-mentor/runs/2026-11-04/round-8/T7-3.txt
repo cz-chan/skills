@@ -1,0 +1,108 @@
+TOOL Read {"file_path":"<sandbox>/.gitignore"}
+RESULT  1	runs/
+2	
+TOOL Agent {"subagent_type":"web-fetch","description":"Verify PostgreSQL docs links","prompt":"Fetch each of these URLs and report, for each one: whether it loads (no 404, no redirect to a home page), its page t
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-basics.html","prompt":"Report the page title. Does this page cover basics of tables, columns, rows and CREATE TABLE? Say yes or no and briefly why. 
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-constraints.html","prompt":"Report the page title. Does this page cover NOT NULL and PRIMARY KEY constraints? Say yes or no and briefly why. Note if
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-basics.html (HTTP 200 OK, text/html, 8086 characters).
+The text inside the <fetched-web-content> t
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-default.html","prompt":"Report the page title. Does this page cover DEFAULT column values? Say yes or no and briefly why. Note if the page is a redi
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-constraints.html (HTTP 200 OK, text/html, 28053 characters).
+The text inside the <fetched-web-cont
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-default.html (HTTP 200 OK, text/html, 5405 characters).
+The text inside the <fetched-web-content> 
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/dml-insert.html","prompt":"Report the page title. Does this page cover inserting rows with INSERT? Say yes or no and briefly why. Note if the page is a 
+RESULT  Fetched https://www.postgresql.org/docs/current/dml-insert.html (HTTP 200 OK, text/html, 6362 characters).
+The text inside the <fetched-web-content> t
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.gitignore","old_string":"runs/\n","new_string":"runs/\n.code-mentor/\n"}
+RESULT  The file <sandbox>/.gitignore has been updated successfully. (file state is current in your context — no need to Read it back)
+TOOL Write {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","content":"---\nstatus: in-progress\ntopic: Like button with Neon\nconcepts: [postgres, neon, create-table, primary-k
+RESULT  File created successfully at: <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md (file state is current in your context — no need to 
+TEXT: Acuerdo ajustado a la opción b: escribimos para Neon, pero **nada quedará probado** hasta que tengas Neon y puedas instalar. Aquí solo revisaré tu código leyéndolo. Crear el proyecto en Neon queda para el final.
+
+También añadí `.code-mentor/` a `.gitignore` y creé el archivo de progreso.
+
+## Paso 1: la tabla donde vive el contador
+
+**El problema:** si guardas los likes en una variable de JavaScript, como `let total = 7`, se pierden al reiniciar el servidor y vuelves a 0. Una base de datos los guarda en disco, fuera de tu app.
+
+### Las piezas
+
+Una **tabla** es como una hoja de cálculo. Cada **columna** define un dato y su tipo, y cada **fila** es un registro:
+
+```
+tabla: likes
+┌────┬───────┐
+│ id │ total │  ← columnas
+├────┼───────┤
+│  1 │     0 │  ← una fila
+└────┴───────┘
+```
+
+Solo necesitamos una fila, porque hay un único contador global.
+
+| Pieza | Qué hace | Qué pasaría sin ella |
+|---|---|---|
+| `INTEGER` | Solo admite números enteros | Podría entrar un `'hola'` en vez de un número |
+| `PRIMARY KEY` | Identifica cada fila: no admite repetidos ni vacíos | Podría haber dos filas con `id = 1` y dos contadores |
+| `NOT NULL` | Prohíbe `NULL`, que significa "sin valor" | Ver el ejemplo de abajo |
+| `DEFAULT 0` | Pone 0 si no indicas un valor | Si no indicas `total`, queda `NULL`, o da error si la columna es `NOT NULL` |
+
+### Por qué importa `NOT NULL`
+
+En SQL, cualquier suma con `NULL` da `NULL`:
+
+```
+total = 5     →  5 + 1    = 6     bien
+total = NULL  →  NULL + 1 = NULL  el contador nunca sube, y sin error
+```
+
+### Por qué hace falta una fila inicial
+
+`CREATE TABLE` solo crea la estructura, y la tabla empieza vacía. En el paso 2, cada clic hará "suma 1 a la fila con `id = 1`". Así cambia la tabla:
+
+```
+Orden                       Tabla después       Resultado
+1. CREATE TABLE             (vacía)             tabla creada
+2. Clic sin fila inicial    (vacía)             0 filas cambiadas, sin error: like perdido
+3. INSERT con id = 1        id=1, total=0       1 fila creada
+4. Clic                     id=1, total=1       1 fila cambiada
+5. Clic                     id=1, total=2       1 fila cambiada
+6. INSERT con id = 1 otra   id=1, total=2       ERROR: id repetido
+```
+
+La fila 2 es el fallo peligroso, porque nada te avisa. La fila 6 muestra a `PRIMARY KEY` protegiéndote de un segundo contador.
+
+### La sintaxis
+
+```sql
+CREATE TABLE nombre_tabla (
+  columna_a TIPO RESTRICCIONES,
+  columna_b TIPO RESTRICCIONES
+);
+
+INSERT INTO nombre_tabla (columna_a, columna_b) VALUES (valor_a, valor_b);
+```
+
+Las columnas van separadas por comas, sin coma tras la última, y cada sentencia termina en `;`.
+
+## Tu turno
+
+Crea `db/schema.sql` con estas dos sentencias:
+
+1. **Crea la tabla `likes`:** esto define dónde se guarda el contador.
+   - `id`: entero y clave primaria.
+   - `total`: entero, no puede ser nulo y empieza en 0.
+2. **Inserta la fila inicial:** usa `id` 1 y `total` 0, para que los clics tengan qué actualizar.
+
+Son unas 5 líneas. Cuando las tengas, dime "listo" y las reviso. La comprobación real queda pendiente para cuando tengas Neon: ejecutar el archivo y ver que `SELECT * FROM likes;` devuelve `1 | 0`.
+
+**Para pensar mientras escribes:** ¿qué pasaría si ejecutaras el archivo dos veces? Fíjate en la tabla de arriba.
+
+Si quieres profundizar por tu cuenta, estas páginas oficiales explican lo que estás haciendo (están en inglés):
+- [Tablas](https://www.postgresql.org/docs/current/ddl-basics.html)
+- [Restricciones](https://www.postgresql.org/docs/current/ddl-constraints.html)
+- [Valores por defecto](https://www.postgresql.org/docs/current/ddl-default.html)
+- [INSERT](https://www.postgresql.org/docs/current/dml-insert.html)
+RESULT_FINAL success 5 0.66741646

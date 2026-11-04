@@ -1,0 +1,44 @@
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","limit":36}
+RESULT  1	---
+2	status: in-progress
+3	topic: Like button with Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: junior
+6	mode: g
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Step 3: design the `likes` table. Next: decide the columns\n(`post_id`, `created_at
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"updated: 2026-10-13","new_string":"updated: 2026-11-04"}
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- Hono — Environment variables: <url> (official)","new_string":"- Hono — Environmen
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: Vamos con la tabla. Lo anoto en el progreso y dejo los pasos 1 y 2 aparte.
+
+## Primero, una decisión de diseño
+¿Puede una misma persona dar like varias veces al mismo post? Esto decide las columnas:
+
+| | A. Likes anónimos | B. Un like por visitante (recomendada) |
+|---|---|---|
+| **Columnas** | `post_id`, `created_at` | `post_id`, `user_id`, `created_at` |
+| **Doble click de `abc` en `hola-mundo`** | 2 filas, el contador suma 2 | La DB rechaza la segunda fila, el contador sigue en 1 |
+| **Deshacer un like** | No sabes cuál borrar | Borras la fila de `abc` |
+
+Recomiendo la B porque te enseña algo que la A no: la propia base de datos hace cumplir una regla, aunque la API tenga un bug. Sin login, `user_id` sería un id anónimo guardado en una cookie, y esa parte la pongo yo en la API.
+
+Solo veo esta carpeta. Si en la otra máquina ya tienes login o una tabla de posts, dímelo, porque puede cambiar los tipos.
+
+## Tu tarea
+Elige A o B y escribe el `CREATE TABLE likes` en un archivo nuevo, `schema.sql`, en la raíz del proyecto. Así el esquema queda guardado en git. **No lo ejecutes todavía**: lo revisamos antes.
+
+Responde estas preguntas columna a columna:
+
+1. **`post_id`:** los valores son como `hola-mundo`. ¿Qué tipo le va, y puede quedar vacío?
+2. **`created_at`:** ¿quién debería poner la hora, tu API o la base de datos? Piensa qué pasa si cada servidor tiene el reloj distinto.
+3. **`user_id` (solo B):** será un texto tipo `abc`. ¿Puede quedar vacío?
+4. **Identidad de la fila:** ¿qué distingue una fila de otra?
+   - **En B:** ¿qué regla rechaza un segundo `(hola-mundo, abc)` pero acepta `(hola-mundo, xyz)` y `(neon-intro, abc)`?
+   - **En A:** dos filas pueden tener el mismo post y casi la misma hora, así que hace falta otra cosa.
+
+Lo que más te va a servir es la página de restricciones que te pasé.
+
+Cuando lo tengas, avísame y leo el archivo. Si te atascas, escribe lo que tengas, aunque esté a medias.
+RESULT_FINAL success 5 0.6569824949999999

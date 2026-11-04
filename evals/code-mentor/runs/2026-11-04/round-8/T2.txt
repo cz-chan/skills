@@ -1,0 +1,32 @@
+TOOL Skill {"skill":"code-mentor","args":"explícame cómo funcionan los websockets"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  No files found
+TOOL Bash {"command":"git status --short --branch && git log -5 --oneline","description":"Show working tree status and recent commits"}
+TOOL Glob {"pattern":"PLAN.md"}
+RESULT  No files found
+RESULT  ## main
+319479b fixture: initial state
+TOOL Grep {"pattern":"websocket|upgradeWebSocket|EventSource|\\bws\\b","-i":true,"glob":"!node_modules/**","output_mode":"content","head_limit":20}
+RESULT  .claude/skills/code-mentor/SKILL.md:94:  ("how do websockets work?", "how do I use `jq`?"). Light mode: no
+.claude/skills/code-mentor/SKILL.md:199:| A
+TEXT: Antes de explicarlo, necesito saber qué buscas y tu nivel. No hay sesiones previas sobre este tema. Responde, por ejemplo, `1b 2a 3c`.
+
+**1. ¿Qué quieres entender?**
+- a) La idea general: qué son y para qué sirven
+- b) El protocolo: handshake, frames, ping/pong
+- c) Cómo usarlos en código: cliente y servidor, por ejemplo con Hono
+- d) Producción: escalar, reconectar, autenticar
+
+**2. ¿Qué experiencia tienes con WebSockets?**
+- a) Ninguna, solo me suena el nombre
+- b) Conozco la idea, pero no los he programado
+- c) Los he usado con una librería (Socket.IO, `ws`…)
+- d) Los he llevado a producción
+
+**3. ¿Qué pasa con la conexión TCP cuando el servidor acepta un WebSocket?**
+- a) Se cierra tras cada mensaje, como en una petición HTTP simple
+- b) Sigue abierta, y cliente y servidor pueden enviar datos cuando quieran
+- c) Sigue abierta, pero solo el servidor puede enviar datos
+- d) No lo sé
+RESULT_FINAL success 7 0.2523742

@@ -1,0 +1,164 @@
+TOOL Bash {"command":"git log --stat -n 3; git status --short; git stash list; git branch -a; ls -la","description":"Show recent commits, status, branches, and files"}
+TOOL Bash {"command":"git show HEAD","description":"Show the latest wip commit diff"}
+RESULT  commit e91f6b919dae7b4004bd62c31c39da8c0617b284
+Author: fixture <fixture@local>
+Date:   Wed Nov 4 14:37:51 2026 +0100
+
+    wip likes
+
+diff --git a/.co
+RESULT  commit e91f6b919dae7b4004bd62c31c39da8c0617b284
+Author: fixture <fixture@local>
+Date:   Wed Nov 4 14:37:51 2026 +0100
+
+    wip likes
+
+ .../memory/data
+TOOL Glob {"pattern":"**/*","path":"~/.claude/projects/-private-tmp-claude-501--Users-user-Desktop-projects-prod-cz-skills-a54ea246-387e-4d48-b65f-5594c8587ebd-scratchpad-sol-3/memory"}
+RESULT  No files found
+TOOL Grep {"pattern":"TODO|FIXME|WIP|likes?","-i":true,"output_mode":"content","glob":"!{node_modules,package-lock.json,pnpm-lock.yaml}/**","head_limit":60}
+RESULT  src/index.ts:7:// TODO: /api/likes
+.claude/skills/code-mentor/SKILL.md:91:  project ("a like button for my site, stored in Neon"). They write the part
+TOOL Skill {"skill":"code-mentor","args":"continuemos"}
+RESULT  Launching skill: code-mentor
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Bash {"command":"cat .gitignore; echo '--- tracked:'; git ls-files | grep -v '^.claude/'; echo '--- src:'; find src -type f; echo '--- env:'; ls -a | grep -E '^\\.env' || echo 'no .env file'; [ -n \"$DATAB
+RESULT ERR  A variable in this command can't be checked before it runs
+TOOL Read {"file_path":"<sandbox>/.claude/skills/code-mentor/references/memory-example.md"}
+RESULT  1	# Memory file examples
+2	
+3	Examples of how to write files in `.code-mentor/memory/` (see section 6 of `SKILL.md`).
+4	This file is a reference only 
+TOOL Agent {"subagent_type":"web-fetch","description":"Verify schema doc links","prompt":"Fetch each URL and report for each: does it load (no 404 / redirect to a home page), its final URL, its page title, and w
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-constraints.html","prompt":"Report the page title. Confirm whether it explains PRIMARY KEY, NOT NULL, and UNIQUE table constraints, including multi-
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/sql-createtable.html","prompt":"Report the page title. Confirm this is the CREATE TABLE syntax reference and quote the top-level synopsis lines verbatim
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-constraints.html (HTTP 200 OK, text/html, 28053 characters).
+The text inside the <fetched-web-cont
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-default.html","prompt":"Report the page title. Confirm whether it explains column DEFAULT values, and whether it mentions now() or CURRENT_TIMESTAMP
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-default.html (HTTP 200 OK, text/html, 5405 characters).
+The text inside the <fetched-web-content> 
+TOOL WebFetch {"url":"https://neon.com/docs/get-started/query-with-neon-sql-editor","prompt":"Report the page title. Confirm whether it explains running SQL such as CREATE TABLE in Neon's SQL Editor, and quote the 
+RESULT ERR  Claude requested permissions to use WebFetch, but you haven't granted it yet.
+RESULT  Fetched https://www.postgresql.org/docs/current/sql-createtable.html (HTTP 200 OK, text/html, 79832 characters, truncated to the first 39931, then a m
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TOOL Bash {"command":"cat .gitignore; echo '--- tracked:'; git ls-files | grep -v '^.claude/'; echo '--- src:'; find src -type f; echo '--- root:'; ls -a","description":"List gitignore rules, tracked files, sou
+RESULT  runs/
+--- tracked:
+.code-mentor/memory/databases/0001-neon-likes-progress.md
+.gitignore
+AGENTS.md
+package.json
+reset.sh
+src/index.ts
+--- src:
+src/inde
+TOOL Grep {"pattern":"neondatabase|DATABASE_URL|SELECT","path":"<sandbox>/src","output_mode":"content"}
+RESULT  No matches found
+TEXT: # Retomamos: botón de likes con Neon
+
+**Primero, el progreso no coincide con el repo.** El archivo (actualizado el 13-10) marca los pasos 1 y 2 como hechos, pero en esta carpeta:
+
+- No hay `.env`.
+- No existe `src/pages/api/likes.ts`.
+- `src/` solo tiene `index.ts`, sin Neon ni `SELECT 1`, y con `// TODO: /api/likes`.
+- No hay `node_modules`, así que las dependencias no están instaladas aquí.
+- Solo existe la rama `main`, y el commit `wip likes` únicamente añade el archivo de progreso.
+- `.gitignore` no incluye `.env`, así que tu contraseña de la DB podría acabar en git al crearlo.
+
+No puedo comprobar desde aquí si tu proyecto de Neon existe.
+
+## El panorama
+Construimos un botón de likes para c12z.io, y tu objetivo es aprender bases de datos.
+
+```
+[Botón] ──click──▶ [API /likes] ──query──▶ [Neon DB]
+   yo                  yo                    TÚ
+```
+
+| Paso | Estado según el archivo |
+|---|---|
+| 1. Proyecto Neon y `.env` | Hecho (no está el `.env`) |
+| 2. Conectar desde la API | Hecho (no está el código) |
+| **3. Esquema: tabla `likes`** | **Toca ahora** |
+| 4. Insertar un like | Pendiente |
+| 5. Contar likes por post | Pendiente |
+| 6. Conectar botón → API → DB | Pendiente |
+
+Según el archivo, ya hablaste con Neon (`SELECT 1`), pero esa consulta no guarda nada. Para guardar likes hace falta un sitio donde ponerlos, y de ahí sale este paso.
+
+## El problema
+Alguien da like a `hola-mundo` y el contador pasa de 0 a 1. Si ese número solo vive en la memoria del servidor o del navegador, al reiniciar o recargar se pierde. Además, Postgres no puede guardar datos sin una tabla donde ponerlos.
+
+El **esquema** es la definición de esas tablas: qué **columnas** tienen, de qué tipo son y qué reglas cumplen. Cada dato guardado es una **fila**.
+
+## La idea
+Cada like es una fila, y el total se obtiene contándolas:
+
+| Evento | Fila nueva | Likes de `hola-mundo` |
+|---|---|---|
+| Click en `hola-mundo`, 10:00 | `hola-mundo`, 10:00 | 1 |
+| Click en `hola-mundo`, 10:05 | `hola-mundo`, 10:05 | 2 |
+| Click en `neon-intro`, 10:07 | `neon-intro`, 10:07 | 2 (es de otro post) |
+| Recarga | ninguna | 2 (las filas siguen en Neon) |
+
+## Por qué así
+Lo obvio sería una tabla de posts con una columna numérica `likes` a la que sumas 1. Es más simple y sirve si solo quieres el total, pero solo guarda ese número:
+
+- No sabes quién dio like ni cuándo.
+- No puedes impedir que alguien dé like dos veces.
+- No puedes deshacer el like de una persona concreta.
+
+Con una fila por like, todo eso sigue siendo posible.
+
+**Decisión abierta:** `user_id`. Sin él no podemos saber quién dio cada like, y ahora mismo el repo no tiene login. Lo decidimos al empezar.
+
+## Qué nos da
+Los pasos 4 y 5 tendrán dónde escribir y qué contar.
+
+**Comprobación final:** este comando, o su equivalente en el SQL Editor de Neon, debe listar la tabla con tus columnas:
+
+```
+psql "$DATABASE_URL" -c '\d likes'
+```
+
+## Cómo
+Este paso es todo tuyo. Yo te guío, pero no te doy el SQL salvo que me lo pidas.
+
+```
+Decidir columnas ─▶ Escribir CREATE TABLE ─▶ Ejecutarlo en Neon ─▶ Comprobar con \d likes
+      TÚ                    TÚ                      TÚ                     TÚ
+```
+
+Si quieres leer por tu cuenta antes de empezar (documentación oficial de PostgreSQL):
+- [CREATE TABLE](https://www.postgresql.org/docs/current/sql-createtable.html)
+- [Restricciones: `PRIMARY KEY`, `NOT NULL`, `UNIQUE`](https://www.postgresql.org/docs/current/ddl-constraints.html)
+- [Valores por defecto: hora de inserción](https://www.postgresql.org/docs/current/ddl-default.html)
+
+## Antes de empezar
+**¿Qué pasó con los pasos 1 y 2?**
+- **A.** El código y el `.env` están en otra máquina o carpeta: los traes aquí y seguimos.
+- **B.** Se perdieron o nunca se guardaron: corrijo el progreso y los rehacemos antes de seguir.
+- **C.** Tu proyecto de Neon sigue activo: hacemos ya el paso 3 en su SQL Editor y dejamos la conexión para antes del paso 4.
+
+**¿Te queda claro el plan y quieres empezar a programar?**
+RESULT_FINAL success 14 0.475396695

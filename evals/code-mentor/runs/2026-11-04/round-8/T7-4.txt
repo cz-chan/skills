@@ -1,0 +1,26 @@
+TOOL Bash {"command":"git status --short; git diff; ls -la db; cat db/schema.sql","description":"Show working tree changes and the schema file"}
+RESULT   M .gitignore
+?? db/
+diff --git a/.gitignore b/.gitignore
+index a1e0396..fdd07cf 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1 +1,2 @@
+ runs/
++.code-
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- [ ] 1. Schema: `db/schema.sql` ← current\n- [ ] 2. Queries: add a like and read t
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully. (file state is current in your context — n
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Step 1: write `db/schema.sql`. Explained to the learner, nothing written yet.\nProb
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully. (file state is current in your context — n
+TEXT: `db/schema.sql` está correcto al leerlo: tiene las restricciones que pedí y la fila inicial. **Sin ejecutar**, así que falta confirmarlo en Neon.
+
+**Pendiente con Neon:** ejecuta el archivo una vez. `SELECT * FROM likes;` debe devolver `1 | 0`.
+
+**Si lo ejecutas dos veces:** `CREATE TABLE` da error porque la tabla ya existe, y el `INSERT` también porque el `id` 1 está repetido. Tus datos no cambian, así que `total` no vuelve a 0.
+
+Progreso guardado.
+
+¿Quieres que haga commit de `db/schema.sql` y `.gitignore`?
+
+Y sobre el paso 2 (sumar un like y leer el total, y qué pasa con dos clics a la vez): ¿seguimos o paramos aquí?
+RESULT_FINAL success 4 0.77179686

@@ -1,0 +1,73 @@
+TOOL Bash {"command":"SALUDO=hola node -e \"console.log(process.env.SALUDO)\"","description":"Print an environment variable set for one Node run"}
+RESULT ERR  This command requires approval
+TOOL Bash {"command":"node -e \"console.log(process.env.SALUDO)\"","description":"Print the same variable when it is not set"}
+RESULT ERR  This command requires approval
+TOOL Bash {"command":"git status --short; grep -c \"process.env\" src/db.ts; cat .gitignore","description":"Check status, env usage in db module, and ignore rules"}
+RESULT   M .gitignore
+?? db/
+?? src/db.ts
+0
+runs/
+.code-mentor/
+TEXT: Vamos más despacio. Solo hay que resolver una cosa: **sacar la contraseña del código**. Tu archivo sigue igual, así que empezamos desde ahí. Si lo que no pillas es otra cosa, dímelo.
+
+## Qué es una variable de entorno
+
+Es un valor que recibe tu programa **desde fuera** al arrancar, sin estar escrito en el código. Pruébalo con estos dos comandos, que no instalan nada ni cambian archivos (yo no pude ejecutarlos aquí por falta de permiso):
+
+```bash
+SALUDO=hola node -e "console.log(process.env.SALUDO)"
+node -e "console.log(process.env.SALUDO)"
+```
+
+El código es el mismo, pero el resultado cambia según lo que venga de fuera:
+
+```
+Al arrancar           process.env.SALUDO
+SALUDO=hola           "hola"
+(nada)                undefined
+```
+
+`process.env.ALGO` significa: "dame el valor que me pasaron con ese nombre".
+
+## Aplicado a tu archivo
+
+Ahora la contraseña viaja con el código, y el objetivo es que quede fuera:
+
+```
+AHORA                                 DESPUÉS
+src/db.ts                             src/db.ts
+  url = "postgresql://...clave..."      url = process.env.DATABASE_URL
+        │                                     ▲
+        ▼                                     │ se lo pasan al arrancar
+     va a git                               .env  (git lo ignora)
+                                              DATABASE_URL=postgresql://...clave...
+```
+
+El `.env` es solo un archivo donde guardar ese valor para no escribirlo en cada arranque. Como aún no tienes Neon, **ni siquiera hace falta crearlo ahora**.
+
+## Qué hace la comprobación
+
+`!valor` significa "no hay valor". Con `DATABASE_URL`:
+
+```
+url                  !url    ¿Lanza el error?
+"postgresql://..."   false   no, sigue
+undefined            true    sí: "Falta DATABASE_URL"
+```
+
+Sin ella, sabrías menos sobre la causa: el fallo llegaría al usar la URL, y con un mensaje que quizá no nombre la variable.
+
+## Tu turno, de uno en uno
+
+Haz solo el primero y dime "listo":
+
+1. **`.gitignore`:** añade una línea que diga `.env`. Así git nunca guardará ese archivo.
+
+Después vendrán estos dos:
+
+2. **Línea 3 de `src/db.ts`:** deja `const url =` y sustituye el texto entre comillas por `process.env.DATABASE_URL`, sin comillas.
+3. **Debajo de esa línea:** escribe un `if` que use `!url` y, dentro, el `throw` que ya te di.
+
+Si prefieres que te dé la solución de los tres cambios, pídemela y te la explico.
+RESULT_FINAL success 4 2.17384634

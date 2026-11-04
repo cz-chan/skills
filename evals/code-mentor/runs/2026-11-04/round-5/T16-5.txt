@@ -1,0 +1,34 @@
+TEXT: Llevo tres explicaciones y no te han servido, así que cambio de enfoque. Olvida las preguntas: esto es traducir una frase del español a SQL con un diccionario.
+
+## El diccionario
+
+| En español | En SQL |
+|---|---|
+| guarda un texto | `text` |
+| guarda un número entero | `integer` |
+| no puede estar vacía | `NOT NULL` |
+
+Primero va el nombre de la columna, y detrás la traducción de lo demás, palabra por palabra.
+
+## Dos ejemplos
+
+| Frase | SQL | Si guardas… |
+|---|---|---|
+| "`pais` guarda un texto." | `pais text` | `'Chile'` se acepta. Vacío también se acepta, porque no dijimos lo contrario. |
+| "`edad` guarda un número entero y no puede estar vacía." | `edad integer NOT NULL` | `30` se acepta. Vacío da error. |
+
+## Tu turno: traduce esta frase
+
+> "`post_id` guarda un texto y no puede estar vacía."
+
+Escríbela aquí tal como te salga. Si está mal, lo vemos juntos, y fallar aquí no rompe nada.
+
+## Si el bloqueo es otro
+
+Quizá el problema no sea esta línea. Si es así, respóndeme solo con una letra:
+
+- **a)** No tengo claro qué es una tabla o una columna.
+- **b)** Entiendo la idea, pero no sé qué se supone que debo escribir.
+- **c)** Estoy cansado: prefiero parar por hoy o que me des la solución explicada.
+- **d)** Es otra cosa, y te cuento cuál.
+RESULT_FINAL success 1 0.719960515

@@ -1,0 +1,44 @@
+TEXT: Fue demasiado de golpe. Vamos a verlo con otro ejemplo y luego escribes una sola línea.
+
+## Cómo se decide cada columna
+Para cada columna, responde tres preguntas en este orden. Cada respuesta te da una parte de la línea:
+
+| Pregunta | Si la respuesta es… | Escribes |
+|---|---|---|
+| 1. ¿Qué dato guarda? | texto / número / fecha | el tipo |
+| 2. ¿Identifica la fila? | sí | `PRIMARY KEY` |
+| 3. ¿Puede faltar? | no, es obligatorio | `NOT NULL` |
+| | si falta, se usa un valor automático | `DEFAULT ...` |
+
+## Ejemplo con otra tabla: libros
+| Columna | ¿Qué guarda? | ¿Identifica la fila? | ¿Puede faltar? | Línea |
+|---|---|---|---|---|
+| `isbn` | texto, `978-1` | sí | no | `isbn text PRIMARY KEY` |
+| `titulo` | texto, `Dune` | no | no | `titulo text NOT NULL` |
+| `paginas` | número, `412` | no | si falta, 0 | `paginas integer DEFAULT 0` |
+
+Juntas quedan así:
+
+```sql
+CREATE TABLE libros (
+  isbn     text PRIMARY KEY,
+  titulo   text NOT NULL,
+  paginas  integer DEFAULT 0
+);
+```
+
+Y esto ocurre al insertar:
+
+| Insertas | Resultado |
+|---|---|
+| `isbn = '978-1'`, `titulo = 'Dune'` | se guarda con `paginas = 0`, el valor automático |
+| `isbn = '978-1'` otra vez, `titulo = 'Otro'` | error: el `isbn` ya existe y `PRIMARY KEY` no deja repetirlo |
+| `isbn = '978-2'`, sin `titulo` | error: `NOT NULL` exige un título |
+
+Cada regla responde a una de esas preguntas: por eso la línea sale sola al contestarlas.
+
+## Tu turno: solo una línea
+Olvida de momento el resto de la tabla, y también Neon. Empezamos por `post_id` porque es la columna más sencilla, y luego las otras dos siguen el mismo método.
+
+Recuerda que `post_id` guarda valores como `hola-mundo`, y que un like sin post no sirve. Responde las tres preguntas para `post_id` y **escríbeme solo esa línea**. Si te equivocas, sabremos exactamente en qué pregunta está el problema.
+RESULT_FINAL success 1 0.70119743

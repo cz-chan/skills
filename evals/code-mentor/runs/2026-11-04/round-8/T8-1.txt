@@ -1,0 +1,174 @@
+TOOL Bash {"command":"git log --stat -5 && git status --short && ls -la && git show HEAD","description":"Show recent commits, status, files, last commit diff"}
+TOOL Glob {"pattern":"**/*"}
+RESULT  .git/info/exclude
+.git/description
+.git/hooks/commit-msg.sample
+.git/hooks/pre-rebase.sample
+.git/hooks/sendemail-validate.sample
+.git/hooks/pre-commi
+RESULT  commit 6b7af73ad063e9dbd29e6c2cbdc9b262d95ae83e
+Author: fixture <fixture@local>
+Date:   Wed Nov 4 14:50:37 2026 +0100
+
+    wip likes
+
+ .../memory/data
+TOOL Bash {"command":"ls -la ~/.claude/projects/-private-tmp-claude-501--Users-user-Desktop-projects-prod-cz-skills-a54ea246-387e-4d48-b65f-5594c8587ebd-scratchpad-final-resume/memory/ && cat ~/.claude/projects
+RESULT ERR  Exit code 1
+total 0
+drwxr-xr-x@ 2 user  staff   64 Nov  4 14:50 .
+drwxr-xr-x@ 4 user  staff  128 Nov  4 14:50 ..
+cat: ~/.claude/projects/-private-tmp-
+TEXT: There's a code-mentor session in progress, so I'll load the skill to resume it.
+TOOL Skill {"skill":"code-mentor","args":"continuemos"}
+RESULT  Launching skill: code-mentor
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Bash {"command":"cat .gitignore; echo '--- files'; ls -a . src; ls src/pages/api/likes.ts 2>&1; test -f .env && echo '.env exists' || echo 'no .env'; test -n \"$DATABASE_URL\" && echo 'DATABASE_URL set' ||
+RESULT ERR  A variable in this command can't be checked before it runs
+TOOL Agent {"subagent_type":"web-fetch","description":"Verify Postgres docs links","prompt":"Fetch these two URLs and report for each: did it load (no 404 or redirect to a home page), the page title, and whether
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-constraints.html","prompt":"Return the page title, and whether the page covers PRIMARY KEY, NOT NULL, and UNIQUE constraints on tables. Quote the se
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/datatype-datetime.html","prompt":"Return the page title, and whether the page covers timestamp with time zone (timestamptz). Quote any sentence that rec
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-constraints.html (HTTP 200 OK, text/html, 28053 characters).
+The text inside the <fetched-web-cont
+RESULT  Fetched https://www.postgresql.org/docs/current/datatype-datetime.html (HTTP 200 OK, text/html, 34470 characters).
+The text inside the <fetched-web-co
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TOOL Bash {"command":"cat .gitignore; echo '--- files'; ls -a . src; ls src/pages/api/likes.ts 2>&1; test -f .env && echo '.env exists' || echo 'no .env'; test -d node_modules && echo 'node_modules exists' || e
+RESULT  runs/
+--- files
+.:
+.
+..
+.claude
+.code-mentor
+.git
+.gitignore
+AGENTS.md
+package.json
+reset.sh
+runs
+src
+
+src:
+.
+..
+index.ts
+ls: src/pages/api/likes.ts: 
+TEXT: # Retomamos: botón de likes con Neon
+
+## Antes de seguir: el repo no coincide con el progreso
+El archivo de progreso (13 oct) marca los pasos 1 y 2 como hechos, pero aquí no veo ese trabajo:
+
+- `src/pages/api/likes.ts` no existe, y `src/index.ts` solo tiene `// TODO: /api/likes`.
+- No hay `.env` ni `node_modules`.
+- Ningún commit tocó esos archivos, y no hay stash. El último commit (`wip likes`) solo añade el archivo de progreso.
+- `.gitignore` solo tiene `runs/`. Cuando vuelvas a crear `.env`, añádelo ahí: contiene la contraseña de la DB y podría acabar en un commit.
+
+No puedo ver tu cuenta de Neon, así que no sé si el proyecto sigue ahí.
+
+## El panorama
+Construimos un botón de likes en c12z.io para que aprendas bases de datos.
+
+```
+[Botón] ──click──▶ [API /likes] ──query──▶ [Neon DB]
+   yo                  yo                    TÚ
+```
+
+- **Según el archivo, ya hecho:** proyecto Neon, connection string en `.env` y `SELECT 1` desde la ruta de Hono.
+- **Ahora:** paso 3, la tabla `likes`.
+- **Después:** insertar un like, contar likes por post y conectar el botón.
+
+El `SELECT 1` demostró que la API puede hablar con la DB, pero todavía no hay dónde guardar nada. Por eso toca la tabla.
+
+## El problema
+Alguien hace click en el post `hola-mundo`. La API intenta guardar el like y Postgres responde:
+
+```
+relation "likes" does not exist
+```
+
+Una **tabla** es donde Postgres guarda los datos. Tiene **columnas** fijas, y cada **fila** es un registro. Sin tabla, el like no tiene dónde quedarse.
+
+## La idea
+Cada like es una fila. Son tres clicks, dos en un post y uno en otro:
+
+| id | post_id | created_at |
+|----|---------|------------|
+| 1 | `hola-mundo` | 2026-11-04 10:00 |
+| 2 | `hola-mundo` | 2026-11-04 10:05 |
+| 3 | `otro-post` | 2026-11-04 10:07 |
+
+Para saber los likes de `hola-mundo`, se cuentan sus filas: 2. Si recargas la página, las filas siguen en la DB y el número no cambia.
+
+Las columnas ya las he decidido, y estos son los motivos:
+
+- **`id`, número autogenerado y primary key:** la **primary key** identifica cada fila sin repetirse, y Postgres genera el número solo.
+- **`post_id`, texto obligatorio:** indica a qué post va el like. Es texto porque este repo no tiene tabla de posts y el slug ya identifica al post. Obligatorio (`NOT NULL`) porque un like sin post no sirve.
+- **`created_at`, `timestamptz` obligatorio:** guarda cuándo ocurrió, como un instante exacto y sin ambigüedad de zona horaria. Postgres puede rellenarlo solo con un valor por defecto.
+- **Sin `user_id`:** en este repo no hay login, así que estaría siempre vacía. La pega es que una persona puede dar like varias veces. Podemos añadirla si algún día hay usuarios.
+
+## Por qué así
+Lo obvio sería una sola columna `likes_count` por post, y sumarle 1 en cada click. Es válido y más simple para leer, pero pierde información: no sabes cuándo llegó cada like. Además, tu plan es aprender `INSERT` y `COUNT`, y con un contador no los practicarías.
+
+## Qué nos da
+El paso 4 tendrá dónde insertar y el paso 5 tendrá qué contar.
+
+**Prueba de que está hecho:** esta consulta devuelve exactamente 3 filas.
+
+```sql
+SELECT column_name, data_type, is_nullable
+FROM information_schema.columns
+WHERE table_name = 'likes';
+```
+
+```
+id         | bigint                   | NO
+post_id    | text                     | NO
+created_at | timestamp with time zone | NO
+```
+
+## Cómo
+```
+Tú escribes el CREATE TABLE ──▶ Neon SQL Editor ──▶ tabla likes
+                                                       │
+Yo te doy la consulta de comprobación ─────────────────┘
+```
+
+1. Abres el SQL Editor de Neon. Así no necesitas `.env` ni código local para este paso.
+2. Escribes un `CREATE TABLE` con las tres columnas. **Esto lo escribes tú.**
+3. Lanzas la consulta de comprobación.
+
+Si quieres investigarlo por tu cuenta antes, estas páginas oficiales explican lo que vas a usar:
+- [Constraints](https://www.postgresql.org/docs/current/ddl-constraints.html): `NOT NULL` y primary key.
+- [Tipos de fecha y hora](https://www.postgresql.org/docs/current/datatype-datetime.html): `timestamp with time zone`.
+
+## Dos preguntas
+**1. ¿Qué pasó con los pasos 1 y 2?**
+- **a)** Están en otra carpeta o máquina: tráelos antes del paso 4.
+- **b)** Se perdieron pero el proyecto Neon sigue: hacemos ahora el paso 3 en el SQL Editor y rehacemos el `.env` y la conexión antes del paso 4. Lo recomiendo si es tu caso.
+- **c)** No queda nada: empezamos desde el paso 1.
+
+Con tu respuesta corrijo el archivo de progreso.
+
+**2. ¿Te queda claro y empezamos a escribir código?**
+RESULT_FINAL success 11 0.43334199999999995

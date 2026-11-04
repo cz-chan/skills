@@ -1,0 +1,24 @@
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Botón de likes con Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: junior
+6	mode:
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Paso 3: diseñar la tabla `likes`. Siguiente: decidir columnas\n(`post_id`, `created
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully. (file state is current in your context — n
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"updated: 2026-10-13","new_string":"updated: 2026-11-04"}
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully. (file state is current in your context — n
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- Hono — Environment variables: <url> (official)\n","new_string":"- Hono — Environm
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully. (file state is current in your context — n
+TEXT: Progreso guardado en `.code-mentor/memory/databases/0001-neon-likes-progress.md`. Sin commit.
+
+**Paso 3, a medias:**
+- **Decidido:** columnas `post_id`, `user_id`, `created_at`.
+- **Falta:** tipos, reglas (`NOT NULL`, evitar likes dobles), escribir `CREATE TABLE`, ejecutarlo en Neon, comprobar con `\d likes`.
+- **Sin ejecutar:** ningún SQL.
+
+**Pendiente para la próxima:** elegir A, B o C, porque el repo sigue sin el trabajo de los pasos 1 y 2.
+
+Hasta la próxima.
+RESULT_FINAL success 5 0.524286965

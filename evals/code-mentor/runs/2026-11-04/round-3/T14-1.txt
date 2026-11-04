@@ -1,0 +1,162 @@
+TOOL Bash {"command":"git log --stat -3 && git ls-files && ls -la && ls -la \"~/.claude/projects/-private-tmp-claude-501--Users-user-Desktop-projects-prod-cz-skills-a54ea246-387e-4d48-b65f-5594c8587ebd-scratchp
+TOOL Bash {"command":"git show HEAD","description":"Show latest commit diff"}
+RESULT  commit 7292a556e2555b5b0702ec9750ca309e1f14e6c0
+Author: fixture <fixture@local>
+Date:   Wed Nov 4 11:53:55 2026 +0100
+
+    wip likes
+
+diff --git a/.co
+RESULT  commit 7292a556e2555b5b0702ec9750ca309e1f14e6c0
+Author: fixture <fixture@local>
+Date:   Wed Nov 4 11:53:55 2026 +0100
+
+    wip likes
+
+ .../memory/data
+TOOL Skill {"skill":"code-mentor","args":"continuemos"}
+RESULT  Launching skill: code-mentor
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Read {"file_path":"<sandbox>/.claude/skills/code-mentor/references/memory-example.md"}
+RESULT  1	# Memory file examples
+2	
+3	Examples of how to write files in `.code-mentor/memory/` (see section 6 of `SKILL.md`).
+4	This file is a reference only 
+TOOL Bash {"command":"git status --short; git log -5 --format='%h %ad %s' --date=short; cat .gitignore; echo '--- progress files'; ls .code-mentor/memory/**/*-progress.md; echo '--- plan'; ls PLAN.md 2>/dev/nul
+RESULT  7292a55 2026-11-04 wip likes
+87a5b92 2026-11-04 fixture: initial state
+runs/
+--- progress files
+.code-mentor/memory/databases/0001-neon-likes-progress
+TOOL Agent {"subagent_type":"web-fetch","description":"Verify Postgres docs links","prompt":"Fetch each URL and report, for each: does it load (no 404 or redirect to a home page), its page title, and whether it 
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-basics.html","prompt":"What is the page title? Does the page load (not a 404 or redirect to home)? Does it explain creating a table with columns (CR
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-basics.html (HTTP 200 OK, text/html, 8086 characters).
+The text inside the <fetched-web-content> t
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/datatype-datetime.html","prompt":"What is the page title? Does the page load (not a 404 or redirect to home)? Does it explain date/time types including 
+RESULT  Fetched https://www.postgresql.org/docs/current/datatype-datetime.html (HTTP 200 OK, text/html, 34470 characters).
+The text inside the <fetched-web-co
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-constraints.html","prompt":"What is the page title? Does the page load (not a 404 or redirect to home)? Does it explain NOT NULL, PRIMARY KEY, and U
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-constraints.html (HTTP 200 OK, text/html, 28053 characters).
+The text inside the <fetched-web-cont
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TEXT: Seguimos con **Botón de likes con Neon**, paso 3 de 6. Tu progreso se guardó por última vez el 2026-10-13.
+
+## Primero: el repo no coincide con tu progreso
+
+El archivo marca los pasos 1 y 2 como hechos, pero aquí no veo ese trabajo:
+
+| El progreso dice | Lo que hay en este repo |
+|---|---|
+| `.env` con la connection string | No existe `.env` |
+| `SELECT 1` desde una ruta de Hono | `src/index.ts` solo tiene `// TODO: /api/likes` |
+| `src/pages/api/likes.ts` | No existe |
+
+Tampoco está `node_modules`. El único commit posterior a esa fecha (`wip likes`) solo añade el archivo de progreso.
+
+**¿Qué prefieres?**
+- **A.** Tienes ese código en otra rama o máquina y lo traes aquí.
+- **B.** Se perdió. Rehacemos el paso 2 rápido, y tú escribes la conexión.
+- **C.** Diseñamos ya la tabla, que no depende de ese código, y dejamos la conexión para antes de ejecutarla.
+
+Te recomiendo **C** si la conexión no está a mano, porque ahora toca pensar en el diseño. Al final actualizo el archivo con lo que elijas.
+
+## La visión general
+
+**Qué construimos:** un botón de likes en c12z.io, para que aprendas bases de datos. Tú escribes la parte de la base de datos. Yo hago el botón, la ruta de la API y los tests.
+
+- **Hecho, según tu progreso:** el proyecto en Neon y la conexión desde la API.
+- **Ahora:** paso 3, la tabla `likes`.
+- **Después:** insertar un like (4), contarlos (5) y conectar botón → API → DB (6).
+
+**Cómo llegamos aquí:** en el paso 2 demostraste que la API puede hablar con Neon, pero `SELECT 1` no guarda nada. Ya hay conexión, pero falta un sitio donde guardar los datos.
+
+## El problema
+
+Alguien abre el post `hola-mundo` y hace click. El contador pasa de 12 a 13 y recarga la página.
+
+Sin tabla, ese 13 solo existía en la memoria del navegador, así que se pierde. Si la API intenta guardarlo, Postgres responde con este error:
+
+```
+relation "likes" does not exist
+```
+
+## La idea
+
+Una **tabla** es como una hoja de cálculo con reglas. Las **columnas** son fijas y cada una tiene un **tipo** (texto, número, fecha). Cada **fila** es un dato.
+
+Aquí, cada like es una fila. Tres clicks en dos posts quedan así:
+
+```
+post_id      | created_at
+-------------+---------------------
+hola-mundo   | 2026-11-04 10:00:00   ← 1.er click
+hola-mundo   | 2026-11-04 10:05:00   ← 2.º click
+otro-post    | 2026-11-04 10:07:00   ← 3.er click
+```
+
+Para saber cuántos likes tiene `hola-mundo`, se cuentan sus filas: **2**. Como las filas viven en Neon y no en el navegador, siguen ahí al recargar.
+
+## Por qué así
+
+La alternativa obvia es guardar un solo número por post:
+
+```
+post_id    | likes
+-----------+------
+hola-mundo | 2
+```
+
+Es más simple, pero solo sabe cuántos likes hay, no de quién son ni cuándo llegaron. Con ese número:
+- No puedes impedir que alguien dé like dos veces al mismo post.
+- No puedes quitar el like de una persona concreta.
+- No puedes ver los likes de la última semana.
+
+Con una fila por like, todo eso se puede hacer. El coste es que hay que contar filas en vez de leer un número, pero a este tamaño no importa.
+
+## Qué nos da
+
+Los pasos 4 y 5 ya tendrán dónde escribir y qué contar.
+
+**Comprobación final del paso:** ejecutar `\d likes` en `psql`, o el equivalente en el SQL Editor de Neon, y ver tus columnas con sus tipos. `psql` es el cliente de Postgres para la terminal.
+
+## Cómo
+
+```
+[Botón] ──click──▶ [API /api/likes] ──query──▶ [Neon DB]
+   yo                     yo                 tabla likes
+                                             TÚ ← estás aquí
+```
+
+**Tus pasos (el código lo escribes tú):**
+1. Decidir las columnas y el tipo de cada una. La duda abierta es si hace falta `user_id`.
+2. Decidir las reglas, por ejemplo qué columnas no pueden quedar vacías.
+3. Escribir el `CREATE TABLE`, el comando SQL que crea la tabla.
+4. Ejecutarlo en Neon y hacer la comprobación final.
+
+Si quieres adelantar por tu cuenta, estas páginas oficiales explican lo que vas a hacer:
+- [Crear tablas](https://www.postgresql.org/docs/current/ddl-basics.html)
+- [Tipos de fecha y hora](https://www.postgresql.org/docs/current/datatype-datetime.html)
+- [Reglas de una tabla (constraints)](https://www.postgresql.org/docs/current/ddl-constraints.html)
+
+**Dime A, B o C. Y con eso, ¿te queda claro y empezamos a escribir código?**
+RESULT_FINAL success 10 0.39247696499999996

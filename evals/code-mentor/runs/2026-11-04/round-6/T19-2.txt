@@ -1,0 +1,36 @@
+TOOL Read {"file_path":"<sandbox>/.claude/skills/code-mentor/references/memory-example.md"}
+RESULT  1	# Memory file examples
+2	
+3	Examples of how to write files in `.code-mentor/memory/` (see section 6 of `SKILL.md`).
+4	This file is a reference only 
+TOOL Bash {"command":"git status --short; git diff --stat","description":"Check for uncommitted changes"}
+RESULT  (Bash completed with no output)
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Step 3: design the `likes` table. Next: decide the columns\n(`post_id`, `created_at
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully. (file state is current in your context — n
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"updated: 2026-10-13","new_string":"updated: 2026-11-04"}
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully. (file state is current in your context — n
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- Hono — Environment variables: <url> (official)\n","new_string":"- Hono — Environm
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully. (file state is current in your context — n
+TEXT: Apunté en el progreso que el código de los pasos 1 y 2 está en la otra máquina, así que no volveré a preguntarte por eso.
+
+## Decisión: `user_id`
+
+| | Opción | A favor | En contra |
+|---|---|---|---|
+| **A** | Sin `user_id` por ahora | Tabla simple, y cumple el objetivo: el contador sube y sobrevive a recargar | Una persona puede dar like varias veces |
+| **B** | Un id anónimo por visitante, guardado en una cookie | Limita los likes repetidos | Hay que añadir cookies, y basta borrarlas para volver a votar |
+
+**Recomiendo A.** Lo que quieres aprender aquí es la tabla y las queries, y las cookies te desviarían de eso. Si más adelante añades login, podrás agregar la columna con `ALTER TABLE`. Si prefieres B, dímelo y ajustamos el paso.
+
+## Tu tarea
+
+Escribe el `CREATE TABLE likes` con `post_id` y `created_at`, **pero no lo ejecutes todavía**. Pégalo aquí y lo revisamos antes, porque corregir una tabla es más fácil cuando aún no existe.
+
+Responde estas tres preguntas para cada columna:
+
+1. **¿Qué tipo de dato guarda?** El tipo decide qué valores acepta la DB. Piensa en el valor real: `hola-mundo` en un caso y una fecha con hora en el otro. Si dudas con la fecha, mira la diferencia entre `timestamp` y `timestamptz`: importa cuando servidor y lector están en zonas horarias distintas.
+2. **¿Puede quedar vacía?** Un like sin post, por ejemplo, no se podría contar para ninguno. Eso se controla con una restricción, una regla que la DB hace cumplir aunque tu código falle.
+3. **¿Quién pone el valor?** La API sabe a qué post se dio like, porque llega con el clic. Pero la hora del like no tiene por qué mandarla la API: piensa si la DB puede ponerla sola.
+
+Si crees que falta alguna columna, añádela y dime por qué.
+RESULT_FINAL success 6 0.5606935600000001

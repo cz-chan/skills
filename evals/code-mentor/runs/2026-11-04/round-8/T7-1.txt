@@ -1,0 +1,78 @@
+TOOL Skill {"skill":"code-mentor","args":"quiero hacer un botón de likes con Neon para aprender bases de datos"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  No files found
+TOOL Bash {"command":"git status --short; git log -5 --oneline; ls -a; cat package.json 2>/dev/null; cat PLAN.md 2>/dev/null; cat .gitignore 2>/dev/null; git ls-files","description":"Show repo state, files, and
+RESULT  17d2edd fixture: initial state
+.
+..
+.claude
+.git
+.gitignore
+AGENTS.md
+package.json
+reset.sh
+runs
+src
+{
+  "name": "c12z-demo",
+  "type": "module",
+  "d
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Bash {"command":"ls -a src; ls node_modules 2>/dev/null | head; ls -a | grep -i env; git check-ignore .env","description":"List source files and check for dependencies and env files"}
+RESULT ERR  This Bash command contains multiple operations. The following part requires approval: grep -i env; git check-ignore .env
+TEXT: Vi la app: Hono con una sola ruta, un `TODO: /api/likes` en `src/index.ts` y `@neondatabase/serverless` en `package.json`. Aún no hay código de base de datos. Antes de empezar, necesito estas respuestas (ej.: `1b 2a 3a…`).
+
+**Alcance**
+
+1. ¿Qué likes quieres?
+   - a) Un contador global: cada clic suma 1
+   - b) Un like por visitante, sin poder repetir (más SQL: filas y restricción `UNIQUE`)
+   - c) Like y quitar like por visitante
+   - d) Como (c), con likes por página o post (relaciona varias tablas)
+
+**Quién hace cada parte**
+
+Opciones: **a)** tú solo, **b)** tú con mi guía, **c)** yo te doy el código en la consola y tú lo pegas.
+
+| # | Parte |
+|---|---|
+| 2 | Crear el proyecto en Neon y guardar `DATABASE_URL` |
+| 3 | Conectar la app a Neon |
+| 4 | Esquema (`CREATE TABLE`) |
+| 5 | Queries (guardar y contar likes) |
+| 6 | Ruta `/api/likes` en Hono |
+| 7 | Botón (UI) |
+
+**Tu nivel en bases de datos**
+
+8. ¿Cuánto has usado SQL?
+   - a) Nunca
+   - b) Algún `SELECT` o `INSERT` siguiendo tutoriales
+   - c) He creado tablas y usado `JOIN` en algún proyecto
+   - d) Lo uso a menudo y he diseñado esquemas e índices
+
+9. Sin buscarlo: ¿qué pasa si dos personas hacen clic a la vez y la app ejecuta primero `SELECT count` y luego `UPDATE count = valor + 1`?
+   - a) Nada, la base de datos lo ordena y suma 2
+   - b) Se puede perder un like
+   - c) Da error de conexión
+   - d) No lo sé
+
+10. ¿Para qué sirve una clave primaria?
+    - a) Para cifrar la fila
+    - b) Para identificar cada fila de forma única
+    - c) Para ordenar los resultados al mostrarlos
+    - d) No lo sé
+
+Con esto te propongo el reparto, el esquema del flujo y cómo comprobaremos que funciona.
+RESULT_FINAL success 7 0.28388040000000003
