@@ -1,0 +1,22 @@
+TEXT: Empezamos por una sola columna. Las otras dos las añadimos después.
+
+Una tabla se crea con `CREATE TABLE`, y su forma general es esta:
+
+```
+CREATE TABLE nombre_de_la_tabla (
+  nombre_columna tipo regla
+);
+```
+
+- **`nombre_de_la_tabla`:** cómo se llama la hoja.
+- **`nombre_columna`:** el encabezado de la columna.
+- **`tipo`:** qué clase de dato guarda, por ejemplo `text` para texto.
+- **`regla`:** opcional. `NOT NULL` significa que la columna no puede quedar vacía.
+- **`;`:** marca el final de la instrucción.
+
+Así, cuando llegue un like con `receta-tortilla`, se guarda bien. Si llega uno sin post, Postgres lo rechaza, porque no sabría a qué post pertenece.
+
+**Tu tarea:** escribe el `CREATE TABLE` de la tabla `likes`, solo con la columna `post_id`, usando el tipo y la regla de arriba. Pégalo aquí.
+
+**No lo ejecutes todavía**, porque aún faltan `id` y `created_at`. De momento no necesitas abrir Neon. Antes de ejecutarlo volveré a preguntarte por A, B o C, para saber si tu proyecto sigue ahí.
+RESULT_FINAL success 1 0.584522585

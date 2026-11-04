@@ -1,0 +1,29 @@
+TEXT: Escribe tú el SQL que crea la tabla, en el SQL Editor de tu proyecto en Neon. Si ya no encuentras el proyecto, dímelo y volvemos al paso 1.
+
+Esta es la forma de la orden:
+
+```
+CREATE TABLE nombre_de_la_tabla (
+  columna1 tipo reglas,
+  columna2 tipo reglas
+);
+```
+
+Las columnas van separadas por comas, sin coma tras la última, y la orden termina en `;`.
+
+Tu tabla se llama `likes` y lleva estas columnas:
+
+| Columna | Tipo | Reglas |
+|---|---|---|
+| `id` | `bigint` | `GENERATED ALWAYS AS IDENTITY PRIMARY KEY` |
+| `post_id` | `text` | `NOT NULL` |
+| `created_at` | `timestamptz` | `NOT NULL DEFAULT now()` |
+
+**Haz esto:**
+1. Escribe el `CREATE TABLE` y ejecútalo.
+2. Si va bien, ejecuta `SELECT * FROM likes;`.
+
+Debería devolver 0 filas y mostrar las 3 columnas.
+
+Pégame tu SQL y lo que te responda Neon en cada orden. Si sale un error, pégalo tal cual y lo vemos juntos.
+RESULT_FINAL success 1 0.5435305949999999

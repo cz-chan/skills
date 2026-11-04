@@ -1,0 +1,61 @@
+TOOL Read {"file_path":"<sandbox>/src/db.ts"}
+RESULT  1	import { neon } from '@neondatabase/serverless'
+2	
+3	export const sql = neon('postgresql://ana:****@ep-demo.neon.tech/likes_demo?sslmode=require')
+4
+TEXT: Vamos con otro ejemplo, sin Neon de por medio. Imagina que tu app usa un servicio de correo que necesita una clave.
+
+## Forma 1: la clave escrita en el código
+
+```ts
+const correo = crearCliente('abc123')
+```
+
+El valor `'abc123'` está en el propio archivo, así que cualquiera que lea el código lo ve.
+
+## Forma 2: la clave en `.env`
+
+Dos archivos, cada uno con su parte:
+
+```
+.env              API_KEY=abc123
+src/correo.ts     const correo = crearCliente(process.env.API_KEY)
+```
+
+Paso a paso, al arrancar la app:
+
+| Paso | Qué pasa | Valor |
+|---|---|---|
+| 1 | Node lee `.env` y lo guarda en el objeto `process.env` | `{ API_KEY: 'abc123' }` |
+| 2 | El código evalúa `process.env.API_KEY` | `'abc123'` |
+| 3 | `crearCliente` recibe ese valor | `crearCliente('abc123')` |
+
+`crearCliente` recibe lo mismo en las dos formas. La diferencia es que en la forma 2 **la clave no está en el código, solo el nombre de la variable**.
+
+Y si mañana cambias la clave, solo tocas `.env`:
+
+```
+.env              API_KEY=xyz789
+src/correo.ts     (no cambia)
+```
+
+Ahora el paso 2 da `'xyz789'`, sin editar ni una línea de código.
+
+## El detalle de las comillas
+
+| Escribes | Qué recibe la función |
+|---|---|
+| `crearCliente('abc123')` | El texto `abc123` |
+| `crearCliente(process.env.API_KEY)` | El valor guardado en `API_KEY`, que es `abc123` |
+| `crearCliente('process.env.API_KEY')` | ❌ El texto literal `process.env.API_KEY`, que no es una clave |
+
+Con comillas, es texto tal cual. Sin comillas, JavaScript busca el valor.
+
+## Tu caso
+
+Tu línea 3 está como la **forma 1**: la URL va entre comillas dentro de `neon(...)`. Tu `.env` ya tiene su parte hecha, con una variable llamada `DATABASE_URL`.
+
+Reescribe la línea 3 como la **forma 2**, con tu variable en lugar de `API_KEY`. `export const sql = neon(...)` se queda igual; solo cambia lo que va dentro de los paréntesis.
+
+Dime "listo" cuando lo tengas. Si sigue sin encajar, dime en qué parte de la tabla te pierdes.
+RESULT_FINAL success 2 1.16348922

@@ -1,0 +1,56 @@
+TOOL Bash {"command":"git status --short; echo ---; cat src/db.ts; echo ---; cat src/index.ts","description":"Re-read the current db and index files"}
+RESULT   M .gitignore
+?? .env.example
+?? src/db.ts
+---
+import { neon } from '@neondatabase/serverless'
+
+export const sql = neon('postgresql://ana:****@ep-demo
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Siguiente: el usuario hace que `ping` reciba `url` como parámetro, quita la URL de 
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: Sin problema, mi explicación daba demasiadas vueltas. Aquí tienes el código, que no se ha ejecutado.
+
+**`src/db.ts`:** cambia todo lo que hay debajo del import por esto:
+
+```ts
+export async function ping(url: string) {
+  const sql = neon(url)
+  const rows = await sql`SELECT 1 AS ok`
+  return rows[0].ok
+}
+```
+
+**`src/index.ts`:** añade estos dos imports arriba:
+
+```ts
+import { env } from 'hono/adapter'
+import { ping } from './db'
+```
+
+Y esta ruta debajo de la ruta `/`:
+
+```ts
+app.get('/db-check', async (c) => {
+  const { DATABASE_URL } = env<{ DATABASE_URL: string }>(c)
+  const ok = await ping(DATABASE_URL)
+  return c.json({ ok })
+})
+```
+
+**Por qué funciona:** la URL solo se puede leer cuando llega una petición, así que la ruta la lee y se la pasa a `ping` como argumento.
+
+**Qué cambia al ejecutarse:**
+
+```
+Antes:  db.ts lleva la URL escrita  → la contraseña queda en el código
+Ahora:  .env guarda la URL
+          ↓  env(c) la lee en la ruta
+        ping(url) la recibe         → la contraseña no está en el código
+```
+
+`ping` hace lo mismo que antes. Lo único nuevo es que ya no sabe la URL de antemano: se la dan al llamarla, igual que `sumar(2, 3)` recibe sus números.
+
+`c.json({ ok })` es la forma corta de `c.json({ ok: ok })`, y la respuesta será `{"ok":1}`.
+
+Copia estas líneas tú mismo y avísame cuando estén. Las reviso y te hago una pregunta rápida para comprobar la idea. Si alguna línea sigue sin cuadrarte, dime cuál.
+RESULT_FINAL success 3 1.2773724899999999

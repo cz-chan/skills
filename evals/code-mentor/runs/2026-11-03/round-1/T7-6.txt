@@ -1,0 +1,62 @@
+TOOL Bash {"command":"git status --short; git diff -- src; ls -la src; echo ---; cat src/db.ts; echo ---; cat src/index.ts","description":"Show src changes and read db and index files"}
+RESULT   M .gitignore
+?? .env.example
+?? src/db.ts
+total 16
+drwxr-xr-x@  4 user  wheel  128 Nov  3 20:08 .
+drwxr-xr-x@ 12 user  wheel  384 Nov  3 20:05 ..
+-rw
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Siguiente: revisar `/db-check` leyendo el código; no se puede ejecutar aquí.","new_
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- `.env.example` (valores falsos)","new_string":"- `src/db.ts` (queries del usuario
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: He revisado `src/db.ts` leyéndolo, sin ejecutarlo. La query funciona sobre el papel, pero hay dos cosas que corregir.
+
+**Bien:** `async`, `await`, la tagged template y `rows[0].ok` están correctos. Separar la base de datos en su propio archivo también es buena idea, mejor que lo que te pedí, y la mantenemos.
+
+## Problema 1: la URL está escrita en el código
+
+`src/db.ts:3` tiene la cadena de conexión dentro del archivo. Ahora no hay fuga: los valores son falsos y no hay commit. Pero al poner la URL real, la contraseña entraría en git con el siguiente commit.
+
+La causa es de diseño, y por eso cambiarla no es inmediato. `sql` se crea al cargar el archivo, y en ese momento `env(c)` aún no puede usarse:
+
+```
+Arranca la app
+  └─ se ejecuta db.ts → neon(...)        ← no hay petición, no existe c
+
+Llega GET /db-check
+  └─ Hono crea c → env(c) ya funciona    ← aquí ya se puede leer la URL
+```
+
+Por tanto, la URL debe llegar a `db.ts` cuando llega la petición. Hay dos opciones:
+
+- **a) `ping` recibe la URL como parámetro (recomendada).** Mantiene tu separación: `index.ts` lee la configuración y `db.ts` habla con la base de datos.
+- **b) Meter todo en la ruta.** Es más corto ahora, pero perderías `db.ts`, y las queries de los pasos 4 y 5 acabarían mezcladas con las rutas.
+
+Recorrido de la opción (a):
+
+```
+GET /db-check
+  ├─ index.ts: env(c)     → url = 'postgresql://...'
+  ├─ index.ts: ping(url)
+  │    ├─ db.ts: neon(url) → sql
+  │    └─ db.ts: sql`...`  → [ { ok: 1 } ] → devuelve 1
+  └─ index.ts: c.json     → {"ok":1}
+```
+
+La URL ya no aparece en ningún archivo de código. Además, tu cadena no incluía `channel_binding=require`. Cuando leas la URL real de `.env`, ya vendrá con los parámetros que dé Neon.
+
+## Problema 2: nadie llama a `ping()`
+
+`src/index.ts` no ha cambiado, así que `db.ts` no se usa en ningún sitio y `GET /db-check` no existe todavía.
+
+## Tu turno
+
+1. **En `src/db.ts`:** borra `export const sql`. Haz que `ping` reciba `url: string` y cree `sql` dentro.
+2. **En `src/index.ts`:** importa `env` y `ping`, y añade `GET /db-check` con una función `async`.
+3. **En esa ruta:** lee `DATABASE_URL` con `env()`, llama a `ping` con `await` y devuelve `c.json({ ok: ... })`.
+
+Un detalle del import: como el proyecto no tiene `tsconfig.json`, el runtime decidirá si acepta `'./db'` sin extensión. Bun lo acepta; en Node depende de cómo ejecutes TypeScript. Usa `'./db'` por ahora y lo ajustamos al elegir runtime.
+
+Cuando acabes, avísame y lo reviso.
+RESULT_FINAL success 4 1.15070989

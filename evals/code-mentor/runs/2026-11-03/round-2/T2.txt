@@ -1,0 +1,57 @@
+TOOL Skill {"skill":"code-mentor","args":"explícame cómo funcionan los websockets"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*.md"}
+RESULT  No files found
+TOOL Bash {"command":"git status --short --branch; git log -5 --format='%h %ad %s' --date=short; git ls-files | grep -v '^\\.claude/' | head -50","description":"Show repo status, recent commits, and tracked fil
+TOOL Glob {"pattern":"PLAN.md"}
+RESULT  No files found
+RESULT  ## main
+54ea5f2 2026-11-03 fixture: initial state
+.gitignore
+AGENTS.md
+package.json
+reset.sh
+src/index.ts
+TOOL Grep {"pattern":"websocket|upgradeWebSocket|new WebSocket|socket\\.io","-i":true,"glob":"!.claude/**","output_mode":"content","head_limit":20}
+RESULT  No matches found
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TEXT: Antes de explicar, 3 preguntas rápidas. Responde tipo `1b 2a 3c`.
+
+**1. ¿Qué quieres entender?**
+- a) La idea general: qué son y cuándo usarlos
+- b) El protocolo por dentro: handshake, frames, ping/pong
+- c) Cómo usarlos en código: cliente y servidor
+- d) Todo lo anterior, de la idea al código
+
+**2. ¿Qué pasa cuando el navegador hace `fetch('/api/likes')`?**
+- a) No lo tengo claro
+- b) Envía una petición y recibe una respuesta, sin más detalle
+- c) Abre o reutiliza una conexión TCP, envía la petición HTTP y lee status, headers y body
+- d) Lo anterior, y además conozco las diferencias entre HTTP/1.1 y HTTP/2, keep-alive, etc.
+
+**3. ¿Cuánto has usado WebSockets?**
+- a) Nada, solo me suena el nombre
+- b) Copié algún ejemplo con `new WebSocket(...)`
+- c) Monté cliente y servidor (un chat, por ejemplo)
+- d) Los tengo en producción: reconexión, escalado, autenticación
+RESULT_FINAL success 9 0.2686824

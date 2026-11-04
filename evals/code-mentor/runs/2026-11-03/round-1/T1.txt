@@ -1,0 +1,64 @@
+TOOL Skill {"skill":"code-mentor","args":"quiero hacer un botón de likes con Neon para aprender bases de datos"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  No files found
+TOOL Bash {"command":"git status --short; git log -5 --oneline; git ls-files | head -100; ls -la","description":"Show git state and list project files"}
+TOOL Glob {"pattern":"**/PLAN.md"}
+RESULT  No files found
+RESULT  3a6d78c fixture: initial state
+.claude/skills/code-mentor/CREDITS.md
+.claude/skills/code-mentor/SKILL.md
+.claude/skills/code-mentor/references/memory-
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/.gitignore"}
+RESULT  1	runs/
+2	
+TEXT: Repo: Hono con una ruta `/`, un `TODO: /api/likes` y `@neondatabase/serverless` en `package.json`. No veo UI ni schema. Antes de armar el plan, 4 preguntas (responde p. ej. `1a 2a 3b 4c`):
+
+**1. ¿Quién hace cada parte?**
+
+Partes: setup de Neon, conexión, schema, queries, ruta API y UI.
+- a) Tú: setup, conexión, schema y queries. Yo: ruta API y UI (recomendado para aprender DB)
+- b) Tú: solo schema y queries. Yo: el resto
+- c) Tú: todo menos la UI, incluida la ruta API
+- d) Otro reparto: dime cuál
+
+**2. ¿Qué debe hacer el botón?**
+- a) Contador global: cada clic suma 1 y sigue ahí al recargar
+- b) Un like por visitante: requiere restricciones `UNIQUE` y enseña más sobre modelado
+- c) Empezar con (a) y pasar a (b) como segundo paso (recomendado)
+
+**3. ¿Cuánta experiencia tienes con SQL?**
+- a) Nunca lo he usado
+- b) He hecho `SELECT` e `INSERT` sueltos
+- c) Uso `JOIN`, `UNIQUE` y claves foráneas sin problema
+- d) Diseño schemas, índices y transacciones
+
+**4. Dos personas dan like a la vez y el contador está en 10. Ambas leen 10 y guardan 11. ¿Qué pasa?**
+- a) No sé
+- b) La base de datos lo resuelve sola y queda en 12
+- c) Queda en 11 y se pierde un like; se evita con `UPDATE ... SET count = count + 1`
+- d) Queda en 11; se evita con `UPDATE` atómico, con bloqueos o con el aislamiento de la transacción, y sé cuándo usar cada uno
+
+Con tus respuestas te paso el acuerdo y el diagrama.
+RESULT_FINAL success 9 0.2839768

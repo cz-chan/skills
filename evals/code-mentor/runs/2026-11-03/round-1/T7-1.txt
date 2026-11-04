@@ -1,0 +1,72 @@
+TOOL Skill {"skill":"code-mentor","args":"quiero hacer un botón de likes con Neon para aprender bases de datos"}
+RESULT  Launching skill: code-mentor
+TOOL Bash {"command":"ls -a; git status --short; git log -5 --oneline; ls -R .code-mentor 2>/dev/null; cat package.json 2>/dev/null; git ls-files | head -50; cat PLAN.md 2>/dev/null; cat .gitignore 2>/dev/null"
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  No files found
+RESULT  .
+..
+.claude
+.git
+.gitignore
+AGENTS.md
+package.json
+reset.sh
+runs
+src
+363585e fixture: initial state
+{
+  "name": "c12z-demo",
+  "type": "module",
+  "d
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TEXT: Hay Hono con un `TODO: /api/likes` en `src/index.ts:7` y `@neondatabase/serverless` en `package.json`. Aún no hay rutas ni botón. Objetivo: aprender bases de datos.
+
+Antes de cerrar el acuerdo, responde así: `1b 2a 3a 4 ok`.
+
+**1. ¿Cuánta experiencia tienes con SQL?**
+- a) Nunca lo he usado
+- b) `SELECT`/`INSERT` básicos
+- c) Joins, índices y transacciones
+- d) Diseño y optimizo esquemas en producción
+
+**2. El contador está en 5. Dos personas hacen clic a la vez, y el código lee el valor, suma 1 y guarda. ¿Qué pasa?**
+- a) No lo sé
+- b) Queda en 7, la base de datos lo gestiona sola
+- c) Puede quedar en 6
+- d) Puede quedar en 6, y sé cómo evitarlo en SQL
+
+**3. ¿Cómo funciona el like?**
+- a) Contador global: cada clic suma 1. Más simple, enseña `UPDATE` atómico.
+- b) Un like por visitante, con opción de quitarlo. Enseña claves primarias, restricciones `UNIQUE` y `COUNT`.
+- c) Primero (a), luego (b). **Recomendado:** ves cómo cambia el esquema al crecer.
+- d) Otra cosa: dime cuál
+
+**4. ¿Quién hace cada parte?** Esta es mi propuesta. Responde `ok` o indica cambios, como `API: tú`.
+
+| Parte | Quién |
+|---|---|
+| Crear proyecto en Neon y `DATABASE_URL` | Tú |
+| Conexión desde Hono | Tú |
+| Esquema (tablas) | Tú |
+| Queries | Tú |
+| Ruta `/api/likes` | Yo |
+| Botón (UI) | Yo |
+| Tests | Yo |
+
+```
+[Botón] ──clic──▶ [/api/likes] ──query──▶ [Neon]
+   yo                 yo                    TÚ
+```
+
+**Terminado cuando:** haces clic, el contador sube y sigue igual tras recargar.
+RESULT_FINAL success 6 0.2802618

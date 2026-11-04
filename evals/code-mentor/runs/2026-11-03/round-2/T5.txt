@@ -1,0 +1,68 @@
+TOOL Skill {"skill":"code-mentor","args":"explícame websockets"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  .code-mentor/memory/realtime/0001-websockets-basics-2026-10-12.md
+TOOL Glob {"pattern":"{PLAN.md,package.json,src/**/*,*.md}"}
+RESULT  AGENTS.md
+package.json
+src/index.ts
+TOOL Bash {"command":"git status --short; git log -5 --stat","description":"Show working tree status and recent commits"}
+RESULT  commit e6f5a03ffd554d28209f90ddde2a14240e99ec1d
+Author: fixture <fixture@local>
+Date:   Tue Nov 3 20:13:41 2026 +0100
+
+    notes
+
+ .../realtime/0001-w
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/realtime/0001-websockets-basics-2026-10-12.md"}
+RESULT  1	---
+2	status: done
+3	topic: Qué son los WebSockets
+4	concepts: [websockets, http, handshake, full-duplex]
+5	level: trainee
+6	mode: explain
+7	updated
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TEXT: Ya lo vimos el 12-oct: `.code-mentor/memory/realtime/0001-websockets-basics-2026-10-12.md`.
+
+**Lo que quedó:**
+- HTTP: el servidor solo habla cuando el cliente pregunta.
+- WebSocket: empieza como petición HTTP (handshake) y queda abierto. Los dos lados envían cuando quieren.
+- Te costó ver que el servidor puede enviar sin que le pidan nada. Lo resolvió el ejemplo de la hora cada segundo.
+
+**Para seguir desde ahí, dos preguntas:**
+
+**1. ¿Qué quieres entender ahora?**
+- a) Repasar lo básico, explicado de otra forma
+- b) Qué pasa por dentro: handshake y mensajes (frames)
+- c) Usarlos en código: servidor en Hono + cliente en navegador
+- d) Problemas reales: reconexión, conexión caída, varios clientes a la vez
+
+**2. ¿Tu nivel con WebSockets?** La última vez anoté trainee.
+- a) Trainee: sigue igual, solo he usado `websocat`
+- b) Junior: he escrito algo de código con ellos
+- c) Mid: los he usado en un proyecto real
+- d) Senior: conozco el protocolo y cómo escalarlos
+
+Responde tipo `1c 2a`.
+RESULT_FINAL success 9 0.278471

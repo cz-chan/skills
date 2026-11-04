@@ -1,0 +1,60 @@
+TEXT: Vamos a dejar el código a un lado y a verlo con otro ejemplo: una web donde se vota entre gatos y perros, y hay que guardar cuántos votos lleva cada uno.
+
+**1. Al principio, la base de datos está vacía.**
+
+Es un espacio sin nada dentro. Si la app pregunta "¿cuántos votos tiene gatos?", Postgres da error, porque no tiene ningún sitio donde mirar.
+
+**2. Primero decimos qué forma tendrán los datos.**
+
+Le pedimos: "crea una tabla llamada `votos`, con una columna para el nombre y otra para el número". Esto solo dibuja las columnas, y todavía no hay datos:
+
+```
+ nombre | total
+--------+-------
+(vacía)
+```
+
+Esta orden es `CREATE TABLE`.
+
+**3. Después añadimos las filas que necesitamos.**
+
+Le pedimos: "añade una fila llamada `gatos`". Como no le decimos el número, Postgres empieza en 0, porque así lo definimos al crear la columna:
+
+```
+ nombre | total
+--------+-------
+ gatos  |     0
+```
+
+Esta orden es `INSERT`.
+
+**4. A partir de ahí, solo cambia el número.**
+
+Cada voto cambia esa misma fila, sin crear otra:
+
+```
+Empieza con 0   →   1 voto: 1   →   2 votos: 2
+```
+
+Si se reinicia el servidor o se recarga la página, sigue en 2, porque el número está guardado en la base de datos y no en la app. Esta parte es el paso 4, no la de ahora.
+
+**Ahora, en tu caso**
+
+Es lo mismo, cambiando solo los nombres:
+
+| | Ejemplo | Tu botón |
+|---|---|---|
+| Tabla | `votos` | `likes` |
+| Columna del nombre | `nombre` | `id` |
+| Columna del número | `total` | `total` |
+| Fila | `gatos` | `home` |
+
+En este paso solo hacemos los puntos 2 y 3, y los guardamos en un archivo, `db/schema.sql`. Ese archivo se ejecuta una sola vez porque la tabla solo hay que crearla una vez.
+
+¿Lo ves más claro ahora? ¿Empezamos a escribirlo? Si no, dime en qué parte te pierdes:
+
+- **A.** Qué es una tabla o una fila
+- **B.** Por qué hacen falta dos órdenes
+- **C.** Por qué va en un archivo aparte y se ejecuta una sola vez
+- **D.** Para qué sirve todo esto dentro del botón de likes
+RESULT_FINAL success 1 0.3888786

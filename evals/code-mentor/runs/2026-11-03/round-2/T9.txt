@@ -1,0 +1,90 @@
+TOOL Bash {"command":"git log --stat -3; git status --short; ls -la; ls -la \"~/.claude/projects/-private-tmp-claude-501--Users-user-Desktop-projects-prod-cz-skills-a54ea246-387e-4d48-b65f-5594c8587ebd-scratchp
+TOOL Bash {"command":"git show HEAD","description":"Show the latest WIP commit diff"}
+RESULT  commit 2337424ff3be3e91216797d019da03d25bec95d8
+Author: fixture <fixture@local>
+Date:   Tue Nov 3 20:15:44 2026 +0100
+
+    wip likes
+
+diff --git a/.co
+RESULT  commit 2337424ff3be3e91216797d019da03d25bec95d8
+Author: fixture <fixture@local>
+Date:   Tue Nov 3 20:15:44 2026 +0100
+
+    wip likes
+
+ .../memory/data
+TOOL Grep {"pattern":"TODO|FIXME|WIP|mentor|progress","-i":true,"glob":"!node_modules/**","output_mode":"content"}
+RESULT  src/index.ts:7:// TODO: /api/likes
+reset.sh:6:if ! git rev-parse -q --verify refs/tags/fixture-initial >/dev/null || [ ! -f .claude/skills/code-mentor
+TOOL Skill {"skill":"code-mentor","args":"continuemos"}
+RESULT  Launching skill: code-mentor
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Bash {"command":"cat .gitignore; echo '---src'; find src -type f; echo '---env'; ls -a | grep -E '^\\.env' || echo 'no .env*'; echo '---node_modules'; ls -d node_modules 2>/dev/null || echo 'no node_module
+RESULT  runs/
+---src
+src/index.ts
+---env
+no .env*
+---node_modules
+no node_modules
+---refs
+* main
+fixture-initial
+---likes history
+---neon usage
+no neon usage 
+TEXT: Retomo **likes con Neon** (nivel senior), pero **el progreso marca hecho algo que no está en este repo**.
+
+**Dónde estamos**
+```
+[Botón] ──click──▶ [API /likes] ──query──▶ [Neon DB]
+   yo                  yo                     TÚ
+```
+- Objetivo: aprender bases de datos con un botón de likes en c12z.io.
+- Hecho, según el archivo: 1. Neon + `.env`, 2. conexión con `SELECT 1`.
+- Falta: **3. esquema (toca ahora)**, 4. insert, 5. count por post, 6. conectar botón → API → DB.
+- Done: click → el contador sube y se mantiene al recargar.
+
+**Paso 3:** el paso 2 solo probó que llegas a la DB, pero aún no hay dónde guardar nada. Insert y count dependen de esta tabla, así que un mal diseño te obliga a migrar después. Queda por decidir: `post_id`, `created_at` y ¿`user_id`? El `user_id` decide si puedes evitar likes duplicados.
+
+**Archivo vs. repo** (última actualización del archivo: 13-oct)
+
+| Dice el archivo | En este repo |
+|---|---|
+| `.env` con la connection string | no existe |
+| `SELECT 1` desde la ruta de Hono | no hay; `src/index.ts:7` solo tiene `// TODO: /api/likes` |
+| `src/pages/api/likes.ts` | no existe, ni en el historial |
+| `@neondatabase/serverless` | en `package.json`, pero sin `node_modules` |
+
+El único commit posterior, `wip likes`, solo añade el archivo de progreso. Tampoco hay otras ramas ni stash. El proyecto de Neon no puedo comprobarlo desde aquí.
+
+**Ojo:** `.gitignore` solo tiene `runs/`, así que un `.env` nuevo podría acabar en git con la contraseña. Puedo añadirlo antes de que lo crees.
+
+**¿Cómo seguimos?**
+1. **Tienes el código en otro sitio:** lo traes aquí y seguimos con el paso 3.
+2. **Rehacer el paso 2 aquí (recomendado si no lo tienes):** tú creas el `.env` y la conexión, y seguimos con el paso 3. Es rápido y el paso 4 lo necesita.
+3. **Ir directo al paso 3:** creas la tabla en el SQL Editor de Neon y dejamos la conexión para el paso 4.
+
+En las opciones 2 y 3 corrijo el archivo de progreso para que refleje el estado real.
+RESULT_FINAL success 9 0.3432042

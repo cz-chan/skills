@@ -1,0 +1,80 @@
+TOOL Read {"file_path":"<sandbox>/src/db.ts"}
+RESULT  1	import { neon } from '@neondatabase/serverless'
+2	
+3	export const sql = neon(process.env.DATABASE_URL!)
+4	
+5	export async function ping() {
+6	  cons
+TOOL Agent {"description":"Verify PostgreSQL docs links","subagent_type":"web-fetch","run_in_background":false,"prompt":"Fetch these two URLs. For each, report: does it load without redirecting to a home page or
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/tutorial-select.html","prompt":"Report the exact page title (the <title> or main heading). Say whether the page is the SELECT tutorial page itself (not 
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/queries-table-expressions.html","prompt":"Report the exact page title (the <title> or main heading). Say whether this is the Table Expressions page itse
+RESULT  Fetched https://www.postgresql.org/docs/current/tutorial-select.html (HTTP 200 OK, text/html, 7666 characters).
+The text inside the <fetched-web-conte
+RESULT  Fetched https://www.postgresql.org/docs/current/queries-table-expressions.html (HTTP 200 OK, text/html, 37030 characters).
+The text inside the <fetche
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- Neon, SQL Editor: https://neon.com/docs/get-started/query-with-neon-sql-editor (o
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Estado (2026-11-03): paso 3 terminado; el paso 4 aún no se ha explicado.\nNext: exp
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: ## Paso 4: leer y sumar
+
+Sin commit, como pediste. Este paso tiene dos partes:
+
+1. **Leer el contador:** `getLikes()`, que hacemos ahora.
+2. **Sumar un like:** `addLike()`, y qué pasa con dos clics a la vez. Eso viene después.
+
+### Cómo se lee una tabla
+
+Sigamos con los votos, ahora con dos filas:
+
+```
+ nombre | total
+--------+-------
+ gatos  |     3
+ perros |     5
+```
+
+Para leer se usa `SELECT`, y esta es su forma general:
+
+```sql
+SELECT columna FROM tabla WHERE otra_columna = 'valor'
+```
+
+- **`SELECT columna`:** qué dato quieres.
+- **`FROM tabla`:** de qué tabla.
+- **`WHERE ...`:** qué filas quieres. Sin esto, recibes todas.
+
+Sigamos dos consultas con esos datos:
+
+```
+SELECT total FROM votos                        → 3 y 5 (todas las filas)
+SELECT total FROM votos WHERE nombre = 'gatos' → 3     (solo gatos)
+```
+
+El `WHERE` importa aunque ahora solo tengas la fila `home`: si mañana añades otro contador, seguirás leyendo el correcto.
+
+### Qué recibe tu código
+
+El resultado siempre llega como una **lista de filas**, aunque solo haya una. Cada fila es un objeto cuyas claves son los nombres de las columnas:
+
+```
+sql`...WHERE nombre = 'gatos'`  →  rows = [ { total: 3 } ]
+                                   rows[0]        = { total: 3 }
+                                   rows[0].total  = 3
+```
+
+Es lo mismo que ya hiciste en `ping()` con `rows[0].ok`.
+
+### Qué hacer
+
+Añade en `src/db.ts`, debajo de `ping()`, una función `getLikes()` que:
+
+1. Se exporte y sea `async`, igual que `ping()`.
+2. Lance un `SELECT` que lea `total` de la tabla `likes`, solo en la fila cuyo `id` es `home`.
+3. Devuelva el número, no la lista.
+
+Con tu tabla recién creada, debería devolver `0`. Aquí no podremos ejecutarla, así que la revisaré leyéndola. Avísame cuando la tengas.
+
+Si quieres profundizar por tu cuenta, esta página explica `SELECT` y `WHERE`: [PostgreSQL, Querying a Table](https://www.postgresql.org/docs/current/tutorial-select.html).
+RESULT_FINAL success 5 0.73390912

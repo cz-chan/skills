@@ -1,0 +1,175 @@
+TOOL Bash {"command":"git log --stat -3 && git status --short && ls -la","description":"Show recent commits, status, and files"}
+TOOL Bash {"command":"git show HEAD","description":"Show latest commit diff"}
+RESULT  commit 3fcb9ae3a042829686b0ff338400f48b0ddfe277
+Author: fixture <fixture@local>
+Date:   Tue Nov 3 20:28:18 2026 +0100
+
+    wip likes
+
+diff --git a/.co
+RESULT  commit 3fcb9ae3a042829686b0ff338400f48b0ddfe277
+Author: fixture <fixture@local>
+Date:   Tue Nov 3 20:28:18 2026 +0100
+
+    wip likes
+
+ .../memory/data
+TOOL Glob {"pattern":"**/*.md","path":"~/.claude/projects/-private-tmp-claude-501--Users-user-Desktop-projects-prod-cz-skills-a54ea246-387e-4d48-b65f-5594c8587ebd-scratchpad-sb5/memory"}
+RESULT  No files found
+TOOL Grep {"pattern":"TODO|FIXME|WIP|wip|likes","glob":"!node_modules/**","output_mode":"content"}
+RESULT  src/index.ts:7:// TODO: /api/likes
+.claude/skills/code-mentor/SKILL.md:142:[Button] ──click──▶ [API /likes] ──query──▶ [Neon DB]
+.claude/skills/code-m
+TOOL Skill {"skill":"code-mentor","args":"continuemos"}
+RESULT  Launching skill: code-mentor
+TOOL Bash {"command":"find . -path ./.git -prune -o -path ./runs -prune -o -type f -print | grep -v '^./.claude/'; echo ---; find .code-mentor/memory -name '*-progress.md'; echo ---; git status --short; git log
+RESULT ERR  This Bash command contains multiple operations. The following part requires approval: grep -v '^./.claude/'; echo ---; find .code-mentor/memory -name 
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Read {"file_path":"<sandbox>/reset.sh"}
+RESULT  1	#!/bin/sh
+2	# Copied into the sandbox by setup.sh. Back to the initial commit, no memory.
+3	# Refuses to run anywhere else: it discards uncommitted 
+TEXT: Reintento por partes más simples.
+TOOL Glob {"pattern":"{src/**,.env*,.code-mentor/**/*-progress.md,PLAN.md}"}
+RESULT  src/index.ts
+.code-mentor/memory/databases/0001-neon-likes-progress.md
+TOOL Bash {"command":"git log -5 --format='%h %ad %s' --date=short","description":"Show last five commits with dates"}
+RESULT  3fcb9ae 2026-11-03 wip likes
+6e0cd07 2026-11-03 fixture: initial state
+TOOL Bash {"command":"git status --short --ignored","description":"Show working tree status including ignored files"}
+RESULT  !! runs/
+TOOL Read {"file_path":"<sandbox>/.gitignore"}
+RESULT  1	runs/
+2	
+TOOL Agent {"subagent_type":"web-fetch","description":"Verify Postgres docs links","prompt":"Fetch each URL and report for each: did it load (no 404 or redirect to a home page), the page title, and whether it ex
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-basics.html","prompt":"Report the page title. Does the page explain creating a table with columns and data types (CREATE TABLE basics)? Quote the ke
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-default.html","prompt":"Report the page title. Does the page explain column DEFAULT values, including now() / CURRENT_TIMESTAMP style defaults? Quot
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-constraints.html","prompt":"Report the page title. Does the page explain NOT NULL and PRIMARY KEY constraints? Quote the key examples and sentence(s
+TOOL WebFetch {"url":"https://neon.com/docs/get-started/query-with-neon-sql-editor","prompt":"Report the page title. Does the page explain running SQL in Neon's SQL Editor from the console? Quote the key steps verb
+RESULT ERR  Claude requested permissions to use WebFetch, but you haven't granted it yet.
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-default.html (HTTP 200 OK, text/html, 5405 characters).
+The text inside the <fetched-web-content> 
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-basics.html (HTTP 200 OK, text/html, 8086 characters).
+The text inside the <fetched-web-content> t
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-constraints.html (HTTP 200 OK, text/html, 28053 characters).
+The text inside the <fetched-web-cont
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TEXT: **Antes de seguir: el progreso no coincide con el repo.** El archivo marca los pasos 1 y 2 como hechos, pero aquí falta su código:
+
+| El progreso dice | En el repo |
+|---|---|
+| `src/pages/api/likes.ts` | no existe |
+| `.env` | no existe, y `.gitignore` solo tiene `runs/` |
+| `SELECT 1` desde una ruta de Hono | `src/index.ts` solo tiene `// TODO: /api/likes` |
+| Cliente de Neon en uso | está en `package.json`, pero sin `node_modules` |
+
+El único commit posterior (`wip likes`) solo añade el archivo de progreso. No puedo ver tu cuenta de Neon, así que no sé si el proyecto sigue ahí.
+
+**¿Dónde está ese código?**
+- **A.** En otra máquina o rama: lo traes aquí.
+- **B.** Se perdió, pero el proyecto de Neon sigue: rehacemos el paso 2 antes del paso 4 y actualizo el progreso.
+- **C.** Se perdió todo: volvemos al paso 1.
+
+Con A o B podemos hacer el paso 3 igualmente, porque se ejecuta en la consola de Neon y no necesita código local.
+
+---
+
+## Dónde estamos
+
+Estás construyendo un botón de likes en c12z.io para aprender bases de datos.
+
+```
+[1 Neon + .env] → [2 Conexión] → [3 TABLA] → [4 Insert] → [5 Count] → [6 Botón]
+     hecho*          hecho*       ← aquí
+                                        * según el archivo de progreso
+```
+
+El paso 2 demostró que tu API puede hablar con Neon, pero `SELECT 1` no guarda nada. Ahora toca crear el sitio donde se guardan los likes.
+
+## El problema
+
+Alguien da like a `hola-mundo` y tu API intenta guardarlo. Neon está vacío, así que Postgres responde:
+
+```
+ERROR: relation "likes" does not exist
+```
+
+Sin tabla no hay dónde guardar el like. Y si lo guardaras en una variable del servidor, se perdería en cada reinicio.
+
+## La idea
+
+Una tabla tiene columnas fijas y una fila por cada dato. Aquí, **cada like es una fila**:
+
+| id | post_id | created_at |
+|---|---|---|
+| 1 | hola-mundo | 2026-11-03 10:00 |
+| 2 | hola-mundo | 2026-11-03 10:05 |
+| 3 | otro-post | 2026-11-03 10:07 |
+
+Sigamos un click con estos valores:
+1. `hola-mundo` tiene 2 filas, así que el contador muestra 2.
+2. Un click añade la fila 4 con `hola-mundo`.
+3. Ahora hay 3 filas de `hola-mundo`, así que muestra 3.
+4. Al recargar sigue en 3, porque las filas están en Neon y no en la página.
+
+**Las columnas ya están decididas:**
+
+| Columna | Qué guarda | Tipo y regla |
+|---|---|---|
+| `id` | Identifica cada fila | Número que genera la DB. Es la **primary key**: única y nunca vacía. |
+| `post_id` | A qué post va el like | Texto, con `NOT NULL` (no puede quedar vacío). Es texto porque aún no hay tabla de posts. |
+| `created_at` | Cuándo se dio el like | `timestamptz` (fecha y hora con zona horaria). Con un **default**, la DB la rellena si no se la pasas. |
+
+**`user_id` queda fuera** porque la app no tiene login y no habría nada que guardar. Por eso una persona podrá dar varios likes; lo aceptamos en esta versión.
+
+## Por qué así
+
+Lo obvio sería una columna `likes_count` que suma 1 en cada click. Es más simple, pero solo guarda el total: pierdes cuándo ocurrió cada like. Con una fila por like, contar sigue siendo fácil (paso 5) y añadir `user_id` más adelante también.
+
+## Qué nos da
+
+Tendrás un sitio real donde guardar likes, y los pasos 4 y 5 ya tendrán sobre qué trabajar.
+
+**Comprobación final:** en Neon, `SELECT * FROM likes;` no da error y devuelve 0 filas con las columnas `id`, `post_id` y `created_at`.
+
+## Cómo
+
+```
+[Botón] ──click──▶ [API /likes] ──query──▶ [Neon: tabla likes]
+   yo                  yo                        TÚ ← paso 3
+```
+
+- **Tú:** escribes el `CREATE TABLE` (unas 5 líneas) y lo ejecutas en el SQL Editor de Neon.
+- **Yo:** reviso el SQL contigo. En este paso no hay código de mi parte.
+
+1. Escribes la tabla con las tres columnas y sus reglas.
+2. La ejecutas en Neon.
+3. Haces la comprobación final y me pegas el resultado.
+
+Si quieres mirarlo antes por tu cuenta, estas páginas explican lo que vas a hacer:
+- [Crear tablas](https://www.postgresql.org/docs/current/ddl-basics.html)
+- [Valores default](https://www.postgresql.org/docs/current/ddl-default.html)
+- [`NOT NULL` y primary key](https://www.postgresql.org/docs/current/ddl-constraints.html)
+
+**Dime A, B o C. ¿Te queda claro y empezamos a escribir código?**
+RESULT_FINAL success 16 0.465491985

@@ -10,4 +10,9 @@
   `src/db.ts` instead of reading it from env.
 - Says "no lo pillo" once after a hint.
 - Declines every commit offer.
-- Turn 7: "paramos por hoy". Turn 8: new session, "seguimos".
+- When accepting the agreement, adds: "explícame las cosas con detalle y ejemplos".
+- After fixing the mistake and starting the next step: "paramos por hoy". Then a
+  new session, "seguimos".
+- After the resume briefing: "no lo he entendido" once, then "ahora sí, empecemos".
+- Once only the real Neon work is left: "lo de Neon real lo haré yo luego por mi
+  cuenta. da la tarea por terminada". Answers the final quiz wrong.

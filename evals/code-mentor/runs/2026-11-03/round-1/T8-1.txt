@@ -1,0 +1,141 @@
+TOOL Bash {"command":"git log --stat -3; git status --short; ls -a; ls -a ~/.claude/projects/-private-tmp-claude-501--Users-user-Desktop-projects-prod-cz-skills-a54ea246-387e-4d48-b65f-5594c8587ebd-scratchpad-s
+TOOL Bash {"command":"git show bdcd403","description":"Show the latest work-in-progress likes commit"}
+RESULT  commit bdcd4031677b96f22b6a1e3d0b3d89e2adf83560
+Author: fixture <fixture@local>
+Date:   Tue Nov 3 20:06:58 2026 +0100
+
+    wip likes
+
+diff --git a/.co
+RESULT  commit bdcd4031677b96f22b6a1e3d0b3d89e2adf83560
+Author: fixture <fixture@local>
+Date:   Tue Nov 3 20:06:58 2026 +0100
+
+    wip likes
+
+ .../memory/data
+TOOL Grep {"pattern":"TODO|FIXME|WIP|likes?","-i":true,"output_mode":"content","glob":"!{node_modules,dist}/**"}
+RESULT  src/index.ts:7:// TODO: /api/likes
+.claude/skills/code-mentor/SKILL.md:87:  ("a like button for my site, stored in Neon"). They write the parts the
+.c
+TOOL Skill {"skill":"code-mentor","args":"continuemos"}
+RESULT  Launching skill: code-mentor
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Bash {"command":"ls -la . .code-mentor/memory/* runs src 2>&1; cat .gitignore reset.sh","description":"List project dirs and show gitignore and reset script"}
+RESULT  .:
+total 32
+drwxr-xr-x@ 11 user  wheel  352 Nov  3 20:06 .
+drwx------@  4 user  wheel  128 Nov  3 20:03 ..
+drwxr-xr-x@  3 user  wheel   96 Nov  3 20:0
+TOOL Bash {"command":"git branch -a; git stash list; git log --all --oneline -- 'src/pages/*' '.env' ; ls -a src; test -f .env && echo \"env: exists\" || echo \"env: missing\"; test -d node_modules && echo \"no
+RESULT  * main
+.
+..
+index.ts
+env: missing
+node_modules: missing
+TOOL Agent {"subagent_type":"web-fetch","description":"Verify Postgres and Neon doc links","prompt":"Fetch each URL and report for each: does it load without error or redirect to a different page, what is the pa
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-basics.html","prompt":"Report the page title and the PostgreSQL version shown on the page (e.g., in the header or breadcrumbs, such as \"PostgreSQL 
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-constraints.html","prompt":"Report the page title and the PostgreSQL version shown on the page. Then state whether the page explains NOT NULL and PR
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-basics.html (HTTP 200 OK, text/html, 8086 characters).
+The text inside the <fetched-web-content> t
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-constraints.html (HTTP 200 OK, text/html, 28053 characters).
+The text inside the <fetched-web-cont
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-identity-columns.html","prompt":"Report the page title and the PostgreSQL version shown on the page. Then state whether the page explains identity c
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-identity-columns.html (HTTP 200 OK, text/html, 5727 characters).
+The text inside the <fetched-web-
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/datatype-datetime.html","prompt":"Report the page title and the PostgreSQL version shown on the page. Then state whether the page explains the timestamp
+RESULT  Fetched https://www.postgresql.org/docs/current/datatype-datetime.html (HTTP 200 OK, text/html, 34470 characters).
+The text inside the <fetched-web-co
+TOOL WebFetch {"url":"https://neon.com/docs/get-started/query-with-neon-sql-editor","prompt":"Report the page title. Then state whether the page explains how to run SQL in Neon's SQL Editor. Summarize the key steps
+RESULT ERR  Claude requested permissions to use WebFetch, but you haven't granted it yet.
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TEXT: Seguimos con **botón de likes con Neon**, paso 3 (último avance: 2026-10-13).
+
+**⚠️ El progress no coincide con el repo:** marca los pasos 1 y 2 como hechos, pero `.env` y `src/pages/api/likes.ts` no están, ni en el historial, otras ramas o stash. `src/index.ts` solo tiene `// TODO: /api/likes`. Tampoco está `node_modules`. No puedo comprobar si tu proyecto de Neon sigue ahí.
+
+## Visión general
+Construimos un botón de likes en c12z.io para que aprendas bases de datos.
+
+- **Según el progress:** ya creaste el proyecto en Neon y probaste la conexión con `SELECT 1`.
+- **Ahora:** la conexión demostró que la API puede hablar con la DB, pero aún no hay dónde guardar un like.
+- **Después:** insertar un like, contarlos por post y conectar el botón.
+
+## El problema
+Das like en el post `hola-mundo` y el contador pasa de 0 a 1. Recargas y vuelve a 0, porque el dato no se guardó en ningún sitio. Para guardarlo, Postgres necesita una tabla.
+
+## La idea
+Una **tabla** es como una hoja de cálculo con reglas: las **columnas** son fijas y tienen un **tipo**, y cada **fila** es un registro. El **esquema** es esa definición. Guardaremos **una fila por cada like**:
+
+| id | post_id | created_at |
+|---|---|---|
+| 1 | `hola-mundo` | 20:01 |
+| 2 | `hola-mundo` | 20:03 |
+| 3 | `otro-post` | 20:04 |
+
+Cada clic añade una fila. Contar las filas de `hola-mundo` da 2 y las de `otro-post`, 1. Al recargar siguen ahí, porque viven en Neon y no en la página.
+
+Las columnas (las decido yo por ser tu primer esquema):
+
+| Columna | Tipo | Regla | Por qué |
+|---|---|---|---|
+| `id` | `bigint` | `GENERATED ALWAYS AS IDENTITY`, `PRIMARY KEY` | Postgres numera solo y cada fila es única |
+| `post_id` | `text` | `NOT NULL` | Un like sin post no significa nada |
+| `created_at` | `timestamptz` | `NOT NULL`, `DEFAULT now()` | Postgres guarda sola la fecha y hora de cada like |
+
+**Sin `user_id`:** el repo no tiene login, así que no habría ningún usuario que guardar. La consecuencia es que una persona podrá dar varios likes. Se puede añadir cuando haya usuarios.
+
+## Por qué así
+Lo obvio sería una sola columna `likes_count = 2` por post. Es más simple, pero solo guarda el total: no sabrías cuándo ocurrió cada like, y tampoco podrías evitar duplicados ni deshacer un like en el futuro. Con una fila por like conservas ese detalle y el total sale de contarlas.
+
+## Qué nos da
+Los pasos 4 y 5 tendrán dónde escribir y qué contar.
+
+**Prueba de que está hecho:** `SELECT * FROM likes;` no da error, devuelve 0 filas y muestra las 3 columnas.
+
+## Cómo
+```
+[Botón] ──click──▶ [API /likes] ──query──▶ [Neon: tabla likes]
+   yo                  yo                     TÚ ← ahora
+```
+
+1. Abre el SQL Editor de tu proyecto en Neon. Este paso no necesita el código del repo.
+2. Escribe un `CREATE TABLE likes (...)` con las 3 columnas de arriba, separadas por comas.
+3. Ejecútalo y lanza la prueba.
+4. Pégame tu SQL y el resultado.
+
+**Aviso:** `.gitignore` solo incluye `runs/`. Un `.env` nuevo podría acabar en un commit, con tu contraseña dentro, así que hay que añadirlo antes.
+
+Si quieres profundizar por tu cuenta, estas páginas oficiales de Postgres explican lo que vas a usar:
+- [Tablas](https://www.postgresql.org/docs/current/ddl-basics.html)
+- [Constraints: `NOT NULL` y `PRIMARY KEY`](https://www.postgresql.org/docs/current/ddl-constraints.html)
+- [Columnas identity](https://www.postgresql.org/docs/current/ddl-identity-columns.html)
+- [Fechas: `timestamptz`](https://www.postgresql.org/docs/current/datatype-datetime.html)
+
+## Dos preguntas
+1. **¿Te queda claro y empezamos a escribir código?**
+2. **¿Dónde está el código del paso 2?**
+   - **A.** En otra carpeta o máquina: lo traes y sigo desde ahí.
+   - **B.** Se perdió: desmarco el paso 2 en el progress y lo rehacemos antes del paso 6. El paso 3 no se bloquea.
+   - **C.** Tampoco tengo ya el proyecto de Neon: volvemos al paso 1.
+RESULT_FINAL success 11 0.439284195

@@ -1,0 +1,130 @@
+TEXT: Compruebo en la documentación la API de `neon()` y cómo lee Hono las variables de entorno, para no explicártelo de memoria.
+TOOL Agent {"subagent_type":"web-fetch","description":"Check Neon driver and Hono env docs","prompt":"Fetch these pages and for each report: final URL, whether it loads (not 404 / not redirected to a home page),
+TOOL WebFetch {"url":"https://neon.com/docs/serverless/serverless-driver","prompt":"Report exactly: (a) how neon() is imported and used with a tagged template, with exact code snippet; (b) the shape of the returned
+TOOL WebFetch {"url":"https://hono.dev/docs/helpers/adapter","prompt":"Report exactly: (a) how `env` is imported from `hono/adapter` and used, with exact code snippet; (b) which runtimes are supported, with exact q
+RESULT  Fetched https://neon.com/docs/serverless/serverless-driver (HTTP 200 OK, text/markdown, 25196 characters).
+The text inside the <fetched-web-content> t
+TOOL WebFetch {"url":"https://hono.dev/docs/getting-started/nodejs","prompt":"Report exactly: (a) whether @hono/node-server is needed to run on Node, with exact quote; (b) the exact code snippet showing how the app
+RESULT  Fetched https://hono.dev/docs/helpers/adapter (HTTP 200 OK, text/markdown, 2850 characters).
+The text inside the <fetched-web-content> tag below is UN
+RESULT  Fetched https://hono.dev/docs/getting-started/nodejs (HTTP 200 OK, text/markdown, 7188 characters).
+The text inside the <fetched-web-content> tag belo
+TOOL WebFetch {"url":"https://hono.dev/docs/getting-started/bun","prompt":"Report exactly: (a) whether `export default app` works directly on Bun, with exact quote/snippet; (b) the default port stated, with exact q
+RESULT  Fetched https://hono.dev/docs/getting-started/bun (HTTP 200 OK, text/markdown, 4870 characters).
+The text inside the <fetched-web-content> tag below i
+TOOL WebFetch {"url":"https://github.com/neondatabase/serverless/blob/main/CHANGELOG.md","prompt":"Report exactly: (a) everything stated about version 0.10.0, with exact quotes; (b) anything on the tagged-template 
+TOOL WebFetch {"url":"https://bun.com/docs/runtime/environment-variables","prompt":"Report exactly: whether Bun loads .env files automatically, with exact quote. Also state whether the page loaded normally (not 404
+RESULT  Fetched https://bun.com/docs/runtime/environment-variables (HTTP 200 OK, text/html, 16989 characters).
+The text inside the <fetched-web-content> tag b
+RESULT  Fetched https://github.com/neondatabase/serverless/blob/main/CHANGELOG.md (HTTP 200 OK, text/html, 16280 characters).
+The text inside the <fetched-web
+TOOL WebFetch {"url":"https://nodejs.org/api/cli.html#--env-filefile","prompt":"Report exactly: (a) whether Node has `--env-file`, with exact quote; (b) whether it is marked stable or experimental (stability index)
+RESULT  Fetched https://nodejs.org/api/cli.html#--env-filefile (HTTP 200 OK, text/html, 184663 characters, truncated to the first 39945, then a model-extracte
+TOOL WebFetch {"url":"https://nodejs.org/api/cli.html#--env-filefile","prompt":"Find the section headed `--env-file=file` (and the `--env-file-if-exists=file` section if present). Quote verbatim the description tex
+RESULT  Fetched https://nodejs.org/api/cli.html#--env-filefile (HTTP 200 OK, text/html, 184663 characters, truncated to the first 39945 from character 39945, 
+RESULT  [{"type":"text","text":"  [Harness note, not part of the agent's report: WebFetch saved no files during this run. In this run WebFetch saved files onl
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Paso 2: conectar Hono con Neon. Aún sin empezar.\nProblema: la app ya sabe qué vari
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- Neon — Manage projects: https://neon.com/docs/manage/projects (official)\n","new_
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: Sin commit, y nada ejecutado. He comprobado la API en la documentación. No he tocado `src/index.ts`: esa parte la escribes tú.
+
+## Paso 2: conectar Hono con Neon
+
+**El problema.** Ya sabes qué es `DATABASE_URL`, pero ningún código la usa. Antes de crear tablas, conviene probar solo la conexión. Si mezclas ambas cosas y algo falla, no sabrás si el fallo está en la conexión o en tu SQL.
+
+**La idea.** Una ruta temporal, `GET /db-check`, lanza la query más simple posible:
+
+```sql
+SELECT 1 AS ok
+```
+
+No lee ninguna tabla: pide a Postgres que devuelva una fila con una columna `ok` que vale `1`. `AS` le pone nombre a la columna. Si recibes esa fila, la conexión funciona.
+
+**Las 3 piezas nuevas**
+
+**1. Leer la variable con `env()`**
+
+```ts
+import { env } from 'hono/adapter'
+
+app.get('/ejemplo', (c) => {
+  const { API_KEY } = env<{ API_KEY: string }>(c)
+  // ...
+})
+```
+
+`c` es el contexto de la petición en Hono. `<{ API_KEY: string }>` le dice a TypeScript qué variable esperas.
+
+La alternativa obvia es `process.env`, pero depende de dónde corra la app, y tu proyecto aún no lo define. `env()` funciona en Node, Bun, Cloudflare Workers y otros.
+
+**2. Crear el cliente con `neon()`**
+
+```ts
+import { neon } from '@neondatabase/serverless'
+
+const sql = neon(url)
+```
+
+`neon()` no devuelve datos, sino una función, `sql`, con la que lanzas queries. Cada query viaja como una petición HTTP a Neon, así que no tienes que abrir ni cerrar conexiones.
+
+**3. Lanzar la query**
+
+```ts
+const filas = await sql`SELECT 'hola' AS saludo`
+// filas → [ { saludo: 'hola' } ]
+// filas[0].saludo → 'hola'
+```
+
+Fíjate en tres cosas:
+- **Comillas invertidas, sin paréntesis:** es una *tagged template*. Más adelante, un valor escrito como `${id}` no se pega dentro del texto SQL, y eso protege contra la inyección SQL.
+- **`await`:** la respuesta viene por la red y tarda. Sin `await` tendrías una promesa, no las filas. La función de la ruta debe ser `async`.
+- **El resultado es siempre un array de filas:** cada fila es un objeto cuyas claves son los nombres de columna. Aunque haya una sola fila, necesitas `[0]`.
+
+**Recorrido con valores reales:**
+
+```
+GET /db-check
+  │
+  ├─ env(c)               → DATABASE_URL = 'postgresql://...'
+  ├─ neon(url)            → sql (función)
+  ├─ sql`SELECT 1 AS ok`  → viaja a Neon por HTTP
+  ├─ filas                → [ { ok: 1 } ]
+  ├─ filas[0].ok          → 1
+  └─ respuesta            → {"ok":1}
+```
+
+**Seguridad:** este código corre en el servidor, nunca en el navegador. No devuelvas `DATABASE_URL` en una respuesta, porque contiene la contraseña.
+
+## Tu turno
+
+En `src/index.ts`, debajo de la ruta `/`:
+
+1. Añade los dos imports.
+2. Crea la ruta `GET /db-check` con una función `async`.
+3. Lee `DATABASE_URL` con `env()`.
+4. Crea `sql` con `neon()`.
+5. Lanza `SELECT 1 AS ok`.
+6. Devuelve `c.json({ ok: ... })` con el valor de la primera fila.
+
+Son unas 8 líneas. Es una ruta temporal: la quitaré en el paso 6.
+
+Cuando acabes, avísame y lo reviso leyendo el código.
+
+## Cuando puedas ejecutarlo
+
+Hace falta tener antes el proyecto de Neon y `.env` (paso 1 pendiente), e instalar las dependencias. El arranque depende del runtime, y eso resuelve el aviso que te di en el paso 1:
+
+| Runtime | `export default app` | `.env` |
+|---|---|---|
+| Bun | Funciona tal cual | Se carga solo |
+| Node | Necesita `@hono/node-server` y `serve(app)` | Necesita `--env-file=.env` |
+
+**Comprobación final:** `curl http://localhost:3000/db-check` debe devolver `{"ok":1}`.
+
+Si quieres profundizar por tu cuenta, estas páginas explican lo que estás haciendo:
+- [Neon: Serverless driver](https://neon.com/docs/serverless/serverless-driver)
+- [Hono: Adapter helper (`env`)](https://hono.dev/docs/helpers/adapter)
+- [Hono en Node](https://hono.dev/docs/getting-started/nodejs)
+- [Hono en Bun](https://hono.dev/docs/getting-started/bun)
+RESULT_FINAL success 4 0.98967249

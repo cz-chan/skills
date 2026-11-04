@@ -1,0 +1,58 @@
+TOOL Bash {"command":"git log --stat -p -n 2 --format='%h %an %ad %s%n%b' | head -300; ls -la; git status --short; git branch -a; git stash list","description":"Show recent commits, files, and branch state"}
+RESULT  2ddbf9f fixture Tue Nov 3 20:30:07 2026 +0100 wip likes
+
+---
+ .../memory/databases/0001-neon-likes-progress.md   | 69 ++++++++++++++++++++++
+ 1 file c
+TOOL Glob {"pattern":"**/*","path":"~/.claude/projects/-private-tmp-claude-501--Users-user-Desktop-projects-prod-cz-skills-a54ea246-387e-4d48-b65f-5594c8587ebd-scratchpad-sb5/memory"}
+RESULT  No files found
+TOOL Skill {"skill":"code-mentor","args":"continuemos"}
+RESULT  Launching skill: code-mentor
+TOOL Bash {"command":"cat src/index.ts package.json .gitignore; ls -R src; git log --oneline -5; git status; ls runs | head -30; ls -a; ls .env 2>&1","description":"Show source, package config, and repo state"}
+RESULT ERR  Exit code 1
+import { Hono } from 'hono'
+
+const app = new Hono()
+
+app.get('/', (c) => c.text('c12z'))
+
+// TODO: /api/likes
+
+export default app
+{
+  "nam
+TEXT: **Likes con Neon, paso 3 (nivel senior). Antes de empezar, el repo no coincide con el progreso.**
+
+## ⚠️ Progreso vs repo
+El archivo marca el paso 2 como hecho (13-oct), pero:
+- `src/pages/api/likes.ts` no existe. Solo está `src/index.ts`, con `// TODO: /api/likes`.
+- No hay `.env` en la raíz ni ninguna query `SELECT 1`.
+- Hay una sola rama y ningún stash. `wip likes` solo añade el archivo de progreso.
+
+Por eso no puedo dar por buena la conexión: sin ella, la tabla no se puede crear desde la app.
+
+Aparte, `.gitignore` solo ignora `runs/`. Un `.env` creado aquí podría acabar commiteado, con la contraseña de la DB dentro.
+
+## Dónde estamos
+Botón → `/api/likes` → Neon, para aprender bases de datos. Según el archivo, Neon y la conexión están hechos. Faltan esquema, insert, count y conectar el botón.
+
+```
+[Botón] ──click──▶ [API /likes] ──query──▶ [Neon DB]
+   yo                  yo                  TÚ (paso 3)
+```
+
+## El problema
+Con la conexión solo llegamos a `SELECT 1`: aún no hay dónde guardar nada. Si Ana da like a `hola-mundo` y recarga, el contador debe seguir en 1. Y si repite el clic, hay que decidir si pasa a 2.
+
+## Por qué importa el esquema
+La tabla decide qué podrás responder después. Un contador por post es lo más obvio, pero solo guarda el total: no sabes quién dio like ni cuándo, y no puedes impedir repetidos. Las columnas pendientes (`post_id`, `created_at`, ¿`user_id`?) dependen de esa decisión, y el diseño es tuyo.
+
+**Hecho cuando:** la tabla existe en Neon y puedes explicar qué impide o permite cada columna y restricción.
+
+## Dos preguntas
+1. **¿Dónde está el código del paso 2?**
+   - **A.** En otra máquina o sin subir: lo traes y seguimos.
+   - **B.** Se perdió o nunca llegó aquí: rehaces la conexión (es tu parte) y yo añado `.env` a `.gitignore` y preparo la ruta.
+   - **C.** Da igual, seguimos: diseñas la tabla ahora y dejamos la conexión pendiente.
+2. **¿Está claro? ¿Empezamos a programar?**
+RESULT_FINAL success 6 0.3251218

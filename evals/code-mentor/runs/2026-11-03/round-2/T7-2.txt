@@ -1,0 +1,39 @@
+TEXT: Te pongo en nivel **trainee** en bases de datos: cada paso lleva explicación, ejemplo trazado y pasos concretos. Lo cambiamos si veo que vas más rápido.
+
+## Acuerdo
+
+```
+Goal: botón de likes en c12z.io, para aprender bases de datos.
+Tú (con mi guía): proyecto Neon y DATABASE_URL, conexión, esquema, queries.
+Yo: ruta /api/likes, botón, tests.
+Done: clic → el contador sube y sigue igual tras recargar la página.
+Explanations: con detalle y ejemplos.
+```
+
+```
+[Botón] ──clic──▶ [POST /api/likes] ──query──▶ [Neon]
+   yo                    yo                     TÚ
+                                     (conexión, tabla, queries)
+```
+
+**Diseño que propongo:** una tabla con una fila por contador, que se actualiza con cada clic. En un contador simple no importa quién pulsó ni cuándo, así que guardar una fila por clic haría crecer la tabla sin aportar nada.
+
+## Pasos
+
+1. **Neon:** creas el proyecto y guardas `DATABASE_URL` en `.env`. Necesitarás una cuenta de Neon. No pegues esa URL en el chat, porque contiene tu contraseña.
+2. **Conexión:** lanzas tu primera query desde el código, `SELECT 1`.
+3. **Esquema:** creas la tabla con `CREATE TABLE` y le metes la primera fila.
+4. **Leer y sumar:** escribes el `SELECT` y el `UPDATE`. Aquí resolvemos la pregunta 3: qué pasa si dos personas pulsan a la vez.
+5. **Unir todo:** yo conecto la ruta y el botón a tus queries, y comprobamos el done.
+
+Ahora mismo el proyecto no tiene forma de arrancar el servidor ni tiene dependencias instaladas. Yo me encargo de eso, y te preguntaré antes de instalar nada.
+
+## Progreso
+
+Guardaré tu progreso entre sesiones en `.code-mentor/memory/databases/0001-neon-likes-progress.md`. Va en la raíz del proyecto porque en `.claude/` las escrituras están bloqueadas.
+
+## Dos preguntas
+
+1. ¿Te vale el acuerdo? Si dices que sí, creo también el archivo de progreso.
+2. ¿Añado `.code-mentor/` a `.gitignore` para que no entre en git?
+RESULT_FINAL success 1 0.34456119999999996

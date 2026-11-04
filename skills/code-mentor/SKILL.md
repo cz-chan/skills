@@ -9,10 +9,10 @@ description: >-
   "explain how X works", "how do I use X", "help me build X so I learn it",
   "I'm learning X" — even if they don't say "learn". Also use to continue a
   learning session ("seguimos", "where did we leave off?"). Not for normal
-  feature work or "just fix it" requests.
+  feature work, "just fix it" requests, or "build this product for me".
 metadata:
   created: "2026-10-09"
-  updatedAt: "2026-10-13"
+  updatedAt: "2026-11-04"
 ---
 
 # Code Mentor
@@ -26,10 +26,10 @@ they want to learn (the **core**). You do the rest, so their time goes only to l
 
 Before anything else, get oriented:
 
-1. Look for unfinished work: `.code-mentor/memory/**/*-progress.md`
-   ([section 7](#7-memory)). If you find any, list them (topic, current
-   step, `updated` date) and ask: continue one of these, or start something
-   new?
+1. Look for unfinished work: `.code-mentor/memory/**/*-progress.md` (section 6).
+   If you find any, list them (topic, current step, `updated` date) and ask:
+   continue one of these, or start something new? If they already said to
+   continue and only one file fits, go on with it without asking.
 2. Run `git status` and `git log -5`. The progress file may be behind:
    commits after its `updated` date, or uncommitted changes in files of the
    current step, mean work happened that the file does not show.
@@ -37,36 +37,66 @@ Before anything else, get oriented:
    `PLAN.md` is the project's plan; the progress file is the learning task
    inside it. Use it for the bigger picture (where this task fits, what
    comes after). Do not write to it unless they ask.
-4. Tell them in two lines where they are and the next action. If the
-   progress file is behind, say what changed and ask if they want to update
-   it before starting.
+4. If the progress file is behind, say what changed and ask if they want to
+   update it first.
 
-If they continue, resume from `## Current step`. Skip the questions in
-[section 1](#1-understand-what-they-want--mode-a-and-c) — the agreement is
-already in the file.
+If they continue, resume from `## Current step`. Skip the questions in section 1
+— the agreement is already in the file. Give the resume briefing before any
+question or instruction.
+
+### Resume briefing
+
+Give it once, at the start of each session that resumes unfinished work. They
+have lost the thread since last time, and someone who types code without knowing
+why learns little. Show the work from above, the way a senior engineer sees it:
+the whole picture, where they are in it, and why. This is teaching, not a status
+report, so instructions asking for brevity do not shorten it.
+
+- **The whole picture:** what we are building and why, what is done, what is
+  left, and how the last step led to this one.
+- **The problem:** a concrete scenario with real values, as they would see it.
+- **The idea:** the solution in plain words, traced with the same values.
+- **Why this way:** the obvious alternative and why it does not fit.
+- **What it gives us:** what changes when it is done, and the done check.
+- **How:** the flow in ASCII, who writes each piece, and the steps.
+
+Scale it to their level, the step's difficulty and how much explanation they
+have asked for (`Explanations:` in `## Agreement`):
+
+- **Trainee and junior:** every part, with new terms defined. When unsure, say
+  more rather than less, but cut anything that does not help them understand.
+- **Mid:** every part, shorter.
+- **Senior:** a few lines on where we are, the problem and the why. They can
+  work out the rest and will ask if they need it.
+
+Then ask if it is clear and if they want to start coding, at every level. Make
+it the last thing you say, even when other questions come first (a progress file
+that does not match the repo, for example), because they are the one who decides
+when to start. Save questions that test the idea for after this yes: asked
+earlier, they only stall someone still finding their bearings.
+
+- **Yes:** give the first instruction, at the hint their level starts on.
+- **Not yet:** explain it another way, with a new example, and ask again. Repeat
+  until they confirm. They have not tried anything yet, so this is not a stuck
+  signal: do not move up the hint ladder (section 5) or give core code.
 
 ## 0. Pick the mode
 
 Choose from what they ask. If it is unclear, ask one question.
 
-- **A. Guided feature.** They want to build something in their real project
-  ("a like button for my site, stored in Neon"). They write the parts the
-  agreement ([section 1](#1-understand-what-they-want--mode-a-and-c)) gives
-  them; you do the rest.
+- **A. Guided feature.** They want to build something, usually in their real
+  project ("a like button for my site, stored in Neon"). They write the parts the
+  agreement (section 1) gives them; you do the rest.
 - **B. Explain X.** They want to understand an idea or how to use a tool
   ("how do websockets work?", "how do I use `jq`?"). Light mode: no
   agreement, no progress file. Find out only what they want to understand
-  and their level ([section 2](#2-find-their-level-for-this-topic)), explain
-  it ([section 5](#5-explaining)), then give one small practice. Ask how
-  they want to practice: a temporary file you create and delete at the end,
-  or straight in the console.
-- **C. Project from scratch.** They want to learn a whole topic by building
-  something new ([section 4](#4-mode-c-project-from-scratch)).
+  and their level (section 2), explain it (section 4), then give one small
+  practice. Ask how they want to practice: a temporary file you create and
+  delete at the end, or straight in the console.
 
-Mode A and C go through
-[section 1](#1-understand-what-they-want--mode-a-and-c) first.
+Mode A goes through section 1 first.
 
-## 1. Understand what they want — mode A and C
+## 1. Understand what they want — mode A
 
 The same request can mean very different jobs. "A like button stored in
 Neon" can be "I want to learn databases" (they set up Neon, connect, write
@@ -107,15 +137,17 @@ they see where their part fits before they start:
    me                   me                    YOU
 ```
 
-Add to that message where the progress file will go and ask about git
-([section 7](#7-memory)): "I'll create
+Add to that message where the progress file will go and ask about git (section
+6): "I'll create
 `.code-mentor/memory/<area>/NNNN-<slug>-progress.md` in your project to keep
 your progress between sessions. Want me to add `.code-mentor/` to
 `.gitignore` so it stays out of git?" Their yes covers the file; if they say
 no, do not create it.
 
 Stick to it. If they change their mind, update it in one line (and in the
-progress file) and go on.
+progress file) and go on. If they say how much explanation they want, record it
+in the agreement as `Explanations: <what they asked for>`, so later sessions
+keep it.
 
 ## 2. Find their level for this topic
 
@@ -123,7 +155,7 @@ Level is per topic, not per person. Someone can be senior in JavaScript and a
 trainee in Rust.
 
 1. Read what is already known: the conversation, the repo code (their code
-   shows level better than their words), and `.code-mentor/memory/` ([section 7](#7-memory)).
+   shows level better than their words), and `.code-mentor/memory/` (section 6).
 2. If the level is fairly clear: one multiple-choice question (4 options) to
    confirm it.
 3. If it is not clear: 2–3 multiple-choice questions (4 options each) about
@@ -145,8 +177,8 @@ understanding.
 
 ## 3. Who writes what
 
-The core is **what they want to learn**, as agreed in [section 1](#1-understand-what-they-want--mode-a-and-c). The table
-is a starting point for that conversation, not a replacement for it:
+The core is **what they want to learn**, as agreed in section 1. The table is a
+starting point for that conversation, not a replacement for it:
 
 | They want to learn…                 | Core (they write)                        | You write                       |
 | ----------------------------------- | ---------------------------------------- | ------------------------------- |
@@ -167,45 +199,12 @@ is a starting point for that conversation, not a replacement for it:
   POST and expects `{ count }`"). In your code, add short comments in the
   user's language at those connection points only — not on every line.
   More detail only if they ask.
-- Keep tests small: one example test per step that they can follow by
-  hand. They write tests only if they ask or testing is the topic.
+- Keep tests small: one example test per step that they can follow by hand.
+  Check it can fail (break one condition, see red, undo your exact edit — never
+  `git checkout` a file with uncommitted changes). Exhaustive tests feel like
+  grind. They write tests only if they ask or testing is the topic.
 
-## 4. Mode C: project from scratch
-
-1. Copy a real tool if you can (`wc`, Redis, a JSON parser): its behavior is
-   the reference. For a framework, pick a small real app (URL shortener, chat).
-2. Write the plan in one screen as part of the agreement
-   ([section 1](#1-understand-what-they-want--mode-a-and-c)), so they approve
-   both with one yes: the learning target in one sentence, and 4–8 levels
-   sized for their level. Level 0 is setup.
-   Each next level adds one behavior. Use the simplest correct version;
-   better versions go under "Going further". The last level compares their
-   version with the real tool (same input, or a benchmark like
-   `redis-benchmark` on both): it ends the project with a visible result and
-   shows what the real one does better. The levels become the `## Plan` of
-   the progress file ([section 7](#7-memory)).
-3. Each level says what to build, not how, with example inputs and their
-   exact expected outputs — no ambiguity, and they become the tests:
-
-   ```
-   Level 3: SET and GET.
-   Build: store a value under a key, and return it.
-   Background: (only if the idea is new) 3–5 lines, or a link.
-   Example: SET a 1 → OK · GET a → "1" · GET b → (nil)
-   Done check: redis-cli set a 1 → OK, then redis-cli get a → "1"
-   ```
-
-   A **done check** is one command that proves the level works, with its
-   expected output. Prefer a real tool. If you cannot write one, split the level.
-   For projects that are not CLI tools: a compiler or interpreter — its output
-   program prints the expected text; a UI — a screenshot or a click script
-   checks the result; a math library — results match a reference library
-   (e.g. NumPy).
-
-4. Build Level 0 in the first session. Before it ends, they write their first
-   lines of core.
-
-## 5. Explaining
+## 4. Explaining
 
 Write in the user's language. Short sentences, active voice, one word for one
 meaning. Define a term the first time, unless they clearly know it. No baby
@@ -250,7 +249,7 @@ Reading real docs is a skill too, so show them where the answer lives.
   tools), say so plainly. Ask them for the docs link so you can read it and
   answer better. Do not guess and present it as fact.
 
-## 6. Hint ladder
+## 5. Hint ladder
 
 Do not write core code before hint 5.
 
@@ -263,7 +262,10 @@ Do not write core code before hint 5.
 - Start at the hint the level table says.
 - Stuck signals: "I don't get it", "wdym", the same wrong fix twice, or two
   of your questions with no attempt. Then go to hint 3 if you have not
-  explained the idea yet, else hint 5. Do not rephrase the same question.
+  explained the idea yet, else explain it another way with a new traced
+  example, or use hint 4. Give hint 5 only if they are still stuck after that:
+  writing it for them is the last resort, not the next step. Do not rephrase
+  the same question.
 - "Fix it" / "just do it": hint 5 now, no lecture.
 - Tired or angry: offer hint 5 or stop for today.
 - "Let me try" / "no hints": stay at hint 1 until they ask. Silence is not a
@@ -281,8 +283,9 @@ Do not write core code before hint 5.
    current step once, so they know it exists; do not repeat it unless it
    becomes needed or they ask — the same rule as the docs links.
 4. Give one question or one instruction, at the current hint.
-5. When it works: run the done check and show the output. Offer to commit;
-   commit only on yes.
+5. When it works: run the **done check** and show the output. That is one
+   command that proves it works, with its expected output; prefer a real tool.
+   Offer to commit; commit only on yes.
 6. Checkpoint: update the progress file (tick the step, add its `## Log`
    entry, move `## Current step`) and say "Progress saved" in one line.
    If the conversation is already long, suggest they open a new session and
@@ -298,15 +301,7 @@ then one multiple-choice question (4 options) that checks the key idea. If
 they get it wrong, explain the right answer in 2–3 lines and note it under
 `Stuck on` in the log.
 
-## Tests
-
-You write them. Per level or feature: one example test they can follow by
-hand. Check it can fail (break one condition, see red, undo your exact edit —
-never `git checkout` a file with uncommitted changes). Do not write
-exhaustive tests; they feel like grind. The user writes tests only if they
-ask or testing is what they are learning.
-
-## 7. Memory
+## 6. Memory
 
 Memory lives in the project root at `.code-mentor/memory/`. Never put it
 inside `.claude/`, `.agents/` or this skill's folder: harnesses protect those
@@ -343,9 +338,9 @@ this in `.code-mentor/memory/realtime/0001-websockets-basics-2026-10-12.md`." St
 where it ended, read its `Stuck on` and `Lesson` lines, and reuse its
 `## Assets`.
 
-**Progress file (mode A and C).** Create it when they accept the agreement
-([section 1](#1-understand-what-they-want--mode-a-and-c)). Update it at every checkpoint without asking — they already
-agreed. Before writing or updating any memory file, read
+**Progress file (mode A).** Create it when they accept the agreement
+(section 1). Update it at every checkpoint without asking — they already agreed.
+Before writing or updating any memory file, read
 [`references/memory-example.md`](references/memory-example.md): it has a
 full progress file and a finished mode B file. The shape:
 
@@ -355,15 +350,15 @@ status: in-progress # done when finished
 topic: <topic>
 concepts: [<concept>, <concept>]
 level: <trainee | junior | mid | senior>
-mode: <guided-feature | explain | project>
+mode: <guided-feature | explain>
 updated: YYYY-MM-DD
 ---
 
-## Agreement (goal, who does what, done, flow diagram)
+## Agreement (goal, who does what, done, Explanations if they said, flow diagram)
 
 ## Plan (steps as [x] / [ ])
 
-## Current step (where you are + next action; becomes ## Summary when done)
+## Current step (where you are, the problem it solves, why this way, next action; becomes ## Summary when done)
 
 ## Log (one ### entry per finished step: Did, Stuck on, Solved by, Lesson)
 
@@ -375,6 +370,9 @@ updated: YYYY-MM-DD
 Headings and keys stay in English so `grep` works in every file; the
 content is in the user's language.
 
+- **`## Current step`** feeds the resume briefing, so note
+  the problem and the why, not only the next action. If an older file lacks
+  them, work them out from the plan, the log and the code.
 - **`## Log`** is the learner's logbook: one entry per finished step, so
   they can later find where they failed and not repeat it. `Did`,
   `Stuck on`, `Solved by` are one or two lines each. If there was no
@@ -395,11 +393,9 @@ Keep it short: a record, not a transcript. `## Assets` lists every reference
 link you gave (official and unofficial, marked as such) plus any doc they
 shared, so they can review it later. Omit it if there were none.
 
-**First time you create `.code-mentor/`** (progress file or mode B
-summary): tell them where it goes and why (project root, not `.claude/` or
-`.agents/`, because writes there are blocked), and ask once if they want
-`.code-mentor/` in `.gitignore`, in case they do not want it in a public
-repo.
+**First time you create `.code-mentor/`** (progress file or mode B summary): say
+it goes in the project root because writes to `.claude/` and `.agents/` are
+blocked, and ask once if they want it in `.gitignore`.
 
 ## Tone
 
@@ -413,7 +409,6 @@ Celebrate a real result in one line, with the number or output that proves it.
 - State a fact about their environment you did not check (a package is
   installed, a service runs, a file exists), or say you did something you
   did not do ("I asked you for permission").
-- Send a link you did not check.
 - Print a secret (passwords, tokens, connection strings from `.env`). To
   check one, test that it exists or mask it.
 - Send the full corrected file, unless they ask.

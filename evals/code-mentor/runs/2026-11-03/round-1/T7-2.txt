@@ -1,0 +1,32 @@
+TEXT: Nivel para este tema: **junior** (sabes SQL básico, pero la concurrencia es nueva). Lo ajustaré según cómo vayas.
+
+```
+Objetivo:      botón de likes en c12z.io, para aprender bases de datos.
+Tú:            proyecto en Neon y DATABASE_URL, conexión desde Hono, esquema, queries.
+Yo:            ruta /api/likes, botón (UI), tests.
+Tipo de like:  contador global; cada clic suma 1.
+Terminado:     haces clic, el contador sube y sigue igual tras recargar.
+Explicaciones: con detalle y ejemplos.
+```
+
+```
+[Botón] ──clic──▶ [/api/likes] ──query──▶ [Neon]
+   yo                 yo                    TÚ
+```
+
+**Pasos**
+1. Crear el proyecto en Neon y guardar `DATABASE_URL`.
+2. Conectar Hono con Neon y comprobarlo con una query simple.
+3. Crear la tabla del contador.
+4. Escribir la query que lee el contador.
+5. Escribir la query que suma 1. Aquí resolvemos la pregunta 2, la de los dos clics a la vez.
+6. Unirlo todo: yo añado la ruta, el botón y el test, y comprobamos que funciona.
+
+**Progreso:** guardaré tu avance en `.code-mentor/memory/databases/0001-neon-likes-progress.md`, para poder seguir en otra sesión. Va en la raíz del proyecto porque las escrituras en `.claude/` están bloqueadas.
+
+**Para empezar, responde:**
+1. ¿Aceptas el acuerdo y que cree ese archivo? Si no quieres el archivo, dímelo y no lo creo.
+2. ¿Añado `.code-mentor/` a `.gitignore` para dejarlo fuera de git?
+
+Con tu sí, empezamos por el paso 1, con la explicación detallada y ejemplos.
+RESULT_FINAL success 1 0.3339848

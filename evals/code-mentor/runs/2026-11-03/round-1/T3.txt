@@ -1,0 +1,170 @@
+TOOL Skill {"skill":"code-mentor","args":"seguimos"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  .code-mentor/memory/databases/0001-neon-likes-progress.md
+TOOL Bash {"command":"git status && git log -5 --stat --format='%h %ad %s' --date=iso","description":"Show working tree status and recent commits"}
+TOOL Glob {"pattern":"PLAN.md"}
+RESULT  No files found
+RESULT  On branch main
+nothing to commit, working tree clean
+f9f338d 2026-11-03 20:04:09 +0100 wip likes
+
+ .../memory/databases/0001-neon-likes-progress.md   
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Botón de likes con Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: junior
+6	mode:
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Read {"file_path":"<sandbox>/.gitignore"}
+RESULT  1	runs/
+2	
+TOOL Bash {"command":"ls -A; ls -R src; test -f src/pages/api/likes.ts && echo \"likes.ts: yes\" || echo \"likes.ts: no\"; test -f .env && echo \".env: yes\" || echo \".env: no\"; test -f .env && (grep -q '^DAT
+RESULT ERR  This command uses shell operators that require approval for safety
+TOOL Read {"file_path":"<sandbox>/.claude/skills/code-mentor/references/memory-example.md"}
+RESULT  1	# Memory file examples
+2	
+3	Examples of how to write files in `.code-mentor/memory/` (see section 7 of `SKILL.md`).
+4	This file is a reference only 
+TOOL Read {"file_path":"<sandbox>/reset.sh"}
+RESULT  1	#!/bin/sh
+2	# Copied into the sandbox by setup.sh. Back to the initial commit, no memory.
+3	# Refuses to run anywhere else: it discards uncommitted 
+TOOL Glob {"pattern":"src/**/*"}
+RESULT  src/index.ts
+TOOL Glob {"pattern":".env*"}
+RESULT  No files found
+TOOL Bash {"command":"ls -A","description":"List project root including hidden files"}
+RESULT  .claude
+.code-mentor
+.git
+.gitignore
+AGENTS.md
+package.json
+reset.sh
+runs
+src
+TOOL Bash {"command":"git log --all --oneline -- src/pages .env","description":"Check git history for route and env files"}
+RESULT  (Bash completed with no output)
+TOOL Agent {"description":"Verify Postgres docs links","subagent_type":"web-fetch","prompt":"Fetch each URL and report, per URL: whether it loaded (no 404, no redirect to a home page), the final URL, the page ti
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/sql-createtable.html","prompt":"Return the final URL, the page title, whether the page loaded normally (not a 404 or redirect to a home page), and the C
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-constraints.html","prompt":"Return the final URL, the page title, whether the page loaded normally (not a 404 or redirect to a home page), and wheth
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-default.html","prompt":"Return the final URL, the page title, whether the page loaded normally (not a 404 or redirect to a home page), and whether i
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-constraints.html (HTTP 200 OK, text/html, 28053 characters).
+The text inside the <fetched-web-cont
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-default.html (HTTP 200 OK, text/html, 5405 characters).
+The text inside the <fetched-web-content> 
+TOOL WebFetch {"url":"https://neon.com/docs/get-started/query-with-neon-sql-editor","prompt":"Return the final URL, the page title, whether the page loaded normally (not a 404 or redirect to a home page), and wheth
+RESULT ERR  Claude requested permissions to use WebFetch, but you haven't granted it yet.
+RESULT  Fetched https://www.postgresql.org/docs/current/sql-createtable.html (HTTP 200 OK, text/html, 79832 characters, truncated to the first 39931, then a m
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TEXT: # Retomamos: likes con Neon, paso 3 de 6
+
+## ⚠️ El progreso no cuadra con el repo
+El archivo marca los pasos 1 y 2 como hechos, pero aquí falta su resultado:
+- **`.env`:** no existe, y `.gitignore` tampoco lo cubre, así que un `git add .` subiría la contraseña cuando lo crees.
+- **`src/pages/api/likes.ts`:** no existe ni aparece en el historial de git. `src/index.ts` solo tiene `// TODO: /api/likes`.
+- **Dependencias:** no hay `node_modules`, así que no están instaladas aquí.
+- **Commits:** el último (`f9f338d`) solo añade el archivo de progreso.
+
+## Lo que construimos
+Un botón de likes en c12z.io para aprender bases de datos. Tú escribes la parte de la DB; yo, la UI, el cableado de la ruta y los tests.
+
+```
+[x] 1. Proyecto Neon + .env        (según el archivo)
+[x] 2. Conectar desde la API       (según el archivo)
+[ ] 3. Tabla likes                 ← estás aquí
+[ ] 4. Insertar un like
+[ ] 5. Contar likes por post
+[ ] 6. Botón → API → DB
+```
+
+El paso 2 solo probó la conexión con `SELECT 1`, que no guarda nada. Ahora toca crear el sitio donde guardar los likes.
+
+## El problema
+Ana da like a `hola-mundo` y luego Luis también, así que el contador muestra 2. Al recargar, no hay de dónde leer ese 2 y el like se pierde.
+
+## La idea
+Una **tabla** es como una hoja de cálculo con columnas fijas, y cada like es una fila:
+
+| post_id | created_at |
+|---|---|
+| hola-mundo | 2026-11-03 20:00 |
+| hola-mundo | 2026-11-03 20:05 |
+| otro-post | 2026-11-03 20:07 |
+
+El **esquema** es la definición de esas columnas: nombre, tipo y reglas. Por ejemplo, una regla puede impedir un like sin `post_id`.
+
+Con estos datos:
+1. Ana da like: se añade la fila 1.
+2. Luis da like: se añade la fila 2.
+3. Recargas: `hola-mundo` tiene 2 filas, así que el contador muestra 2.
+
+Las filas viven en Neon, así que sobreviven a la recarga.
+
+## Por qué así
+Lo obvio sería una sola columna `likes` que guarde un número y sume 1 en cada click.
+
+| | Contador | Una fila por like |
+|---|---|---|
+| Mostrar el total | Lee el número | Cuenta filas |
+| Saber cuándo fue cada like | No | Sí |
+| Evitar likes repetidos o deshacerlos | No sabe quién dio like | Posible si guardas `user_id` |
+
+Sin `user_id`, el contador también valdría, porque la fila solo añade la fecha. Usamos filas porque dejan abierto saber quién dio like, y porque así practicas `INSERT` y `COUNT`, que son los pasos 4 y 5.
+
+## Qué nos da
+Cuando esté hecho, la tabla existirá en Neon y los pasos 4 y 5 tendrán dónde escribir y leer.
+
+**Done check:** ejecuta esto en Neon y deben salir tus columnas con sus tipos:
+```sql
+SELECT column_name, data_type
+FROM information_schema.columns
+WHERE table_name = 'likes';
+```
+
+## Cómo
+```
+[Botón] ──click──▶ [API /likes] ──query──▶ [Neon: tabla likes]
+   yo                  yo                     TÚ (este paso)
+```
+
+1. **Tú:** decides las columnas, sus tipos y sus reglas. Queda abierto si incluir `user_id`.
+2. **Tú:** escribes el `CREATE TABLE` y lo ejecutas en Neon.
+3. **Yo:** reviso el SQL contigo y comprobamos el done check.
+
+Si quieres adelantarte, esto explica lo que vas a usar:
+- [CREATE TABLE](https://www.postgresql.org/docs/current/sql-createtable.html)
+- [Restricciones (NOT NULL, UNIQUE, PRIMARY KEY)](https://www.postgresql.org/docs/current/ddl-constraints.html)
+- [Valores por defecto](https://www.postgresql.org/docs/current/ddl-default.html)
+
+## Antes de empezar
+1. **¿Dónde están los pasos 1 y 2?**
+   - a) En otra máquina o carpeta: los traes aquí, o me dices dónde están.
+   - b) Tengo el proyecto en Neon, pero falta el código: hacemos el paso 3 en Neon y rehacemos la conexión antes del paso 4.
+   - c) No hay nada: volvemos al paso 1 y actualizo el archivo.
+2. **¿Añado `.env` a `.gitignore`?** Es una línea y evita subir la contraseña.
+3. **¿Está clara la idea y empezamos a escribir código?** Si no, te lo explico de otra forma.
+RESULT_FINAL success 18 0.448748075

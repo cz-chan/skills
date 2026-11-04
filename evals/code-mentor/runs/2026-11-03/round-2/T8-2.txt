@@ -1,0 +1,64 @@
+TEXT: Te lo explico de otra forma, sin términos nuevos y con otro ejemplo.
+
+**Hoy tu base de datos está vacía: no tiene ningún sitio donde guardar un like.** En este paso solo vas a crear ese sitio.
+
+**1. Sin la tabla**
+
+Si le pides a la DB que cuente los likes, te da un error, porque `likes` todavía no existe:
+
+```
+SELECT count(*) FROM likes;
+→ ERROR: relation "likes" does not exist
+```
+
+**2. Creas la tabla (este paso)**
+
+Le dices a la DB: "crea un sitio llamado `likes`, donde cada like guarde estos tres datos". Por ahora está vacío:
+
+```
+likes
+┌────┬─────────┬────────────┐
+│ id │ post_id │ created_at │
+├────┼─────────┼────────────┤
+│        (sin filas)        │
+└───────────────────────────┘
+```
+
+Ya no hay error. La misma pregunta ahora responde `0`, y con eso este paso está terminado.
+
+**3. Llegan los clicks (paso 4)**
+
+Cada click añade una fila. Imagina tres clicks: dos en `receta-tortilla` y uno en `viaje-lisboa`:
+
+```
+likes
+┌────┬─────────────────┬────────────┐
+│ id │ post_id         │ created_at │
+├────┼─────────────────┼────────────┤
+│  1 │ receta-tortilla │ 10:00      │  ← 1.er click
+│  2 │ receta-tortilla │ 10:05      │  ← 2.º click
+│  3 │ viaje-lisboa    │ 10:07      │  ← 3.er click
+└────┴─────────────────┴────────────┘
+```
+
+- **`id`:** el número de la fila, para distinguirla de las demás.
+- **`post_id`:** el post que recibió el like.
+- **`created_at`:** cuándo se dio el like.
+
+**4. Cuentas los likes (paso 5)**
+
+¿Cuántos likes tiene `receta-tortilla`? Se cuentan sus filas: **2**. Y `viaje-lisboa` tiene **1**.
+
+Como las filas quedan guardadas en la DB, al recargar la página siguen ahí y el contador no se pierde.
+
+**Lo único que harás ahora** es el punto 2: crear la tabla vacía. Insertar y contar vienen después.
+
+**¿Ahora se entiende?** Si no, dime por dónde te pierdes:
+- **A.** Qué es una tabla o una fila.
+- **B.** Para qué sirve cada columna.
+- **C.** Por qué hay que crear la tabla antes de guardar nada.
+- **D.** Cómo encaja esto con el botón y la API.
+- **E.** Otra cosa, o todo en general.
+
+Si ya está claro, dime y empezamos. Lo de los pasos 1 y 2 que faltan en el repo lo vemos después; no hace falta para crear la tabla si tu proyecto de Neon sigue existiendo.
+RESULT_FINAL success 1 0.5105751000000001

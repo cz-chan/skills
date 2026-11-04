@@ -1,11 +1,11 @@
 # Memory file examples
 
-Examples of how to write files in `.code-mentor/memory/` (see section 7 of `SKILL.md`).
+Examples of how to write files in `.code-mentor/memory/` (see section 6 of `SKILL.md`).
 This file is a reference only — never copy it into `.code-mentor/memory/` and never treat
 it as the learner's real progress.
 
 The rules (English headings, content in the user's language, length of each
-log field) are in section 7 of `SKILL.md`; these examples show them applied.
+log field) are in section 6 of `SKILL.md`; these examples show them applied.
 The examples are written in English so anyone can read them. In real files,
 keep the headings and keys in English and write the content in the user's
 language.
@@ -32,6 +32,7 @@ Goal: like button on c12z.io, to learn databases.
 You: Neon setup, connection, schema, insert and count queries.
 Me: button UI, API route wiring, tests.
 Done: click → the count goes up and survives a reload.
+Explanations: more detail, with examples.
 
     [Button] ──click──▶ [API /likes] ──query──▶ [Neon DB]
        me                  me                    YOU
@@ -47,8 +48,11 @@ Done: click → the count goes up and survives a reload.
 
 ## Current step
 
-Step 3: design the `likes` table. Next: decide the columns
-(`post_id`, `created_at`, `user_id`?).
+Step 3: design the `likes` table.
+Problem: the API connects, but nothing stores a like, so a reload loses the count.
+Why this way: one row per like, not a counter column, so a user can undo their
+like and cannot like the same post twice.
+Next: decide the columns (`post_id`, `created_at`, `user_id`?).
 
 ## Log
 

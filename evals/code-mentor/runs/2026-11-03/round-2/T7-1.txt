@@ -1,0 +1,78 @@
+TOOL Skill {"skill":"code-mentor","args":"quiero hacer un botón de likes con Neon para aprender bases de datos"}
+RESULT  Launching skill: code-mentor
+TOOL Bash {"command":"git status --short; git log -5 --oneline; ls -a; ls -R .code-mentor 2>/dev/null; cat package.json 2>/dev/null; cat PLAN.md 2>/dev/null; cat .gitignore 2>/dev/null; git ls-files | grep -v '
+TOOL Glob {"pattern":".code-mentor/memory/**/*.md"}
+RESULT  No files found
+RESULT  54ea5f2 fixture: initial state
+.
+..
+.claude
+.git
+.gitignore
+AGENTS.md
+package.json
+reset.sh
+runs
+src
+{
+  "name": "c12z-demo",
+  "type": "module",
+  "d
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TEXT: Veo el proyecto: Hono con una ruta, `@neondatabase/serverless` en `package.json` (sin instalar, no hay `node_modules`) y un `TODO: /api/likes` en `src/index.ts:7`. El objetivo ya está claro: aprender bases de datos. Antes de cerrar el acuerdo, necesito saber esto.
+
+Puedes responder así: `1a 2c 3b…`
+
+**Tu nivel**
+
+**1. ¿Cuánto has usado bases de datos?**
+- a) Nunca
+- b) Algún tutorial, poco más
+- c) Las he usado en proyectos, con ayuda u ORM
+- d) Escribo SQL y diseño esquemas con soltura
+
+**2. Sin buscarlo, ¿qué hace `SELECT count(*) FROM likes WHERE post_id = 1`?**
+- a) Ni idea
+- b) Crea un like en el post 1
+- c) Cuenta las filas de likes del post 1
+- d) Suma los valores de la columna `post_id`
+
+**3. Dos personas pulsan like a la vez. Con `UPDATE posts SET likes = likes + 1`, ¿qué pasa?**
+- a) Ni idea
+- b) Se pierde un like seguro, hace falta un lock manual
+- c) Da error
+- d) Cuenta los dos, porque el `UPDATE` bloquea la fila
+
+**El resultado**
+
+**4. ¿Qué botón quieres?**
+- a) Contador simple: cada clic suma 1 y se puede pulsar sin límite
+- b) Un like por visitante, identificado con una cookie o un id anónimo
+- c) Un like por visitante, y que pueda quitarlo
+- d) Decídelo tú (recomiendo b: enseña claves únicas y restricciones, y sigue siendo pequeño)
+
+**Quién hace cada parte**
+
+Para cada parte, elige: **T** = la escribes tú, **G** = la escribes tú con mi guía, **Y** = la hago yo.
+
+| # | Parte | Tu elección |
+|---|---|---|
+| 5 | Crear el proyecto en Neon y `DATABASE_URL` | T / G / Y |
+| 6 | Conexión desde Hono | T / G / Y |
+| 7 | Esquema (`CREATE TABLE`) | T / G / Y |
+| 8 | Queries (insertar y contar) | T / G / Y |
+| 9 | Ruta `/api/likes` | T / G / Y |
+| 10 | Botón (UI) | T / G / Y |
+
+Si quieres ir rápido, responde "reparto por defecto": 5 a 8 **G** (la parte de base de datos), 9 y 10 **Y**.
+RESULT_FINAL success 6 0.2838648

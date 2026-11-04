@@ -1,0 +1,92 @@
+TOOL Read {"file_path":"<sandbox>/.claude/skills/code-mentor/references/memory-example.md"}
+RESULT  1	# Memory file examples
+2	
+3	Examples of how to write files in `.code-mentor/memory/` (see section 7 of `SKILL.md`).
+4	This file is a reference only 
+TOOL Read {"file_path":"<sandbox>/.gitignore"}
+RESULT  1	runs/
+2	
+TOOL Agent {"subagent_type":"web-fetch","description":"Check Neon docs links","prompt":"Fetch these pages and for each report: final URL after redirects, whether it loads (not 404 / not redirected to a home page
+TOOL WebFetch {"url":"https://neon.com/docs/get-started/signing-up","prompt":"Report: the page title/heading. Does it explain creating a Neon project and getting the connection string (DATABASE_URL)? Does it explai
+TOOL WebFetch {"url":"https://neon.com/docs/connect/connect-from-any-app","prompt":"Report: the page title/heading. Does it explain creating a Neon project and getting the connection string (DATABASE_URL)? Does it 
+RESULT  Fetched https://neon.com/docs/get-started/signing-up (HTTP 200 OK, text/markdown, 18654 characters).
+The text inside the <fetched-web-content> tag bel
+RESULT  Fetched https://neon.com/docs/connect/connect-from-any-app (HTTP 200 OK, text/markdown, 11785 characters).
+The text inside the <fetched-web-content> t
+TOOL WebFetch {"url":"https://neon.com/docs/get-started-with-neon/signing-up","prompt":"Report: the page title/heading. Does it explain creating a Neon project and getting the connection string (DATABASE_URL)? Does
+RESULT  Fetched https://neon.com/docs/get-started-with-neon/signing-up (HTTP 200 OK, text/markdown, 18654 characters).
+The text inside the <fetched-web-conten
+TOOL WebFetch {"url":"https://neon.com/docs/manage/projects","prompt":"Report: the page title/heading. Does it explain creating a Neon project and getting the connection string (DATABASE_URL)? Does it explain the p
+RESULT  Fetched https://neon.com/docs/manage/projects (HTTP 200 OK, text/markdown, 44710 characters).
+The text inside the <fetched-web-content> tag below is U
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.gitignore","old_string":"runs/\n","new_string":"runs/\n.code-mentor/\n.env\n"}
+RESULT  The file <sandbox>/.gitignore has been updated successfully. (file state is current in your context — no need to Read it back)
+TOOL Write {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","content":"---\nstatus: in-progress\ntopic: Botón de likes con Neon\nconcepts: [postgres, neon, connection-string, en
+RESULT  File created successfully at: <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md (file state is current in your context — no need to 
+TEXT: Listo: progreso guardado en `.code-mentor/memory/databases/0001-neon-likes-progress.md`, y `.code-mentor/` y `.env` añadidos a `.gitignore`. Nada de esto se ha ejecutado. Sin Neon aquí, el paso 1 queda en teoría más un ejercicio; crear el proyecto real queda pendiente.
+
+## Paso 1: `DATABASE_URL`
+
+**El problema.** Tu app corre en un sitio y tu base de datos en otro: Neon es Postgres alojado en sus servidores. Para hablar con ella, la app necesita saber dónde está y con qué credenciales entrar. Todo eso cabe en un solo texto, la **connection string** (cadena de conexión). Por convención se guarda en una variable llamada `DATABASE_URL`.
+
+**Sus partes**, con el ejemplo de la documentación de Neon:
+
+```
+postgresql://alex:****@ep-cool-darkness-a1b2c3d4-pooler.us-east-2.aws.neon.tech/dbname?sslmode=require&channel_binding=require
+```
+
+| Parte | Valor | Qué es |
+|---|---|---|
+| Protocolo | `postgresql://` | El "idioma" de la conexión |
+| Rol | `alex` | El usuario de la base de datos |
+| Contraseña | `AbC123dEf` | **El secreto** |
+| Host | `ep-cool-darkness-a1b2c3d4-pooler.us-east-2.aws.neon.tech` | El servidor. `-pooler` indica conexión agrupada: muchos clientes comparten pocas conexiones reales |
+| Base de datos | `dbname` | Un mismo servidor puede tener varias |
+| Parámetros | `sslmode=require&channel_binding=require` | Opciones de conexión. Neon exige SSL (conexión cifrada), así que no los borres |
+
+Se lee así: "conéctate con Postgres, como `alex` con esta contraseña, a este servidor, a la base `dbname`, y con cifrado".
+
+**Por qué no va en el código.** Compara las dos opciones:
+
+```ts
+// ❌ En el código: la contraseña entra en cada commit
+const url = 'postgresql://alex:****@...'
+
+// ✅ En el código solo está el nombre de la variable
+const url = process.env.DATABASE_URL
+```
+
+Con la primera, si subes el repo a GitHub, cualquiera con acceso lee la contraseña y puede borrar tus datos. Borrarla después no basta, porque sigue en el historial de git. Habría que cambiar la contraseña.
+
+La solución son dos archivos:
+
+```
+.env          → valor real      → fuera de git (ya está en .gitignore)
+.env.example  → valor falso     → en git: indica qué variables hacen falta
+```
+
+**Qué harás cuando tengas acceso a Neon** (no lo he podido probar):
+1. Pulsa **New Project**, pon nombre y región (la más cercana a donde corra tu app) y pulsa **Create project**.
+2. Pulsa **Connect**. Se abre un panel que monta la cadena. Deja los valores por defecto, incluido el agrupado (pooled).
+3. Copia la cadena en `.env`: `DATABASE_URL=postgresql://...`
+4. Nunca la pegues en un chat, tampoco aquí.
+
+## Tu turno
+
+Crea `.env.example` en la raíz del proyecto, con una sola línea `DATABASE_URL=...`, montada con estas piezas falsas:
+
+- Rol: `ana`
+- Contraseña: `ClaveFalsa123`
+- Host: `ep-demo-lake-a1b2c3d4-pooler.eu-central-1.aws.neon.tech`
+- Base de datos: `likes_demo`
+- Parámetros: los mismos del ejemplo
+
+Fíjate en qué separa cada pieza: `:`, `@`, `/`, `?`, `&`. Luego avísame: lo reviso leyendo el archivo.
+
+**Aviso para el paso 2:** `package.json` no define cómo arrancar la app (no hay script ni adaptador de servidor), y `.env` no siempre se carga solo. Lo vemos ahí.
+
+Si quieres profundizar por tu cuenta, estas páginas explican lo que estás haciendo:
+- [Neon: Connect from any application](https://neon.com/docs/connect/connect-from-any-app)
+- [Neon: Manage projects](https://neon.com/docs/manage/projects)
+RESULT_FINAL success 6 0.5800864700000001

@@ -1,0 +1,130 @@
+TOOL Skill {"skill":"code-mentor","args":"seguimos"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  .code-mentor/memory/databases/0001-neon-likes-progress.md
+TOOL Bash {"command":"git status && git log -5 --format='%h %ad %s' --date=iso && git diff","description":"Show git status, recent commits and diff"}
+TOOL Glob {"pattern":"PLAN.md"}
+RESULT  No files found
+RESULT  On branch main
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard c
+TOOL Read {"file_path":"<sandbox>/src/db.ts"}
+RESULT  1	import { neon } from '@neondatabase/serverless'
+2	
+3	export const sql = neon(process.env.DATABASE_URL!)
+4	
+5	export async function ping() {
+6	  cons
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	import { ping } from './db'
+3	
+4	const app = new Hono()
+5	
+6	app.get('/', (c) => c.text('c12z'))
+7	
+8	// Temporal: pru
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Botón de likes con Neon
+4	concepts: [postgres, neon, connection-string, env-vars]
+5	level: trainee
+6	mode: guided
+TOOL Bash {"command":"ls -la; cat package.json; ls -la src; test -f .env && echo \".env exists\" || echo \"no .env\"; test -f .env && grep -q '^DATABASE_URL=' .env && echo \"DATABASE_URL set\" || echo \"DATABAS
+RESULT  total 40
+drwxr-xr-x@ 12 user  wheel  384 Nov  3 20:13 .
+drwx------@  7 user  wheel  224 Nov  3 20:18 ..
+drwxr-xr-x@  3 user  wheel   96 Nov  3 20:10 .
+TEXT: Retomamos el **paso 3 de 6**. El archivo de progreso está al día: no hay commits nuevos y `db/schema.sql` aún no existe.
+
+## La imagen completa
+
+Estamos construyendo un botón de likes en c12z.io para que aprendas bases de datos. Al hacer clic, el contador sube y sigue igual tras recargar la página.
+
+```
+[1] .env y .gitignore        ✓
+[2] Conexión con SELECT 1    ✓ (sin ejecutar)
+[3] Tabla y primera fila     ← estamos aquí
+[4] Leer y sumar
+[5] Conectar ruta y botón    (yo)
+[6] Crear Neon real y probarlo todo
+```
+
+En el paso 2 abriste el camino hasta la base de datos, pero aún no hay nada que leer ni dónde guardar. Por eso ahora toca crear ese sitio.
+
+En este entorno no hay Neon, así que todavía no se ha ejecutado nada, ni siquiera la conexión. Lo probaremos todo en el paso 6.
+
+## El problema
+
+Imagina que la conexión ya funciona contra una base de datos Neon recién creada, que está vacía. Alguien pulsa el botón y la app intenta leer el contador:
+
+```
+Postgres: ERROR: relation "likes" does not exist
+```
+
+Postgres no crea tablas por su cuenta: solo guarda datos en tablas que hayan creado antes.
+
+## La idea
+
+Una **tabla** es como una hoja de cálculo con columnas fijas. Cada **fila** es un dato guardado. La nuestra se llama `likes` y tiene dos columnas:
+
+| Columna | Tipo | Reglas | Para qué sirve |
+|---|---|---|---|
+| `id` | `text` | `PRIMARY KEY` | Nombre del contador. No se puede repetir ni estar vacío. |
+| `total` | `integer` | `NOT NULL`, `DEFAULT 0` | Número de likes. Siempre tiene valor; si no das ninguno, vale 0. |
+
+Necesitas dos instrucciones SQL, cada una con su trabajo:
+
+- **`CREATE TABLE`** crea la estructura, sin ningún dato.
+- **`INSERT`** añade una fila, con `id` igual a `home`.
+
+Así cambia la tabla, siguiendo el valor de `total`:
+
+```
+Tras CREATE TABLE      Tras INSERT 'home'     Tras 2 clics (paso 4)
+ id | total             id   | total           id   | total
+----+------            ------+------          ------+------
+(sin filas)             home |     0           home |     2
+```
+
+Fíjate en dos detalles:
+
+- **El 0 lo pone Postgres:** el `INSERT` solo da el `id`, y `DEFAULT 0` rellena `total`.
+- **Un segundo `home` falla:** otro `INSERT` con ese `id` da error por la `PRIMARY KEY`. Eso impide tener dos contadores `home` y no saber cuál es el bueno.
+
+## Por qué así
+
+Hay dos alternativas obvias, y ninguna encaja:
+
+- **Guardar el número en una variable del servidor:** es lo más fácil, pero si el servidor se reinicia, el contador pasa de 2 a 0. Tu objetivo pide que el dato sobreviva.
+- **Una fila por cada clic:** con 3 clics tendrías 3 filas y las contarías. Eso sirve si quieres saber quién pulsó o cuándo, pero acordamos un contador simple. Tendrías muchas filas para obtener un solo número.
+
+Por eso usamos **una fila por contador**, y cada clic actualiza esa fila. Si mañana quieres otro contador, añades una fila con otro `id`, sin cambiar la tabla.
+
+El SQL va en `db/schema.sql` porque se ejecuta **una sola vez**, en el SQL Editor de Neon, y no cada vez que arranca la app. Si estuviera en `src/db.ts`, cada arranque intentaría crear de nuevo una tabla que ya existe.
+
+## Qué nos da
+
+Queda definido dónde vive el contador, y el paso 4 ya tendrá una fila que leer y sumar.
+
+- **Comprobación de ahora:** yo reviso `db/schema.sql`, sin ejecutarlo.
+- **Comprobación en el paso 6:** tras ejecutarlo en Neon, un `SELECT` sobre la tabla debe devolver `home | 0`.
+
+## Cómo
+
+```
+db/schema.sql ──una vez, paso 6──▶ [Neon: tabla likes, fila home]
+     TÚ                                       ▲
+                                              │ query (paso 4)
+[Botón] ──clic──▶ [POST /api/likes] ──▶ [src/db.ts]
+   yo                    yo                 TÚ
+```
+
+1. **Tú:** creas `db/schema.sql` con el `CREATE TABLE`.
+2. **Tú:** añades debajo el `INSERT` de la fila `home`.
+3. **Yo:** reviso el archivo y te digo si algo falla.
+
+¿Te queda claro? ¿Empezamos a escribir el código?
+RESULT_FINAL success 10 0.3346446

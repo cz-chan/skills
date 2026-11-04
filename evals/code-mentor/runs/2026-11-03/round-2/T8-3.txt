@@ -1,0 +1,59 @@
+TEXT: Vas a escribir un `CREATE TABLE`, la instrucción que crea la tabla. Tiene esta forma:
+
+```sql
+CREATE TABLE nombre_tabla (
+  columna1 tipo opciones,
+  columna2 tipo opciones
+);
+```
+
+Las columnas van separadas por comas, sin coma tras la última, y la instrucción termina en `;`.
+
+## Las piezas
+
+**Tipos:** he elegido uno para cada columna, para que no tengas que buscarlos.
+
+| Columna | Tipo | Por qué |
+|---|---|---|
+| `id` | `bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY` | La DB genera el número sola (1, 2, 3…) y nunca se repite |
+| `post_id` | `text` | Guarda textos como `receta-tortilla` |
+| `created_at` | `timestamptz` | Guarda fecha y hora, con zona horaria |
+
+**Opciones:** en `id` ya van incluidas. Para las otras dos columnas tienes estas, y puedes usar las dos en la misma columna:
+
+- **`NOT NULL`:** la columna no puede quedar vacía. Si intentas guardar una fila sin ese dato, la DB da error.
+- **`DEFAULT now()`:** si no le pasas un valor, la DB pone la hora actual.
+
+## Qué hacen, con un ejemplo
+
+Cuando llegue un click, la API solo enviará `post_id = 'receta-tortilla'`. Nada más.
+
+```
+Llega:   post_id = 'receta-tortilla'
+La DB completa:
+  id         → 1 (lo genera ella)
+  created_at → ?
+```
+
+Y si un fallo enviara un like sin `post_id`:
+
+```
+Sin NOT NULL:  2 | (vacío) | 10:05   ← se guarda un like de ningún post
+Con NOT NULL:  ERROR, y no se guarda nada
+```
+
+## Qué tienes que hacer
+
+1. Decide qué opciones lleva `post_id` y cuáles `created_at`, según esos dos ejemplos.
+2. Escribe el `CREATE TABLE` completo para `likes`.
+3. Abre tu proyecto en la consola de Neon, entra en **SQL Editor** y ejecútalo.
+4. Ejecuta la comprobación:
+   ```sql
+   SELECT count(*) FROM likes;
+   ```
+   Debe devolver `0`.
+
+Si el proyecto de Neon ya no existe, dímelo y lo rehacemos primero.
+
+**Pégame tu SQL y el resultado**, o el error si sale alguno, y lo revisamos. No hace falta que funcione a la primera. Si la connection string aparece en algún sitio, no la pegues, porque lleva tu contraseña.
+RESULT_FINAL success 1 0.5753927000000001

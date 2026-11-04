@@ -1,0 +1,95 @@
+TOOL Skill {"skill":"code-mentor","args":"quiero hacer la primera función de PLAN.md para aprender bases de datos"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  No files found
+TOOL Bash {"command":"git status --short --branch; git log -5 --stat; ls -a","description":"Show git state, recent commits, and root files"}
+TOOL Read {"file_path":"<sandbox>/PLAN.md"}
+RESULT  1	# Plan: Recetario
+2	
+3	App para guardar recetas y compartirlas con un enlace público.
+4	
+5	## Stack
+6	
+7	- Hono en el servidor
+8	- Postgres en Neon
+
+RESULT  ## main
+commit 1f7ff36dfe663182780655f0a2880ba89ddaec2b
+Author: fixture <fixture@local>
+Date:   Wed Nov 4 09:28:32 2026 +0100
+
+    plan
+
+ PLAN.md | 22
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/.gitignore"}
+RESULT  1	runs/
+2	
+TEXT: Has elegido la función 1 del plan: **crear una receta (título e ingredientes)**. Ahora mismo hay Hono con una sola ruta, `@neondatabase/serverless` en `package.json` y nada de conexión ni tablas. Me faltan unos datos antes de cerrar el reparto.
+
+Responde en formato `1A 2B…`.
+
+**Tu proyecto**
+
+**1. ¿Tienes Neon listo?**
+- A. No tengo cuenta
+- B. Tengo cuenta, pero no un proyecto para esto
+- C. Tengo el proyecto y la connection string
+- D. No sé qué es eso
+
+**2. ¿Qué parte quieres escribir tú?**
+- A. Todo lo de base de datos: setup de Neon, conexión, tabla e `INSERT` (recomendado para aprender bases de datos)
+- B. Solo tabla e `INSERT`; yo hago el setup y la conexión
+- C. Lo de A, más la ruta `POST /recetas`
+- D. Otro reparto (dime cuál)
+
+**3. ¿Cómo se crea una receta en esta función?**
+- A. Con `curl`, sin interfaz (recomendado: el foco queda en la base de datos)
+- B. Con un formulario HTML simple que escribo yo
+- C. Con un formulario HTML que escribes tú
+- D. Aún no lo sé, decide tú
+
+Lo que no escribas tú lo hago yo: la ruta, los tests y el formulario, si lo hay.
+
+**Tu nivel en bases de datos**
+
+**4. ¿Qué has hecho con SQL?**
+- A. Nada
+- B. Algún `SELECT` o `INSERT` siguiendo un tutorial
+- C. He creado tablas relacionadas con claves foráneas en una app
+- D. He usado índices, transacciones y migraciones en producción
+
+**5. ¿Por qué no conviene montar el SQL así: `"INSERT ... VALUES ('" + titulo + "')"`?**
+- A. Porque es más lento
+- B. Porque un título malicioso puede ejecutar SQL
+- C. Porque Postgres no acepta strings concatenados
+- D. No lo sé
+
+**6. Una receta tiene varios ingredientes. ¿Cómo los guardarías?**
+- A. En una columna de texto, separados por comas
+- B. En una tabla aparte, con una fila por ingrediente y un enlace a la receta
+- C. En una columna `JSONB` o de tipo array
+- D. No lo sé
+
+Si no sabes alguna, marca D sin problema: solo me sirve para ajustar las explicaciones.
+RESULT_FINAL success 9 0.28015

@@ -1,0 +1,105 @@
+TOOL Read {"file_path":"<sandbox>/src/db.ts"}
+RESULT  1	import { neon } from '@neondatabase/serverless'
+2	
+3	export const sql = neon(process.env.DATABASE_URL!)
+4	
+5	export async function ping() {
+6	  cons
+TOOL Bash {"command":"git status --short; git diff --stat; cat db/schema.sql","description":"Show working tree changes and schema file"}
+RESULT   M .gitignore
+ M src/index.ts
+?? db/
+?? src/db.ts
+ .gitignore   | 2 ++
+ src/index.ts | 4 ++++
+ 2 files changed, 6 insertions(+)
+CREATE TABLE likes (
+ 
+TOOL Agent {"description":"Verify PostgreSQL docs links","subagent_type":"web-fetch","run_in_background":false,"prompt":"Fetch these three URLs. For each, report: does it load without redirecting to a home page 
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/dml-update.html","prompt":"Report the exact page title (the <title> or H1). Confirm whether the page is the UPDATE reference page and whether it explain
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/dml-returning.html","prompt":"Report the exact page title (the <title> or H1). Confirm whether the page is about RETURNING data-returning clauses, and w
+RESULT  Fetched https://www.postgresql.org/docs/current/dml-update.html (HTTP 200 OK, text/html, 6305 characters).
+The text inside the <fetched-web-content> t
+RESULT  Fetched https://www.postgresql.org/docs/current/dml-returning.html (HTTP 200 OK, text/html, 7217 characters).
+The text inside the <fetched-web-content
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/transaction-iso.html","prompt":"Report the exact page title (the <title> or H1). Confirm whether the page covers transaction isolation levels and Read C
+RESULT  Fetched https://www.postgresql.org/docs/current/transaction-iso.html (HTTP 200 OK, text/html, 29049 characters).
+The text inside the <fetched-web-cont
+RESULT  [{"type":"text","text":"  [Harness note, not part of the agent's report: WebFetch saved no files during this run. In this run WebFetch saved files onl
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Estado (2026-11-03): `SELECT` y `WHERE` explicados; el usuario debe escribir `getLi
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- PostgreSQL, Querying a Table: https://www.postgresql.org/docs/current/tutorial-se
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: `getLikes()` está correcta: el `SELECT`, el `WHERE` y `rows[0].total` son lo que hace falta. La he revisado leyéndola, **sin ejecutarla**.
+
+Ahora toca sumar un like, `addLike()`.
+
+### El problema: dos clics a la vez
+
+Lo primero que se te ocurriría es leer el número en la app, sumarle 1 y escribirlo. Con una sola persona funciona. Pero si dos pulsan casi a la vez, con `total` en 5:
+
+```
+Clic A: lee 5
+Clic B: lee 5              (A aún no ha escrito)
+Clic A: calcula 6, escribe 6
+Clic B: calcula 6, escribe 6
+
+Resultado: 6. Debería ser 7: se ha perdido un clic.
+```
+
+El fallo es que el número se calcula en la app con un dato que quizá ya está viejo.
+
+### La solución: que sume Postgres
+
+En vez de decirle "escribe 6", le decimos "suma 1 a lo que haya". Se hace todo en una sola orden, `UPDATE`:
+
+```sql
+UPDATE tabla SET columna = nuevo_valor WHERE otra_columna = 'valor'
+```
+
+A la derecha del `=` puedes usar la propia columna, y entonces vale lo que tenga la fila en ese momento. Con los votos, sumando 10 a gatos:
+
+```
+UPDATE votos SET total = total + 10 WHERE nombre = 'gatos'
+
+ gatos | 3   →   gatos | 13
+ perros| 5   →   perros| 5    (el WHERE la deja fuera)
+```
+
+**Cuidado:** sin `WHERE`, el `UPDATE` cambia **todas** las filas de la tabla.
+
+Si dos `UPDATE` llegan a la vez a la misma fila, Postgres los pone en fila: el segundo espera a que termine el primero y suma sobre el valor ya actualizado:
+
+```
+Clic A: 5 + 1 = 6
+Clic B: espera... 6 + 1 = 7
+
+Resultado: 7. No se pierde ningún clic.
+```
+
+### Que te devuelva el número nuevo
+
+El botón necesita mostrar el número nuevo tras el clic, pero un `UPDATE` normal no devuelve filas. Si añades `RETURNING columna` al final, te devuelve el valor ya actualizado, con el mismo formato que un `SELECT`:
+
+```
+UPDATE votos SET total = total + 10 WHERE nombre = 'gatos' RETURNING total
+→ rows = [ { total: 13 } ]
+```
+
+Así no hace falta una segunda query para leerlo.
+
+### Qué hacer
+
+Añade en `src/db.ts`, debajo de `getLikes()`, una función `addLike()` que:
+
+1. Se exporte y sea `async`, como las otras.
+2. Sume **1** a `total`, solo en la fila cuyo `id` es `home`.
+3. Devuelva el número nuevo, usando `RETURNING`.
+
+Si `total` vale 0, la primera llamada debería devolver `1` y la segunda `2`. Avísame cuando la tengas.
+
+Si quieres profundizar por tu cuenta:
+- [PostgreSQL, Updating Data](https://www.postgresql.org/docs/current/dml-update.html)
+- [PostgreSQL, Returning Data from Modified Rows](https://www.postgresql.org/docs/current/dml-returning.html)
+- [PostgreSQL, Transaction Isolation](https://www.postgresql.org/docs/current/transaction-iso.html): la sección 13.2.1 explica por qué el segundo `UPDATE` espera. Es más avanzada, así que es opcional.
+RESULT_FINAL success 6 0.89218771

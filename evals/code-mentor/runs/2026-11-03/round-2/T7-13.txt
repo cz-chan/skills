@@ -1,0 +1,27 @@
+TEXT: Empieza solo con la primera orden, el `CREATE TABLE`; el `INSERT` vendrá después.
+
+**Qué hacer:** crea el archivo `db/schema.sql` (la carpeta `db/` va en la raíz del proyecto) y escribe ahí la orden que crea la tabla `likes`.
+
+**La forma general** es esta:
+
+```sql
+CREATE TABLE nombre_de_la_tabla (
+  columna1 tipo reglas,
+  columna2 tipo reglas
+);
+```
+
+**Qué poner en cada hueco:**
+
+| Columna | Tipo | Reglas |
+|---|---|---|
+| `id` | `text` | `PRIMARY KEY` |
+| `total` | `integer` | `NOT NULL`, `DEFAULT 0` |
+
+**Tres detalles de escritura:**
+- Las reglas de una columna van seguidas y separadas por espacios, sin comas entre ellas.
+- Las columnas se separan con una coma, pero la última no lleva coma detrás.
+- La orden termina con `;`.
+
+Cuando lo tengas, avísame y lo reviso. Si te atascas, dime hasta dónde llegaste.
+RESULT_FINAL success 1 0.424254

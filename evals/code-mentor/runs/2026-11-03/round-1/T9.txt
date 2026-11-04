@@ -1,0 +1,80 @@
+TEXT: Reviso estado del repo y memoria.
+TOOL Bash {"command":"git log --stat -3 && git status --short && ls -la","description":"Show recent commits, status and files"}
+RESULT  commit bf52bb15409bf49acde5cd5e1cb1d7c09ca9d33d
+Author: fixture <fixture@local>
+Date:   Tue Nov 3 20:08:32 2026 +0100
+
+    wip likes
+
+ .../memory/data
+TOOL Glob {"pattern":"**/*","path":"~/.claude/projects/-private-tmp-claude-501--Users-user-Desktop-projects-prod-cz-skills-a54ea246-387e-4d48-b65f-5594c8587ebd-scratchpad-sb1/memory"}
+RESULT  No files found
+TOOL Grep {"pattern":"TODO|FIXME|WIP|likes?","-i":true,"output_mode":"content","glob":"!{node_modules,package-lock.json,pnpm-lock.yaml}/**","head_limit":40}
+RESULT  src/index.ts:7:// TODO: /api/likes
+.claude/skills/code-mentor/SKILL.md:87:  ("a like button for my site, stored in Neon"). They write the parts the
+.c
+TOOL Skill {"skill":"code-mentor","args":"continuemos"}
+RESULT  Launching skill: code-mentor
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Botón de likes con Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: senior
+6	mode:
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Bash {"command":"ls -R src; test -f .env && echo \".env: existe\" || echo \".env: no existe\"; test -d node_modules && echo \"node_modules: existe\" || echo \"node_modules: no existe\"; ls PLAN.md 2>/dev/n
+RESULT  index.ts
+.env: no existe
+node_modules: no existe
+runs/
+bf52bb1 2026-11-03 wip likes
+3a6d78c 2026-11-03 fixture: initial state
+TEXT: **Dónde estamos:** botón de likes en c12z.io, para aprender bases de datos. Según el progreso (13-oct), ya hiciste Neon + `.env` (1) y la conexión con `SELECT 1` (2). Toca el paso 3, el esquema de la tabla `likes`. Faltan insert (4), count (5) y conectar el botón (6).
+
+```
+[Botón] ──click──▶ [API /likes] ──query──▶ [Neon DB]
+   yo                  yo                  TÚ ← paso 3
+```
+
+**Problema:** la API conecta, pero no hay dónde guardar un like, así que el contador no sobrevive a un reload.
+
+**Por qué importa el diseño:** los pasos 4 y 5 dependen de esta tabla. La decisión abierta es `post_id`, `created_at` y si añadir `user_id`. Sin una identidad de usuario, la DB no puede impedir que alguien dé like dos veces al mismo post.
+
+**⚠️ El repo no coincide con el progreso:**
+- No hay `.env`.
+- No hay `src/pages/api/likes.ts`; `src/index.ts` solo tiene `// TODO: /api/likes`.
+- No hay `node_modules`, aunque `package.json` sí declara `hono` y `@neondatabase/serverless`.
+- Los 2 commits (3-nov) no añaden nada de esto; el único cambio de likes es el propio archivo de progreso.
+
+No sé si el proyecto de Neon sigue existiendo. No lo he comprobado.
+
+El paso 3 no depende de esto si lo haces en el SQL Editor de Neon, pero el 4 sí necesita la conexión.
+
+**Dos preguntas:**
+1. ¿Qué pasó con el código de los pasos 1 y 2?
+   - a) Está en otra rama o máquina, y lo traes.
+   - b) Se perdió: rehaces `.env` y conexión, y yo cableo la ruta.
+   - c) Seguimos con el paso 3 en Neon y lo resolvemos antes del 4.
+2. ¿Está claro el paso 3 y empezamos?
+RESULT_FINAL success 10 0.3287078

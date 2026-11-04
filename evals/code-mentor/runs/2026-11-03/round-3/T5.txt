@@ -1,0 +1,67 @@
+TOOL Skill {"skill":"code-mentor","args":"explícame websockets"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  .code-mentor/memory/realtime/0001-websockets-basics-2026-10-12.md
+TOOL Bash {"command":"git status --short; git log -5 --stat; ls -a","description":"Show git state, recent commits and root files"}
+TOOL Glob {"pattern":"**/PLAN.md"}
+RESULT  No files found
+RESULT  commit 8a4ab777af51cf66c733b877b16f1efd856b38d5
+Author: fixture <fixture@local>
+Date:   Tue Nov 3 20:27:56 2026 +0100
+
+    notes
+
+ .../realtime/0001-w
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/realtime/0001-websockets-basics-2026-10-12.md"}
+RESULT  1	---
+2	status: done
+3	topic: Qué son los WebSockets
+4	concepts: [websockets, http, handshake, full-duplex]
+5	level: trainee
+6	mode: explain
+7	updated
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TEXT: Ya lo vimos el 12 oct: `.code-mentor/memory/realtime/0001-websockets-basics-2026-10-12.md`
+
+**Lo que quedó:**
+- HTTP: servidor solo habla cuando cliente pregunta.
+- WebSocket: empieza como petición HTTP (handshake), luego queda abierto. Ambos lados envían cuando quieren.
+- Te costó: creías que el servidor solo podía responder. Se resolvió con un servidor que enviaba la hora cada segundo.
+- Practicaste: `websocat` contra servidor echo.
+
+Sigo desde ahí. Dos preguntas:
+
+**1. ¿Qué quieres entender ahora?**
+- a) Repasar la idea desde cero
+- b) Handshake por dentro: qué viaja por la red (`Upgrade`, `101`, frames)
+- c) Programar un servidor pequeño en Hono
+- d) Cuándo usarlo y cuándo no (polling, SSE)
+
+**2. ¿Tu nivel hoy?** (en octubre: trainee)
+- a) Recuerdo poco
+- b) Tengo clara la idea, nunca programé uno
+- c) Programé uno simple
+- d) Lo he usado en producción
+
+Responde tipo `1b 2a`.
+RESULT_FINAL success 9 0.280402

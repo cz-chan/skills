@@ -1,0 +1,74 @@
+TOOL Skill {"skill":"code-mentor","args":"quiero hacer un botón de likes con Neon para aprender bases de datos"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  No files found
+TOOL Bash {"command":"git status --short --branch; git log -5 --oneline; ls -la; cat package.json 2>/dev/null; ls PLAN.md 2>/dev/null; git ls-files | head -50","description":"Show repo state, history, and files
+RESULT  ## main
+54ea5f2 fixture: initial state
+total 32
+drwxr-xr-x@ 10 user  wheel  320 Nov  3 20:10 .
+drwx------@  6 user  wheel  192 Nov  3 20:10 ..
+drwxr-x
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/.gitignore"}
+RESULT  1	runs/
+2	
+TOOL Bash {"command":"ls -a; test -f .env && echo \".env exists\" || echo \"no .env\"; test -d node_modules && echo \"node_modules exists\" || echo \"no node_modules\"","description":"Check for env file and ins
+RESULT  .
+..
+.claude
+.git
+.gitignore
+AGENTS.md
+package.json
+reset.sh
+runs
+src
+no .env
+no node_modules
+TEXT: Lo montamos para que aprendas haciendo: tú escribes la parte de base de datos y yo el resto.
+
+**Lo que hay en el repo:** Hono con un `// TODO: /api/likes` en `src/index.ts:7`, y `@neondatabase/serverless` en `package.json`. No hay UI, `.env` ni `node_modules`.
+
+Respóndeme en corto, por ejemplo: `1b 2a 3a 4: A, B, C, D yo; E, F tú`.
+
+**1. ¿Qué experiencia tienes con bases de datos?**
+- a) Ninguna, nunca he escrito SQL
+- b) He hecho algún `SELECT` o `INSERT` siguiendo un tutorial
+- c) Uso SQL a veces y he creado tablas
+- d) Lo uso a menudo, y quiero aprender Neon o temas más avanzados
+
+**2. Una tabla `likes` tiene una fila por cada like. ¿Qué devuelve `SELECT COUNT(*) FROM likes WHERE post_id = 1`?**
+- a) El primer like del post 1
+- b) Cuántos likes tiene el post 1
+- c) Todos los likes de todos los posts
+- d) No lo sé
+
+**3. ¿Cómo debe funcionar el like?**
+- a) Contador simple: cada clic suma 1 y se puede repetir
+- b) Un like por visitante: un segundo clic no suma (más que aprender: restricciones `UNIQUE`)
+- c) Toggle: un clic da like y otro lo quita (lo más completo)
+
+**4. ¿Quién hace cada parte?** Para cada una: *yo*, *yo con tu guía* o *tú*.
+
+| | Parte | Mi propuesta |
+|---|---|---|
+| A | Crear el proyecto en Neon y `DATABASE_URL` | tú con mi guía |
+| B | Conexión desde el código | tú con mi guía |
+| C | Schema (la tabla) | tú |
+| D | Queries (insertar y contar) | tú |
+| E | Ruta `/api/likes` en Hono | yo |
+| F | Botón (UI) y tests | yo |
+
+Si te vale la propuesta, pon `4: ok`.
+RESULT_FINAL success 8 0.28929479999999996

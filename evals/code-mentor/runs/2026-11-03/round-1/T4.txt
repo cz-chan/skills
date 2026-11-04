@@ -1,0 +1,144 @@
+TOOL Skill {"skill":"code-mentor","args":"seguimos"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  .code-mentor/memory/databases/0001-neon-likes-progress.md
+TOOL Bash {"command":"git status && git log -5 --stat --format='%h %ad %s' --date=iso","description":"Show working tree status and recent commits"}
+TOOL Glob {"pattern":"PLAN.md"}
+RESULT  No files found
+RESULT  On branch main
+nothing to commit, working tree clean
+e6c0307 2026-11-03 20:05:27 +0100 add likes table
+
+ src/schema.sql | 5 +++++
+ 1 file changed, 5 i
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Botón de likes con Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: junior
+6	mode:
+TOOL Read {"file_path":"<sandbox>/src/schema.sql"}
+RESULT  1	CREATE TABLE likes (
+2	  id serial PRIMARY KEY,
+3	  post_id text NOT NULL,
+4	  created_at timestamptz NOT NULL DEFAULT now()
+5	);
+6	
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Bash {"command":"ls -a; echo '--- gitignore'; cat .gitignore; echo '--- src'; find src -type f; echo '--- env keys (values hidden)'; [ -f .env ] && sed -E 's/=.*/=<hidden>/' .env || echo 'no .env'; echo '-
+RESULT ERR  A variable in this command can't be checked before it runs
+TOOL Read {"file_path":"<sandbox>/.claude/skills/code-mentor/references/memory-example.md"}
+RESULT  1	# Memory file examples
+2	
+3	Examples of how to write files in `.code-mentor/memory/` (see section 7 of `SKILL.md`).
+4	This file is a reference only 
+TOOL Bash {"command":"ls -a; echo '--- gitignore'; cat .gitignore; echo '--- src'; find src -type f; echo '--- node_modules'; ls node_modules 2>/dev/null | head -20; echo '--- likes.ts history'; git log --all -
+RESULT  .
+..
+.claude
+.code-mentor
+.git
+.gitignore
+AGENTS.md
+package.json
+reset.sh
+runs
+src
+--- gitignore
+runs/
+--- src
+src/schema.sql
+src/index.ts
+--- node_mo
+TOOL Grep {"pattern":"^[A-Za-z_][A-Za-z0-9_]*=","path":"<sandbox>/.env","output_mode":"count"}
+RESULT ERR  Path does not exist: <sandbox>/.env. Note: your current working directory is <sandbox>.
+TOOL Agent {"subagent_type":"web-fetch","description":"Check two docs links","prompt":"Fetch these two URLs. For each, report: whether it loads, final URL after redirects, page title, and whether it covers the s
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/dml-insert.html","prompt":"Report the page title. Does the page explain inserting rows with INSERT and that columns omitted from the column list get the
+TOOL WebFetch {"url":"https://neon.com/docs/serverless/serverless-driver","prompt":"Report the page title. Does the page explain running queries with the `neon` function from @neondatabase/serverless using a tagged
+RESULT  Fetched https://www.postgresql.org/docs/current/dml-insert.html (HTTP 200 OK, text/html, 6362 characters).
+The text inside the <fetched-web-content> t
+RESULT ERR  Claude requested permissions to use WebFetch, but you haven't granted it yet.
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TEXT: # Seguimos: botón de likes con Neon
+
+## Antes de empezar: el repo no cuadra con el progreso
+- **Archivo de progreso atrasado:** dice paso 3 pendiente, pero el commit `e6c0307` ya añade `src/schema.sql`.
+- **No sé si la tabla existe en Neon:** el commit solo prueba que el SQL está escrito. Aquí no hay `.env`, así que no puedo comprobarlo.
+- **Falta el código del paso 2:** el log lo da por hecho, pero `src/pages/api/likes.ts` no existe ni está en el historial. `src/index.ts` solo tiene `// TODO: /api/likes`.
+- **`.env` no está en `.gitignore`:** si lo creas o lo copias aquí, tu contraseña podría acabar en un commit. Lo añado yo si me dices que sí.
+
+## La foto completa
+Estamos haciendo un botón de likes en c12z.io para que aprendas bases de datos.
+
+```
+[1 Neon] ✓ → [2 Conexión] ✓ (falta el código) → [3 Tabla] ✓ (¿creada?) → [4 INSERT] ← aquí → [5 COUNT] → [6 Botón]
+```
+
+El paso 3 preparó dónde guardar los likes, pero nada escribe todavía en esa tabla. Por eso toca el paso 4.
+
+## El problema
+Un usuario hace click en el post `hola-mundo`. La petición llega a la API, nadie la guarda y el like se pierde. Al recargar, el contador no ha cambiado.
+
+## La idea
+Cada click crea **una fila** en `likes`. Tú solo mandas `post_id`, y Postgres rellena el resto con lo que definiste en tu esquema:
+
+| Click | `post_id` que envías | `id` (`serial`) | `created_at` (`DEFAULT now()`) |
+|---|---|---|---|
+| 1.º | `hola-mundo` | 1 | hora del click |
+| 2.º | `hola-mundo` | 2 | hora del click |
+| 3.º | `otro-post` | 3 | hora del click |
+
+En el paso 5, contar los likes de `hola-mundo` dará 2.
+
+## Por qué así
+**Fila por like o contador:** la alternativa obvia es una columna `likes` que suba de 1 en 1. Es más simple, pero solo guarda un número: no sabes cuándo ocurrió cada like. Con filas, además, podrás añadir `user_id` más adelante.
+
+**Valor separado del SQL:** `post_id` viene del navegador, así que puede traer cualquier cosa. Si lo pegas como texto dentro del SQL, alguien puede enviar `x'); DROP TABLE likes; --` y Postgres lo ejecutaría como código. Esto se llama **inyección SQL**. Con una **query parametrizada**, el SQL y el valor viajan por separado, y ese texto se guarda como un dato sin ejecutarse.
+
+**Pendiente:** tu tabla no tiene `user_id`, así que una persona puede dar like muchas veces. No bloquea este paso. Lo decidimos antes del paso 6.
+
+## Qué nos da
+Los likes quedan guardados y sobreviven a una recarga.
+
+**Done check:** después de dos `POST /api/likes` con `hola-mundo`, `SELECT id, post_id FROM likes` en el SQL Editor de Neon muestra 2 filas nuevas con ese `post_id`.
+
+## Cómo
+```
+[curl / test] ──POST {post_id}──▶ [ruta /api/likes] ──INSERT──▶ [Neon: likes]
+      yo                                 yo                         TÚ
+```
+
+1. **Tú:** confirmas que la tabla existe en Neon y, si no, ejecutas `schema.sql`.
+2. **Yo:** creo la ruta en `src/index.ts`, leo `post_id` y te dejo un hueco para la query.
+3. **Tú:** escribes el INSERT parametrizado con `@neondatabase/serverless`.
+4. **Yo:** añado un test pequeño. Te pediré permiso antes de instalar nada, porque aún no hay `node_modules`.
+5. **Juntos:** pasamos el done check.
+
+Si quieres profundizar por tu cuenta, [Inserting Data en Postgres](https://www.postgresql.org/docs/current/dml-insert.html) explica el INSERT y los valores por defecto. La página del driver de Neon no pude comprobarla, así que no la enlazo.
+
+## Tres preguntas
+1. **Progreso:** ¿marco el paso 3 como hecho y paso el actual al 4? Si la tabla aún no está creada en Neon, lo dejo en el 3.
+2. **`.env` y código del paso 2:** ¿los tienes en otra carpeta o máquina, o los rehacemos aquí? La ruta la escribo yo, pero la conexión te toca a ti. ¿Añado `.env` a `.gitignore`?
+3. **¿Está claro y empezamos a programar?**
+RESULT_FINAL success 15 0.45745275499999993

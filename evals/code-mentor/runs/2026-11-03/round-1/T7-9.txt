@@ -1,0 +1,128 @@
+TOOL Skill {"skill":"code-mentor","args":"seguimos"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  .code-mentor/memory/databases/0001-neon-likes-progress.md
+TOOL Bash {"command":"git status && git log -5 --format='%h %ad %s' --date=iso && git diff","description":"Show git status, recent commits and diff"}
+TOOL Glob {"pattern":"PLAN.md"}
+RESULT  No files found
+RESULT  On branch main
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard c
+TOOL Read {"file_path":"<sandbox>/src/db.ts"}
+RESULT  1	import { neon } from '@neondatabase/serverless'
+2	
+3	export async function ping(url: string) {
+4	  const sql = neon(url)
+5	  const rows = await sql`
+TOOL Read {"file_path":"<sandbox>/.env.example"}
+RESULT  1	DATABASE_URL=postgresql://ana:****@ep-demo-lake-a1b2c3d4-pooler.eu-central-1.aws.neon.tech/likes_demo?sslmode=require&channel_binding=require
+2	
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Botón de likes con Neon
+4	concepts: [postgres, neon, connection-string, env-vars, secrets, sql-update, concurrenc
+TOOL Bash {"command":"ls -la . src 2>/dev/null; cat package.json 2>/dev/null; test -f .env && echo \".env exists\" || echo \".env missing\"; test -d node_modules/@neondatabase/serverless && echo \"neon pkg inst
+RESULT  .:
+total 40
+drwxr-xr-x@ 12 user  wheel  384 Nov  3 20:05 .
+drwx------@  4 user  wheel  128 Nov  3 20:03 ..
+drwxr-xr-x@  3 user  wheel   96 Nov  3 20:0
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TEXT: # Retomamos: botón de likes con Neon, paso 2
+
+El progreso está al día: `src/db.ts` ya tiene `ping(url)` y `src/index.ts` sigue sin cambios.
+
+## Todo el trabajo
+Construimos un contador global de likes en c12z.io para que aprendas bases de datos. Haces clic, sube y sigue igual tras recargar.
+
+| Paso | Qué | Estado |
+|---|---|---|
+| 1 | Proyecto en Neon y `DATABASE_URL` | A medias: ejercicio de `.env.example` hecho; faltan el proyecto real y `.env` |
+| **2** | **Conectar Hono con Neon** | **Aquí: `ping` escrita, falta la ruta** |
+| 3 | Crear la tabla del contador | Pendiente |
+| 4 | Query que lee el contador | Pendiente |
+| 5 | Query que suma 1 (dos clics a la vez) | Pendiente |
+| 6 | Unir ruta, botón y test (yo), y comprobarlo | Pendiente |
+
+El paso 1 te enseñó qué contiene la URL y por qué es secreta. El paso 2 la usa para hablar con la base de datos.
+
+## El problema
+Ahora mismo tienes dos piezas que no se tocan:
+
+- `ping(url)` sabe lanzar una query, pero nadie la llama.
+- `src/index.ts` solo responde en `/` con `c12z`.
+
+Si pidieras `GET /db-check`, Hono respondería `404 Not Found`, porque esa ruta no existe. La query nunca llegaría a salir.
+
+## La idea
+La ruta `/db-check` une las dos piezas. Sigamos una petición:
+
+| Momento | Qué pasa | Valor |
+|---|---|---|
+| 1 | Llega la petición | `GET /db-check` |
+| 2 | `env(c)` lee las variables | `DATABASE_URL = "postgresql://…neon.tech/…"` |
+| 3 | La ruta llama a `ping` | `ping("postgresql://…")` |
+| 4 | Neon ejecuta `SELECT 1 AS ok` | `rows = [{ ok: 1 }]` |
+| 5 | `ping` devuelve `rows[0].ok` | `1` |
+| 6 | La ruta responde con `c.json({ ok })` | `{"ok":1}` |
+
+`{ ok }` es una forma corta de escribir `{ ok: ok }`.
+
+Esto es lo que te costó la última vez: **por qué la URL llega como parámetro**. `c` es el contexto de una petición y solo existe mientras se atiende esa petición. Como `env(c)` lo necesita, la URL solo se puede leer dentro de la ruta. `db.ts` se carga al arrancar la app, cuando aún no hay ninguna petición ni `c`, así que un `sql` creado ahí no tendría URL. Por eso el orden es este:
+
+```
+ARRANQUE   se carga db.ts      → no hay c, no hay URL
+PETICIÓN   existe c → env(c)   → URL → ping(url) → crea sql
+```
+
+## Por qué así
+- **¿Por qué no `process.env.DATABASE_URL`, que parece más directo?** Depende del runtime (el programa que ejecuta tu código: Node, Bun, Workers…), y el proyecto aún no ha elegido uno. En Cloudflare Workers, por ejemplo, las variables llegan por el contexto y no por `process.env`. `env()` de `hono/adapter` funciona con cualquiera.
+- **¿Por qué `SELECT 1` y no la query de los likes?** No necesita tablas. Si falla, el problema está en la conexión y no en tu SQL, así que separas los dos tipos de fallo.
+
+## Qué nos da
+Tendrás el camino completo de petición a Neon y vuelta. Los pasos 3 a 5 solo cambiarán la query, no la conexión.
+
+**Comprobación final:**
+```
+curl http://localhost:3000/db-check
+→ {"ok":1}
+```
+
+**Aquí no se puede ejecutar:** no hay `.env` ni dependencias instaladas, y este entorno no tiene acceso a Neon. Hoy revisaré tu código leyéndolo, así que el paso no estará comprobado hasta que hagas lo siguiente en tu máquina:
+1. Crear el proyecto real en Neon.
+2. Guardar la URL en `.env`.
+3. Elegir runtime e instalar dependencias.
+4. Ejecutar el `curl`.
+
+## Cómo
+```
+curl ──▶ GET /db-check ──▶ env(c) ──▶ ping(url) ──▶ Neon
+              TÚ             TÚ       TÚ (hecho)     │
+                                                     │ SELECT 1
+{"ok":1} ◀── c.json({ ok }) ◀── 1 ◀── [{ ok: 1 }] ◀──┘
+                   TÚ
+```
+
+Todo lo de este paso lo escribes tú, en `src/index.ts`:
+1. Importar `env` de `hono/adapter` y `ping` de `./db`.
+2. Añadir la ruta `GET /db-check`, que tiene que ser `async` porque espera a Neon.
+3. Dentro, sacar `DATABASE_URL` de `env(c)`.
+4. Hacer `await ping(...)` y guardar el resultado en `ok`.
+5. Devolver `c.json({ ok })`.
+
+Esta ruta es temporal: la quitamos en el paso 6.
+
+¿Está claro? ¿Empezamos con el código?
+RESULT_FINAL success 11 0.3381752

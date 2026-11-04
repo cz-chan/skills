@@ -1,0 +1,125 @@
+TOOL Skill {"skill":"code-mentor","args":"seguimos"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  .code-mentor/memory/databases/0001-neon-likes-progress.md
+TOOL Bash {"command":"git status && git log -5 --stat --format='%h %ad %s' --date=iso && ls -a","description":"Show repo status, recent commits and root files"}
+TOOL Glob {"pattern":"PLAN.md"}
+RESULT  No files found
+RESULT  On branch main
+nothing to commit, working tree clean
+bb83658 2026-11-03 20:12:47 +0100 add likes table
+
+ src/schema.sql | 5 +++++
+ 1 file changed, 5 i
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Botón de likes con Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: junior
+6	mode:
+TOOL Read {"file_path":"<sandbox>/src/schema.sql"}
+RESULT  1	CREATE TABLE likes (
+2	  id serial PRIMARY KEY,
+3	  post_id text NOT NULL,
+4	  created_at timestamptz NOT NULL DEFAULT now()
+5	);
+6	
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Bash {"command":"git log -3 --format='%h %s%n%b' -- .code-mentor; cat .gitignore; ls -la runs src; ls -a .env* 2>/dev/null | head","description":"Check gitignore, runs and src folders, env files"}
+RESULT  492bd87 wip likes
+
+runs/
+runs:
+total 1552
+drwxr-xr-x@ 12 user  wheel     384 Nov  3 20:12 .
+drwxr-xr-x@ 11 user  wheel     352 Nov  3 20:12 ..
+-rw-r--
+TOOL Agent {"description":"Check docs links load","subagent_type":"web-fetch","prompt":"Fetch each URL and report, per URL: whether it loaded (no 404, no redirect to a home page), the final URL, the page title, 
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/sql-insert.html","prompt":"Return the page title, and quote the single short passage that states that columns omitted from the INSERT column list receiv
+TOOL WebFetch {"url":"https://neon.com/docs/serverless/serverless-driver","prompt":"Return the page title, and quote the single short passage or code snippet showing how to run a parameterized query with the `neon`
+RESULT ERR  Claude requested permissions to use WebFetch, but you haven't granted it yet.
+RESULT  Fetched https://www.postgresql.org/docs/current/sql-insert.html (HTTP 200 OK, text/html, 25099 characters).
+The text inside the <fetched-web-content> 
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TEXT: Retomamos **botón de likes con Neon**. Antes, el archivo de progreso y el repo no coinciden.
+
+## El progreso está desactualizado
+
+- **Paso 3:** sigue como pendiente, pero el commit `bb83658` añade `src/schema.sql` con `id`, `post_id` y `created_at`. Sin `user_id`.
+- **Paso 2:** figura como hecho, pero en el repo no hay rastro de él. No existe `src/pages/api/likes.ts`, y `src/index.ts` solo tiene `// TODO: /api/likes`. No hay ningún `SELECT 1`.
+- **`.env`:** no está en esta carpeta, y `.gitignore` solo ignora `runs/`. Si lo creas aquí, la contraseña de la DB podría acabar en un commit.
+- **Sin comprobar:** no sé si la tabla existe en Neon. Sin `.env` no puedo conectarme.
+
+## El panorama
+
+Construimos un botón de likes para aprender bases de datos.
+
+```
+[Botón] ──click──▶ [API /api/likes] ──query──▶ [Neon DB]
+   yo                    yo                       TÚ
+```
+
+- **Hecho:** proyecto en Neon (1) y diseño de la tabla (3). La conexión (2) está por confirmar.
+- **Falta:** insertar un like (4), contarlos (5) y unir botón, API y DB (6).
+- **Cómo llegamos aquí:** la tabla define la forma de los datos, pero sigue vacía. Por eso toca escribir en ella.
+
+## Paso 4: insertar un like
+
+**El problema:** alguien hace click en el post `hola-mundo`, recarga la página y el like se ha perdido, porque nada lo guardó.
+
+**La idea:** cada like es una fila nueva. Tú solo envías `post_id`, y Postgres rellena el resto con lo que definiste en el esquema:
+
+| Click en | `id` (`serial`, número automático) | `post_id` | `created_at` (`now()`) |
+|---|---|---|---|
+| `hola-mundo` | 1 | `hola-mundo` | 20:15 |
+| `hola-mundo` | 2 | `hola-mundo` | 20:16 |
+| `otro-post` | 3 | `otro-post` | 20:17 |
+
+En el paso 5, contar los likes de `hola-mundo` dará 2.
+
+**Por qué así:**
+- **Una fila por like, no un contador:** lo obvio sería una columna `likes` que suba de 1 en 1. Es más simple, pero pierdes cuándo ocurrió cada like. Con filas, el total se calcula y conservas ese historial.
+- **Parámetros, no texto pegado:** el `post_id` viene del navegador, así que cualquiera puede mandar `'; DROP TABLE likes; --`. Si lo pegas dentro del SQL, ese texto se ejecuta como código (inyección SQL). Con un parámetro, el valor viaja aparte de la query y Postgres lo trata solo como dato.
+
+**Límite actual:** sin `user_id`, una persona puede dar likes infinitos. Sirve para aprender, y se puede añadir después.
+
+**Qué nos da:** los likes sobreviven a una recarga, que es la mitad del objetivo final.
+
+**Comprobación:** llamas a la ruta con `hola-mundo` y `SELECT * FROM likes` muestra la fila nueva, con `id` y `created_at` ya rellenos.
+
+**Quién hace qué:**
+1. **Tú:** recuperar la conexión a Neon, si se perdió.
+2. **Yo:** la ruta `POST /api/likes`, que te entrega `post_id`.
+3. **Tú:** escribir el `INSERT` con parámetro.
+4. **Juntos:** ejecutar la comprobación.
+
+Si quieres profundizar por tu cuenta, [PostgreSQL: INSERT](https://www.postgresql.org/docs/current/sql-insert.html) explica lo que vas a escribir, incluido cómo se rellenan las columnas que omites.
+
+## Antes de empezar
+
+1. **¿Ejecutaste `schema.sql` en Neon?** Si es así, marco el paso 3 como hecho.
+2. **¿Dónde quedó el código del paso 2 y tu `.env`?** ¿Los tienes en otro sitio o rehacemos la conexión?
+3. **¿Actualizo el archivo de progreso** con lo anterior y añado `.env` a `.gitignore`?
+4. **¿Está claro el paso 4?** ¿Empezamos a programar?
+RESULT_FINAL success 12 0.37717953500000007

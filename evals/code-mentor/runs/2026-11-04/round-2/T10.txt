@@ -1,0 +1,77 @@
+TOOL Skill {"skill":"code-mentor","args":"quiero aprender cómo funciona Redis por dentro construyendo uno desde cero"}
+RESULT  Launching skill: code-mentor
+TOOL Bash {"command":"ls -la; git status --short; git log -5 --oneline; find .code-mentor -type f 2>/dev/null; ls PLAN.md 2>/dev/null; cat package.json 2>/dev/null; git ls-files | head -50; which node go python
+RESULT ERR  This Bash command contains multiple operations. The following part requires approval: head -50; which node go python3 rustc redis-cli; node -v; go ver
+TOOL Bash {"command":"git status --short; git log -5 --oneline; git ls-files","description":"Show git status, recent commits, tracked files"}
+TOOL Glob {"pattern":".code-mentor/memory/**/*"}
+RESULT  No files found
+TOOL Glob {"pattern":"*"}
+RESULT  .git/info/exclude
+.git/description
+.git/hooks/commit-msg.sample
+.git/hooks/pre-rebase.sample
+.git/hooks/sendemail-validate.sample
+.git/hooks/pre-commi
+RESULT  dbb8897 fixture: initial state
+.claude/skills/code-mentor/CREDITS.md
+.claude/skills/code-mentor/SKILL.md
+.claude/skills/code-mentor/references/memory-
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/.gitignore"}
+RESULT  1	runs/
+2	
+TEXT: Antes de arrancar, 5 preguntas rápidas. Responde tipo `1b 2a,c 3a 4a 5b`.
+
+**1. Lenguaje**
+- a) TypeScript/Node: el del repo; el event loop ya viene hecho (recomendado si no quieres pelear con el lenguaje)
+- b) Go
+- c) C o Rust: más cerca del Redis real, pero mucho más lento
+- d) Otro: ¿cuál?
+
+**2. Qué quieres entender** (elige varios)
+- a) Protocolo RESP y servidor TCP: cómo viajan los comandos por la red
+- b) Estructuras de datos: strings, listas, hash table, sorted sets
+- c) Expiración de claves (TTL)
+- d) Persistencia (AOF/RDB): sobrevivir a un reinicio
+- e) Por qué un solo hilo aguanta muchos clientes (event loop)
+- f) Replicación o pub/sub
+
+**3. ¿Quién escribe cada parte?**
+- a) Tú: parser RESP, comandos y las partes que elegiste en la 2. Yo: tests, setup y soporte de sintaxis (recomendado)
+- b) Tú también el servidor TCP. Yo: solo tests y setup
+- c) Tú: solo las estructuras de datos. Yo: red y protocolo
+- d) Otro reparto: ¿cuál?
+
+**4. ¿Dónde vive el código?**
+- a) Carpeta aparte en este repo (`redis/`), sin tocar la app Hono (recomendado)
+- b) Repo nuevo
+- c) Integrado en la app
+
+**5. Tu nivel: si dos clientes hacen `INCR` a la vez sobre la misma clave en Redis, ¿qué pasa?**
+- a) No lo sé, nunca he mirado cómo funciona Redis ni he usado sockets
+- b) Se pisan si no usas locks o transacción
+- c) Da el valor correcto, porque los comandos se ejecutan en serie en un hilo, pero no tengo claro cómo se implementa
+- d) Da el valor correcto, y podría explicar el event loop con `epoll`/`kqueue` y su relación con el I/O multihilo de Redis 6+
+
+Con esto te paso el acuerdo y el plan por pasos.
+RESULT_FINAL success 10 0.29474880000000003

@@ -1,0 +1,138 @@
+TOOL Skill {"skill":"code-mentor","args":"seguimos"}
+RESULT  Launching skill: code-mentor
+TOOL Glob {"pattern":".code-mentor/memory/**/*-progress.md"}
+RESULT  .code-mentor/memory/databases/0001-neon-likes-progress.md
+TOOL Bash {"command":"git status && git log -5 --stat --format='%h %ad %s' --date=iso","description":"Show working tree status and recent commits"}
+TOOL Glob {"pattern":"PLAN.md"}
+RESULT  No files found
+RESULT  On branch main
+nothing to commit, working tree clean
+1213890 2026-11-03 20:11:49 +0100 wip likes
+
+ .../memory/databases/0001-neon-likes-progress.md   
+TOOL Read {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md"}
+RESULT  1	---
+2	status: in-progress
+3	topic: Botón de likes con Neon
+4	concepts: [postgres, neon, db-connection, env-vars, sql-insert]
+5	level: junior
+6	mode:
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Bash {"command":"ls -a; cat .gitignore; test -f .env && echo \".env exists\"; test -d node_modules && echo \"node_modules exists\"","description":"List project root and check env and dependencies exist"}
+RESULT ERR  Exit code 1
+.
+..
+.claude
+.code-mentor
+.git
+.gitignore
+AGENTS.md
+package.json
+reset.sh
+runs
+src
+runs/
+TOOL Bash {"command":"ls -R src; git branch -a; git stash list; git log --all --oneline -- src/pages .env; ls -a .code-mentor/memory/*; cat .git/info/exclude 2>/dev/null | grep -v '^#'","description":"Check sou
+RESULT  index.ts
+* main
+.
+..
+0001-neon-likes-progress.md
+TOOL Agent {"subagent_type":"web-fetch","description":"Check schema docs links","prompt":"Fetch each URL. For each, report: does it load without redirecting to a home page or 404, final URL, and page title, and 
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/tutorial-table.html","prompt":"Report the page title, and whether this page explains how to create a table with CREATE TABLE in PostgreSQL. Give one lin
+TOOL WebFetch {"url":"https://neon.com/docs/get-started/query-with-neon-sql-editor","prompt":"Report the page title, and whether this page explains how to run SQL in Neon's SQL Editor from the Neon console. Give on
+RESULT  Fetched https://www.postgresql.org/docs/current/tutorial-table.html (HTTP 200 OK, text/html, 6261 characters).
+The text inside the <fetched-web-conten
+RESULT ERR  Claude requested permissions to use WebFetch, but you haven't granted it yet.
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TEXT: Retomamos **likes con Neon**, paso 3. Eres nivel junior.
+
+## ⚠️ El progreso no coincide con el repo
+El paso 2 está marcado como hecho, pero aquí falta su código:
+- **Sin ruta:** no existe `src/pages/api/likes.ts`, y `src/index.ts` sigue con `// TODO: /api/likes`. Tampoco está en el historial ni en otras ramas o stashes.
+- **Sin `.env`:** no hay archivo, y `.gitignore` tampoco lo excluye. Si lo creas tal cual, tu contraseña puede acabar en un commit.
+- **Sin `node_modules`:** las dependencias no están instaladas.
+
+El último commit (`wip likes`) solo añadió el archivo de progreso.
+
+## El cuadro completo
+Estamos haciendo un botón de likes para c12z.io, y tu objetivo es aprender bases de datos.
+
+```
+1. Neon + .env       ✓ según el archivo (.env no está aquí)
+2. Conectar API      ✓ según el archivo (código no está aquí)
+3. Tabla likes       ← estamos aquí
+4. Insertar un like
+5. Contar por post
+6. Botón → API → DB
+```
+
+En el paso 2 probaste la conexión con `SELECT 1`, que no necesita ninguna tabla. Ahora hace falta un sitio donde guardar los likes.
+
+## El problema
+Alguien da 3 likes al post `hola-mundo`. La DB está vacía, así que el `INSERT` del paso 4 fallaría con `relation "likes" does not exist`. Hay que definir antes el **esquema**: qué tablas hay, qué columnas tienen y de qué tipo son.
+
+## La idea
+Cada like es una **fila** de la tabla. Tras esos 3 clicks:
+
+| post_id | created_at |
+|---|---|
+| hola-mundo | 2026-11-03 20:01 |
+| hola-mundo | 2026-11-03 20:05 |
+| otro-post | 2026-11-03 20:06 |
+| hola-mundo | 2026-11-03 20:09 |
+
+Contar los likes de `hola-mundo` es contar sus filas: 3. `otro-post` no suma. Eso lo harás en el paso 5.
+
+## Por qué así
+Lo obvio sería una columna `likes_count` que sube de 1 en 1. Es más simple, pero solo guarda el total: no sabes cuándo llegó cada like ni de quién. Con una fila por like conservas ese dato y el total se calcula cuando lo necesitas.
+
+## Qué nos da
+Los pasos 4 y 5 ya tendrán dónde escribir y leer.
+
+**Done check**, en el SQL Editor de Neon:
+```sql
+SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'likes';
+```
+Debe listar las columnas que hayas elegido, con sus tipos.
+
+## Cómo
+```
+[Botón] ──▶ [API /likes] ──▶ [Neon: tabla likes]
+   yo            yo                 TÚ ← este paso
+```
+
+1. **Tú:** decidir las columnas y sus tipos, incluido si añadir `user_id`.
+2. **Tú:** escribir el `CREATE TABLE` y ejecutarlo.
+3. **Yo:** revisar el resultado contigo con el done check.
+
+Puedes hacer este paso desde el SQL Editor de Neon sin `.env`, siempre que tu proyecto siga existiendo (desde aquí no puedo comprobarlo). La ruta y el `.env` sí harán falta antes del paso 4.
+
+Si quieres leer por tu cuenta, esto explica lo que vas a hacer: [PostgreSQL: Creating a New Table](https://www.postgresql.org/docs/current/tutorial-table.html) (oficial).
+
+## Dos preguntas
+1. **¿Dónde está el código del paso 2?**
+   - **a)** En otra copia o sin subir: tráelo aquí.
+   - **b)** Se perdió: lo rehacemos antes del paso 4. Recomiendo esta si no lo tienes a mano, porque no bloquea el paso 3.
+2. **¿Está claro? ¿Empezamos a escribir la tabla?**
+RESULT_FINAL success 12 0.39348390000000005

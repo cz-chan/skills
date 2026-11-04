@@ -1,0 +1,19 @@
+TOOL Glob {"pattern":".code-mentor/memory/databases/*"}
+RESULT  .code-mentor/memory/databases/0001-neon-likes-progress.md
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Pregunta final: pendiente de respuesta.","new_string":"Pregunta final: falló (respo
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- Did: escribió `getLikes()` con `SELECT` y `addLike()` con `UPDATE` y `RETURNING`.
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: No, es la **B**: queda en 7.
+
+La A describe lo que pasa cuando la **app** lee el número, le suma 1 y lo escribe: las dos peticiones leen 5 y las dos escriben 6. Tu `addLike()` no lee antes: con `total = total + 1`, la suma se hace dentro de Postgres, que bloquea la fila mientras la cambia.
+
+```
+Clic A: bloquea la fila, 5 + 1 = 6
+Clic B: espera a que A termine, 6 + 1 = 7
+```
+
+Tu código ya lo hace bien; lo que hay que afianzar es el motivo. Puedes verlo tú mismo cuando tengas Neon: lanza dos `POST /api/likes` a la vez y el total debe subir 2.
+
+He anotado el fallo y la explicación en el archivo de progreso, que sigue con el nombre `-progress` hasta que ejecutes el `mv` de antes.
+RESULT_FINAL success 4 1.50114091

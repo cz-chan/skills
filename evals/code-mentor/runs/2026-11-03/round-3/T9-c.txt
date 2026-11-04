@@ -1,0 +1,91 @@
+TOOL Bash {"command":"git log --stat -3; git status --short; git ls-files; ls -a; ls -a ~/.claude/projects/-private-tmp-claude-501--Users-user-Desktop-projects-prod-cz-skills-a54ea246-387e-4d48-b65f-5594c8587eb
+TOOL Bash {"command":"git show HEAD","description":"Show latest wip commit diff"}
+RESULT  commit bb18380f377b5ac7af6f4e4ba0062b30422cbfe1
+Author: fixture <fixture@local>
+Date:   Tue Nov 3 20:31:03 2026 +0100
+
+    wip likes
+
+diff --git a/.co
+RESULT  commit bb18380f377b5ac7af6f4e4ba0062b30422cbfe1
+Author: fixture <fixture@local>
+Date:   Tue Nov 3 20:31:03 2026 +0100
+
+    wip likes
+
+ .../memory/data
+TOOL Skill {"skill":"code-mentor","args":"continuemos"}
+RESULT  Launching skill: code-mentor
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Bash {"command":"cat .gitignore; echo ---; find src runs -maxdepth 3 | head -30; echo ---; test -f .env && echo \".env exists\" || echo \".env missing\"; test -d node_modules && echo \"node_modules exists\
+RESULT  runs/
+---
+src
+src/index.ts
+runs
+runs/T4.err
+runs/T5.jsonl
+runs/T5.err
+runs/T6.err
+runs/T3.jsonl
+runs/T2.err
+runs/T8-3.err
+runs/T9-c.jsonl
+runs/T8-2.er
+TEXT: **Retomamos: likes con Neon, nivel senior. Vas por el paso 3 de 6, la tabla `likes`.**
+
+**El progreso no coincide con el repo**
+
+El archivo (última actualización: 2026-10-13) marca los pasos 1 y 2 como hechos, pero aquí falta su resultado:
+- `.env` no existe. Puede ser normal si lo tienes en otra máquina, pero `.gitignore` tampoco lo excluye, solo a `runs/`.
+- `src/pages/api/likes.ts` no existe.
+- `src/index.ts:7` solo tiene `// TODO: /api/likes`, sin el `SELECT 1`.
+- `node_modules` no está instalado, aunque `package.json` sí declara `@neondatabase/serverless`.
+- Los commits posteriores no aportan código: `bb18380` solo añade el archivo de progreso.
+
+**Dónde estamos**
+- **Hecho, según el archivo:** proyecto en Neon y conexión desde la API.
+- **Falta:** esquema, insert, count y conectar botón → API → DB. Tú escribes el esquema y las queries; yo, la UI, el cableado de la ruta y los tests.
+
+**El problema:** hoy no hay dónde guardar nada. Un click en el post `42` no deja rastro, así que tras recargar no hay ningún número que mostrar. El insert y el count de los pasos 4 y 5 dependen de esta tabla.
+
+**Por qué una tabla de likes:** lo obvio sería una columna `likes_count` en `posts`, y sumar 1 en cada click. Es barato de leer, pero solo guarda un total: pierdes cuándo ocurrió cada like y no puedes saber quién dio cuál. Con una fila por like, el total sale de un `COUNT`.
+
+**Lo que decides tú:** las columnas (`post_id`, `created_at`, ¿`user_id`?), tipos y restricciones. `user_id` es lo que más condiciona el resto.
+
+**Listo cuando:** la tabla exista en Neon y un `INSERT` manual seguido de un `SELECT` devuelva la fila.
+
+```
+[Botón] ──click──▶ [API /likes] ──query──▶ [Neon: tabla likes]
+   yo                  yo                    TÚ ← aquí
+```
+
+**Antes de empezar:**
+1. ¿Cómo dejamos los pasos 1 y 2?
+   - **a)** El trabajo está en otra máquina o rama, y lo traes.
+   - **b)** Se perdió, y los rehacemos rápido.
+   - **c)** Seguimos sin ellos: el paso 3 se puede hacer desde la consola SQL de Neon, y el resto queda pendiente para el paso 4.
+
+   Con cualquiera de las tres actualizo el archivo, y la ruta `src/pages/api/likes.ts` debería pasar a `src/index.ts`, que es donde está el TODO.
+2. ¿Te queda claro? ¿Empezamos a escribir código?
+RESULT_FINAL success 8 0.304629

@@ -1,0 +1,168 @@
+TOOL Bash {"command":"git log --stat -3; git show HEAD; git status --short --branch; git branch -a; git stash list; ls -a","description":"Inspect recent commits, branches and files"}
+RESULT  commit a26eb002c610e4bc6a6f584d4ba5cf705869cd1e
+Author: fixture <fixture@local>
+Date:   Tue Nov 3 20:14:01 2026 +0100
+
+    wip likes
+
+ .../memory/data
+TOOL Glob {"pattern":"*","path":"~/.claude/projects/-private-tmp-claude-501--Users-user-Desktop-projects-prod-cz-skills-a54ea246-387e-4d48-b65f-5594c8587ebd-scratchpad-sb4/memory/"}
+RESULT  No files found
+TOOL Grep {"pattern":"TODO|FIXME|WIP|likes?","-i":true,"output_mode":"content","glob":"!{node_modules,package-lock.json,pnpm-lock.yaml}"}
+RESULT  src/index.ts:7:// TODO: /api/likes
+.code-mentor/memory/databases/0001-neon-likes-progress.md:3:topic: Botón de likes con Neon
+.code-mentor/memory/data
+TOOL Skill {"skill":"code-mentor","args":"continuemos"}
+RESULT  Launching skill: code-mentor
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/package.json"}
+RESULT  1	{
+2	  "name": "c12z-demo",
+3	  "type": "module",
+4	  "dependencies": {
+5	    "hono": "4.6.0",
+6	    "@neondatabase/serverless": "0.10.0"
+7	  }
+8	}
+9
+TOOL Read {"file_path":"<sandbox>/.claude/skills/code-mentor/references/memory-example.md","limit":90}
+RESULT  1	# Memory file examples
+2	
+3	Examples of how to write files in `.code-mentor/memory/` (see section 7 of `SKILL.md`).
+4	This file is a reference only 
+TOOL Bash {"command":"ls -a src runs; [ -f .env ] && echo \".env exists\" || echo \"no .env\"; [ -d node_modules ] && ls node_modules/@neondatabase 2>/dev/null || echo \"no node_modules/neon\"; cat .gitignore; 
+RESULT ERR  This Bash command contains multiple operations. The following part requires approval: git check-ignore .env .code-mentor
+TOOL Bash {"command":"ls -a src runs; [ -f .env ] && echo \".env exists\" || echo \"no .env\"; [ -d node_modules ] && ls node_modules/@neondatabase 2>/dev/null || echo \"no node_modules/neon\"","description":"L
+RESULT  runs:
+.
+..
+T1.err
+T1.jsonl
+T2.err
+T2.jsonl
+T3.err
+T3.jsonl
+T4.err
+T4.jsonl
+T5.err
+T5.jsonl
+T6.err
+T6.jsonl
+T8-1.err
+T8-1.jsonl
+
+src:
+.
+..
+index.ts
+no 
+TOOL Read {"file_path":"<sandbox>/.gitignore"}
+RESULT  1	runs/
+2	
+TOOL Agent {"subagent_type":"web-fetch","description":"Verify Postgres and Neon doc links","prompt":"Fetch these pages. For each, report: does it load, final URL if redirected, and does it actually explain the s
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-basics.html","prompt":"Does this page explain how to create a table with CREATE TABLE in PostgreSQL? Quote the key CREATE TABLE syntax/example verba
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/datatype.html","prompt":"Is this an overview of PostgreSQL column data types? Name the main categories covered (e.g., numeric, character, date/time) in 
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-basics.html (HTTP 200 OK, text/html, 8086 characters).
+The text inside the <fetched-web-content> t
+TOOL WebFetch {"url":"https://neon.com/docs/get-started/query-with-neon-sql-editor","prompt":"Does this page explain how to run SQL in Neon's SQL Editor? Summarize the steps in one or two lines and quote any key UI
+RESULT  Fetched https://www.postgresql.org/docs/current/datatype.html (HTTP 200 OK, text/html, 12825 characters).
+The text inside the <fetched-web-content> ta
+RESULT ERR  Claude requested permissions to use WebFetch, but you haven't granted it yet.
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TEXT: Seguimos con **Botón de likes con Neon**, paso 3: diseñar la tabla `likes`. Antes, una cosa: el repo no coincide con el progreso guardado.
+
+## ⚠️ Progreso vs. repo
+
+Los pasos 1 y 2 están marcados como hechos, pero aquí no aparecen:
+
+| El archivo de progreso dice | Lo que hay en el repo |
+|---|---|
+| Connection string en `.env` | No hay `.env` |
+| `SELECT 1` desde una ruta de Hono | `src/index.ts` solo tiene `// TODO: /api/likes` |
+| `src/pages/api/likes.ts` | No existe |
+
+- **Commits:** `wip likes` solo añade el archivo de progreso, sin código.
+- **Dependencias:** `@neondatabase/serverless` está en `package.json`, pero no hay `node_modules`.
+- **Neon:** no puedo comprobar si tu proyecto sigue existiendo.
+- **Riesgo:** `.gitignore` no incluye `.env`, así que tu contraseña de la DB podría acabar en git. Si me dices, lo añado.
+
+## Dónde estamos
+
+Queremos un botón de likes en c12z.io para que aprendas bases de datos.
+
+```
+[Botón] ──click──▶ [API /likes] ──query──▶ [Neon DB]
+   yo                  yo                     TÚ
+```
+
+- **Hecho, según el archivo:** proyecto en Neon y conexión desde la API.
+- **Ahora:** 3. tabla `likes`.
+- **Falta:** 4. insertar un like, 5. contar likes por post, 6. conectar botón → API → DB.
+
+En el paso 2 comprobaste que la API llega a la DB con `SELECT 1`. Esa query no guarda nada, así que ahora toca crear dónde guardar los likes.
+
+## El problema
+
+Alguien abre el post `hola-mundo` y hace click: el contador pasa de 3 a 4. Recarga la página y vuelve a 3, o da error, porque el like no se guardó en ningún sitio. Hoy la DB está conectada, pero no tiene dónde ponerlo.
+
+## La idea
+
+Una **tabla** es como una hoja de cálculo con columnas fijas, y el **esquema** es la definición de esas columnas: nombre y tipo de dato. Cada like será una **fila** nueva:
+
+| Columna | Qué guarda | Ejemplo |
+|---|---|---|
+| `id` | Identifica la fila, y la DB lo genera sola | `1` |
+| `post_id` | Qué post recibió el like | `hola-mundo` |
+| `created_at` | Cuándo ocurrió, y la DB lo rellena sola | `2026-11-03 20:15` |
+
+Así evolucionan los datos con tres clicks:
+
+```
+click en hola-mundo   → 1 | hola-mundo | 20:15
+click en hola-mundo   → 2 | hola-mundo | 20:16
+click en otro-post    → 3 | otro-post  | 20:17
+```
+
+Para saber los likes de `hola-mundo`, se cuentan sus filas: 2. Eso será el paso 5.
+
+**`user_id`:** lo dejamos fuera, porque en el repo no hay login y no sabríamos qué usuario poner. Por ahora, una persona podrá dar varios likes al mismo post. Si algún día añades login, se puede agregar la columna.
+
+## Por qué así
+
+Lo obvio sería una tabla con un contador: `hola-mundo | 2`, que sube con cada click. Es más simple, pero solo guarda el total: no sabes cuándo fue cada like, y no podrías añadir después "un like por usuario". Con una fila por like conservas esos datos, y el total sigue saliendo con solo contar.
+
+## Qué nos da
+
+Los pasos 4 y 5 tendrán dónde escribir y leer, y los likes sobrevivirán a una recarga.
+
+**Comprobación del paso 3:** ejecutas `SELECT count(*) FROM likes;` y devuelve `0`. Eso prueba que la tabla existe y está vacía.
+
+## Cómo lo haremos
+
+1. **Tú:** escribes el `CREATE TABLE` con esas tres columnas, eligiendo el tipo de cada una.
+2. **Tú:** lo ejecutas en el SQL Editor de Neon, sin tocar código local.
+3. **Tú:** lanzas la comprobación y me pegas el resultado.
+4. **Yo:** después reviso tu SQL y actualizo el progreso.
+
+## Dos preguntas
+
+1. **¿Dónde está el trabajo de los pasos 1 y 2?**
+   - **A.** En otra carpeta o rama: lo traes, o me dices dónde está.
+   - **B.** Se perdió: lo rehacemos antes de seguir. El paso 4 lo necesita, aunque el 3 se puede hacer ya.
+   - **C.** No lo sé: lo revisamos juntos.
+2. **¿Te queda clara la idea y empezamos a escribir?** Si no, te la explico de otra forma.
+
+Si quieres leer antes por tu cuenta, estas páginas oficiales explican lo que vamos a hacer:
+- [Crear tablas en Postgres](https://www.postgresql.org/docs/current/ddl-basics.html)
+- [Tipos de datos en Postgres](https://www.postgresql.org/docs/current/datatype.html)
+RESULT_FINAL success 13 0.44964850000000006

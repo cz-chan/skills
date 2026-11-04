@@ -1,0 +1,84 @@
+TOOL Read {"file_path":"<sandbox>/.claude/skills/code-mentor/references/memory-example.md"}
+RESULT  1	# Memory file examples
+2	
+3	Examples of how to write files in `.code-mentor/memory/` (see section 7 of `SKILL.md`).
+4	This file is a reference only 
+TOOL Read {"file_path":"<sandbox>/.gitignore"}
+RESULT  1	runs/
+2	
+TOOL Agent {"subagent_type":"web-fetch","description":"Check Neon docs links","prompt":"Fetch each URL and report for each: does it load (not 404, not redirect to a home page), its final URL and title, and wheth
+TOOL WebFetch {"url":"https://neon.com/docs/get-started/signing-up","prompt":"Report the page's final URL and title. Does it explain how to sign up for Neon and create a first project and get a connection string? Q
+TOOL WebFetch {"url":"https://neon.com/docs/connect/connect-from-any-app","prompt":"Report the page's final URL and title. Does it explain what a Postgres connection string is and its parts (user, password, host, d
+RESULT  Fetched https://neon.com/docs/get-started/signing-up (HTTP 200 OK, text/markdown, 18654 characters).
+The text inside the <fetched-web-content> tag bel
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING","prompt":"Report the page's final URL and title. Does it describe the connection URI format? Quote the URI format l
+RESULT  Fetched https://neon.com/docs/connect/connect-from-any-app (HTTP 200 OK, text/markdown, 11785 characters).
+The text inside the <fetched-web-content> t
+RESULT  Fetched https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING (HTTP 200 OK, text/html, 70901 characters, truncated to the first 
+RESULT  [{"type":"text","text":"  <tools-used-before-summary>WebFetch</tools-used-before-summary>\n  \n  [Harness note, not part of the agent's report: WebFet
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.gitignore","old_string":"runs/\n","new_string":"runs/\n.code-mentor/\n"}
+RESULT  The file <sandbox>/.gitignore has been updated successfully. (file state is current in your context — no need to Read it back)
+TOOL Write {"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","content":"---\nstatus: in-progress\ntopic: Botón de likes con Neon\nconcepts: [postgres, neon, connection-string, en
+RESULT  File created successfully at: <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md (file state is current in your context — no need to 
+TEXT: Archivo de progreso creado y `.code-mentor/` añadido a `.gitignore`.
+
+Como aquí no puedes instalar ni usar Neon, el plan cambia un poco: escribimos todo sin ejecutarlo, y **nada quedará probado** hasta que lo corras con Neon real. Eso queda como último paso (paso 6). Crear el proyecto de Neon también pasa ahí, así que el paso 1 usa una URL de ejemplo.
+
+## Paso 1: dónde guardar la conexión
+
+**El problema.** Neon es un servidor de Postgres que está en internet. Tu código tiene que saber dónde está y con qué contraseña entrar, y todo eso va en un solo texto, la **connection string** (cadena de conexión).
+
+**Cómo se lee.** Este es el ejemplo de la documentación de Neon, con datos inventados:
+
+```
+postgresql://alex:****@ep-cool-darkness-a1b2c3d4-pooler.us-east-2.aws.neon.tech/dbname?sslmode=require&channel_binding=require
+```
+
+| Parte | Valor | Qué es |
+|---|---|---|
+| Esquema | `postgresql://` | El protocolo: "esto habla Postgres" |
+| Rol | `alex` | El usuario dentro de la base de datos (no tu cuenta de Neon) |
+| Contraseña | `AbC123dEf` | La contraseña de ese rol |
+| Host | `ep-cool-darkness-a1b2c3d4-pooler.us-east-2.aws.neon.tech` | La dirección del servidor |
+| Base de datos | `dbname` | Un servidor puede tener varias; esta es la tuya |
+| Opciones | `sslmode=require&channel_binding=require` | Obligan a cifrar la conexión; no las borres |
+
+**Dónde no ponerla.** Imagina que escribes esto en `src/index.ts`:
+
+```ts
+const url = 'postgresql://alex:****@...'
+```
+
+1. Haces commit y lo subes a GitHub.
+2. Cualquiera con acceso al repo lee `AbC123dEf`.
+3. Con eso puede entrar en tu base de datos, leerla y borrarla.
+4. Borrar la línea después no lo arregla, porque git guarda el historial. Tendrías que cambiar la contraseña.
+
+**La solución: una variable de entorno.** El valor vive en un archivo aparte, `.env`, que git ignora. El código solo usa el nombre:
+
+```
+.env (fuera de git)            src/index.ts (en git)
+DATABASE_URL=postgresql://...  ◀── lee DATABASE_URL por su nombre
+```
+
+Así el código puede ser público sin que lo sea la contraseña. Y cuando tengas Neon, solo cambias el valor en `.env`, no el código.
+
+**El formato de `.env`** es una variable por línea, `NOMBRE=valor`, sin espacios alrededor del `=`. Por ejemplo, con otra variable:
+
+```
+API_KEY=abc123
+```
+
+## Qué tienes que hacer
+
+Hazlo en este orden, para que `.env` ya esté ignorado cuando exista:
+
+1. En `.gitignore`, añade una línea nueva con `.env`.
+2. En la raíz del proyecto, crea `.env` con una variable llamada `DATABASE_URL`. Como valor, usa la URL de ejemplo de arriba. Cuando tengas Neon, la cambias por la real.
+
+Cuando termines, dime "listo". Compruebo con `git check-ignore .env`, que solo mira si git ignora el archivo y debería imprimir `.env`.
+
+Si quieres profundizar por tu cuenta, estas páginas explican lo que estás haciendo:
+- [Neon: Connect from any application](https://neon.com/docs/connect/connect-from-any-app)
+- [PostgreSQL: Connection Strings](https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING)
+RESULT_FINAL success 6 0.590602545

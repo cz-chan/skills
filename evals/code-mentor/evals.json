@@ -35,7 +35,8 @@
 			"checks": [
 				"Loads the skill from a one-word prompt",
 				"Finds the -progress.md file and names topic, current step and date",
-				"Compares the file with the repo and reports differences"
+				"Compares the file with the repo and reports differences",
+				"Gives the full resume briefing for a junior, then asks if it is clear and if they want to start"
 			]
 		},
 		{
@@ -77,13 +78,77 @@
 				"Asks before installing anything; exact versions only",
 				"Reads the learner's code from disk before reviewing it",
 				"Shows the first problem first and does not give core code before hint 5",
-				"On 'no lo pillo', moves to hint 3 with a traced example",
+				"On 'no lo pillo', gives a traced example (a new one, another way, if the idea was already explained) and no core code",
 				"At each finished step: ticks the plan, adds a Log entry with a self-contained Lesson",
 				"On a mid-step stop, updates Current step",
+				"Records the learner's request as an Explanations line in ## Agreement",
+				"Current step in the progress file notes the problem and the why, not only the next action",
 				"In a new session, 'seguimos' resumes from the progress file",
+				"In the new session, gives the full resume briefing at the depth Explanations asks for",
+				"On 'no lo he entendido' during the briefing: explains another way, gives no core code, asks again",
+				"On 'ahora sí, empecemos': gives the first instruction",
 				"At the end: recap, status done, Summary, final multiple-choice quiz",
 				"On a wrong quiz answer: explains and logs it under Stuck on"
 			]
+		},
+		{
+			"id": "T8",
+			"name": "resume-briefing-trainee",
+			"state": "fixtures/neon-likes-progress.md with level: trainee, committed; a concise-style instruction is appended to the system prompt; three turns (scripts/run-resume.sh)",
+			"prompt": "continuemos",
+			"followups": ["no lo he entendido, explícamelo mejor", "ahora sí, empecemos"],
+			"checks": [
+				"Turn 1: says what the project is, what is done and left, and how the last step led to this one",
+				"Turn 1: shows the problem as a concrete scenario with real values",
+				"Turn 1: explains the idea, and why this way over an obvious alternative",
+				"Turn 1: says what the step gives them and its done check",
+				"Turn 1: shows the flow, who writes each piece, and the steps",
+				"Turn 1: defines new terms; the concise-style instruction does not shorten the briefing",
+				"Turn 1: asks no question testing the idea; ends by asking if it is clear and if they want to start",
+				"Turn 2: explains it another way, with a new example, gives no core code, and asks again",
+				"Turn 3: gives the first instruction and no core code"
+			]
+		},
+		{
+			"id": "T9",
+			"name": "resume-briefing-senior",
+			"state": "fixtures/neon-likes-progress.md with level: senior, committed",
+			"prompt": "continuemos",
+			"checks": [
+				"Says where they are, the problem and the why in a few lines",
+				"Omits the traced example and the step-by-step instructions",
+				"Ends by asking if it is clear and if they want to start"
+			]
+		},
+		{
+			"id": "T10",
+			"name": "learn-by-building-something-new",
+			"state": "clean; scripts/run-scope.sh",
+			"prompt": "quiero aprender cómo funciona Redis por dentro construyendo uno desde cero",
+			"checks": [
+				"Loads the skill and picks mode A",
+				"Asks what they want to learn, who writes each part and their level",
+				"Writes no code"
+			]
+		},
+		{
+			"id": "T11",
+			"name": "feature-from-product-plan",
+			"state": "fixtures/product-PLAN.md committed as PLAN.md; scripts/run-scope.sh",
+			"prompt": "quiero hacer la primera función de PLAN.md para aprender bases de datos",
+			"checks": [
+				"Loads the skill and reads PLAN.md",
+				"Picks mode A for that one feature, and places it in the plan",
+				"Does not change PLAN.md or write a second plan",
+				"Writes no code"
+			]
+		},
+		{
+			"id": "T12",
+			"name": "product-without-learning-should-not-trigger",
+			"state": "fixtures/product-PLAN.md committed as PLAN.md; scripts/run-scope.sh",
+			"prompt": "hazme este producto siguiendo PLAN.md",
+			"checks": ["Does NOT load the skill"]
 		}
 	]
 }

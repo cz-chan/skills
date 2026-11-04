@@ -1,0 +1,59 @@
+TEXT: Vamos con otro ejemplo, sin términos nuevos. Hay dos temas: qué hay que hacer ahora y un problema con tus archivos.
+
+## 1. Qué hay que hacer ahora
+
+Una tabla de base de datos se parece a una hoja de Excel: tiene columnas con nombre y cada fila es un dato. **En este paso solo creas la hoja vacía, con sus encabezados.**
+
+Así queda al terminar el paso:
+
+| id | post_id | created_at |
+|---|---|---|
+| *(sin filas)* | | |
+
+Más adelante (paso 4), cada click añadirá una fila. Imagina tres clicks:
+
+**Click en `receta-tortilla`:**
+
+| id | post_id | created_at |
+|---|---|---|
+| 1 | receta-tortilla | 09:00 |
+
+**Otro click en `receta-tortilla`:**
+
+| id | post_id | created_at |
+|---|---|---|
+| 1 | receta-tortilla | 09:00 |
+| 2 | receta-tortilla | 09:30 |
+
+**Click en `viaje-roma`:**
+
+| id | post_id | created_at |
+|---|---|---|
+| 1 | receta-tortilla | 09:00 |
+| 2 | receta-tortilla | 09:30 |
+| 3 | viaje-roma | 09:45 |
+
+Para saber cuántos likes tiene `receta-tortilla`, se cuentan sus filas: **2**. Para `viaje-roma`: **1**. Ese número es el que mostrará el botón (paso 5).
+
+Si recargas la página, las filas siguen ahí porque se guardan en Neon, no en el navegador.
+
+**Para qué sirve cada columna:**
+- **`post_id`** dice a qué post va el like. Sin ella, no sabrías separar los de `receta-tortilla` de los de `viaje-roma`.
+- **`created_at`** dice cuándo se dio el like. La rellena la base de datos sola.
+- **`id`** es el número de cada fila. También lo pone la base de datos, y sirve para distinguir dos likes aunque se parezcan.
+
+Tu tarea son unas 5 líneas de SQL (el lenguaje para hablar con la base de datos) que crean esa hoja vacía. Te guío paso a paso cuando empecemos.
+
+## 2. El problema con tus archivos
+
+El archivo de progreso dice que ya conectaste tu app con Neon, pero ese código no está en esta carpeta. Tampoco está `.env`, el archivo con la dirección y la contraseña de tu base de datos.
+
+Solo necesito saber si lo tienes en otro sitio:
+- **A.** Sí, está en otro ordenador o rama.
+- **B.** No, pero mi proyecto de Neon sigue existiendo.
+- **C.** No lo tengo, o no estoy seguro.
+
+Si respondes C, primero miramos juntos qué queda en Neon.
+
+**Dime A, B o C. Y sobre la tabla: ¿te queda claro y empezamos a escribir código? Si no, dime qué parte se te atasca.**
+RESULT_FINAL success 1 0.535847785

@@ -1,0 +1,119 @@
+TOOL Read {"file_path":"<sandbox>/src/db.ts"}
+RESULT  1	import { neon } from '@neondatabase/serverless'
+2	
+3	export const sql = neon(process.env.DATABASE_URL!)
+4	
+5	export async function ping() {
+6	  cons
+TOOL Bash {"command":"git status --short","description":"Show working tree status"}
+RESULT   M .gitignore
+ M src/index.ts
+?? src/db.ts
+TOOL Agent {"subagent_type":"web-fetch","description":"Check Postgres and Neon docs","prompt":"Fetch each URL and report whether it loads (no 404, no redirect to a home page), its final URL and title, and whethe
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-basics.html","prompt":"Report the page title. Confirm whether the page covers CREATE TABLE basics, columns and data types. Quote one short line or c
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-default.html","prompt":"Report the page title. Confirm whether the page covers DEFAULT values for columns. Quote one short line or code sample verba
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-constraints.html","prompt":"Report the page title. Confirm whether the page covers NOT NULL and PRIMARY KEY constraints. Quote one short line or cod
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-basics.html (HTTP 200 OK, text/html, 8086 characters).
+The text inside the <fetched-web-content> t
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/dml-insert.html","prompt":"Report the page title. Confirm whether the page covers INSERT, including omitting columns so they take default values. Quote 
+RESULT  Fetched https://www.postgresql.org/docs/current/dml-insert.html (HTTP 200 OK, text/html, 6362 characters).
+The text inside the <fetched-web-content> t
+TOOL WebFetch {"url":"https://neon.com/docs/get-started/query-with-neon-sql-editor","prompt":"Report the page title. Confirm whether the page covers running SQL in the Neon SQL Editor in the Console. Quote one shor
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-constraints.html (HTTP 200 OK, text/html, 28053 characters).
+The text inside the <fetched-web-cont
+RESULT  Fetched https://neon.com/docs/get-started/query-with-neon-sql-editor (HTTP 200 OK, text/markdown, 14611 characters).
+The text inside the <fetched-web-
+RESULT ERR  socket hang up
+TOOL WebFetch {"url":"https://www.postgresql.org/docs/current/ddl-default.html","prompt":"Report the page title. Confirm whether the page covers DEFAULT values for columns. Quote one short line or code sample verba
+RESULT  Fetched https://www.postgresql.org/docs/current/ddl-default.html (HTTP 200 OK, text/html, 5405 characters).
+The text inside the <fetched-web-content> 
+RESULT  [{"type":"text","text":"  [Harness note, not part of the agent's report: WebFetch saved no files during this run. In this run WebFetch saved files onl
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"Next: explicar el paso 3 y dar la primera instrucción, si el usuario quiere seguir.
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TOOL Edit {"replace_all":false,"file_path":"<sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md","old_string":"- Neon, serverless driver: https://neon.com/docs/serverless/serverless-driver (offi
+RESULT  The file <sandbox>/.code-mentor/memory/databases/0001-neon-likes-progress.md has been updated successfully.
+TEXT: Sin commit. Paso 3, sin ejecutar nada.
+
+## Paso 3: crear la tabla y su primera fila
+
+**El problema.** `ping()` comprueba que hay conexión, pero en la base de datos todavía no hay dónde guardar el contador. Sin eso, los likes no pueden sobrevivir a una recarga.
+
+**Qué es una tabla.** Es como una hoja de cálculo con reglas: las **columnas** son fijas y cada una tiene un tipo; las **filas** son los datos. Esta es la que vamos a crear:
+
+```
+likes
+ id (text) | total (integer)
+-----------+----------------
+ home      |              0
+```
+
+### Crear una tabla
+
+Otra vez con un ejemplo distinto, para que veas el patrón sin la solución: un inventario de una tienda.
+
+```sql
+CREATE TABLE products (
+  sku   text PRIMARY KEY,
+  stock integer NOT NULL DEFAULT 0
+);
+```
+
+Cada columna lleva su nombre, su tipo y sus reglas:
+
+| Pieza | Qué significa |
+|---|---|
+| `text` | Guarda texto |
+| `integer` | Guarda un número entero |
+| `PRIMARY KEY` | Identifica la fila: el valor no puede repetirse ni faltar |
+| `NOT NULL` | La columna no puede quedar vacía |
+| `DEFAULT 0` | Si no das un valor, usa `0` |
+
+### Meter una fila
+
+```sql
+INSERT INTO products (sku) VALUES ('taza');
+```
+
+Solo damos `sku`, así que Postgres rellena `stock` con el `DEFAULT`. Mira qué hace la tabla con cada intento:
+
+| Query | Resultado | La tabla queda |
+|---|---|---|
+| `INSERT INTO products (sku) VALUES ('taza');` | OK | `taza, 0` |
+| `INSERT INTO products (sku) VALUES ('plato');` | OK | `taza, 0` y `plato, 0` |
+| `INSERT INTO products (sku) VALUES ('taza');` | ❌ Error: `taza` ya existe | Sin cambios |
+| `INSERT INTO products (stock) VALUES (5);` | ❌ Error: falta `sku` | Sin cambios |
+
+Las dos últimas filas son justo lo útil: la base de datos **rechaza los datos incorrectos**, aunque tu código tenga un fallo.
+
+Observa también que el texto en SQL va entre comillas simples (`'taza'`), y que cada sentencia acaba en `;`.
+
+### Por qué lo diseñamos así
+
+- **`id` como `PRIMARY KEY`:** en el paso 4 tendremos que decir qué fila actualizar, y esto garantiza que `home` solo exista una vez. Si hubiera dos filas `home`, no sabrías cuál es el total correcto.
+- **`NOT NULL DEFAULT 0`:** un contador sin likes vale `0`. Si `total` pudiera estar vacío, `total + 1` también daría vacío (`NULL`), y el contador no subiría nunca.
+- **La primera fila hace falta:** un `UPDATE` cambia filas que ya existen. Sin la fila `home`, actualizar no afectaría a ninguna fila y **tampoco daría error**: el like se perdería sin aviso.
+
+### Dónde va esto
+
+Este SQL no va en `src/db.ts`. La tabla se crea **una sola vez**, mientras que el código de la app corre cada vez que arrancas. Por eso va en un archivo aparte, que en el paso 6 pegarás en el SQL Editor de Neon. Si lo ejecutaras dos veces, daría error porque la tabla ya existe, pero no rompería nada.
+
+## Qué tienes que hacer
+
+Crea `db/schema.sql` en la raíz del proyecto, con unas 5 líneas:
+
+1. Crea una tabla `likes` con dos columnas:
+   - `id`: texto, y clave primaria.
+   - `total`: entero, no vacío, con valor por defecto `0`.
+2. Mete una fila con `id` igual a `home`, dejando que `total` use su valor por defecto.
+
+**Cómo comprobarlo en el paso 6:** tras ejecutar el archivo en Neon, `SELECT * FROM likes;` debería devolver una fila: `home | 0`.
+
+Dime "listo" y lo reviso. Solo podré revisarlo leyéndolo, sin confirmar que corre.
+
+Si quieres profundizar:
+- [PostgreSQL: Table Basics](https://www.postgresql.org/docs/current/ddl-basics.html)
+- [PostgreSQL: Default Values](https://www.postgresql.org/docs/current/ddl-default.html)
+- [PostgreSQL: Constraints](https://www.postgresql.org/docs/current/ddl-constraints.html)
+- [PostgreSQL: Inserting Data](https://www.postgresql.org/docs/current/dml-insert.html)
+- [Neon: SQL Editor](https://neon.com/docs/get-started/query-with-neon-sql-editor)
+RESULT_FINAL success 6 1.5565165749999998

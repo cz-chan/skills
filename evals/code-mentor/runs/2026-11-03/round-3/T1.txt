@@ -1,0 +1,62 @@
+TOOL Skill {"skill":"code-mentor","args":"quiero hacer un botón de likes con Neon para aprender bases de datos"}
+RESULT  Launching skill: code-mentor
+TOOL Bash {"command":"ls -la; git status --short; git log -5 --oneline; find . -path ./node_modules -prune -o -type f -not -path './.git/*' -not -path './.claude/*' -print | head -50; cat package.json 2>/dev/nu
+RESULT  total 32
+drwxr-xr-x@ 10 user  wheel  320 Nov  3 20:25 .
+drwx------@  8 user  wheel  256 Nov  3 20:25 ..
+drwxr-xr-x@  3 user  wheel   96 Nov  3 20:25 .
+TOOL Read {"file_path":"<sandbox>/src/index.ts"}
+RESULT  1	import { Hono } from 'hono'
+2	
+3	const app = new Hono()
+4	
+5	app.get('/', (c) => c.text('c12z'))
+6	
+7	// TODO: /api/likes
+8	
+9	export default app
+10
+TOOL Read {"file_path":"<sandbox>/.gitignore"}
+RESULT  1	runs/
+2	
+TEXT: Ya sé esto: quieres aprender bases de datos, con Hono y `@neondatabase/serverless` en `package.json`. `/api/likes` es solo un TODO, y no hay UI ni `.env`. Faltan 3 cosas; responde tipo `1b 2a 3a 4: propuesta`.
+
+**1. ¿Qué has hecho con SQL/Postgres?**
+- a) Nada
+- b) Algún `SELECT` o tutorial
+- c) He creado tablas y usado `INSERT`/`UPDATE` en un proyecto
+- d) Uso habitual: índices, transacciones, migraciones
+
+**2. Dos personas pulsan like a la vez y el contador está en 10. ¿Qué pasa con este código?**
+```
+leo count → sumo 1 en mi código → guardo count
+```
+- a) Queda en 12, la base de datos lo gestiona
+- b) Puede quedar en 11
+- c) Da error
+- d) No lo sé
+
+**3. ¿Qué debe hacer el botón?**
+- a) **Contador global:** cada clic suma 1. Es lo más simple: una fila y un `UPDATE`.
+- b) **Un like por visitante:** una fila por like y `COUNT`. Añade claves únicas y evita duplicados, pero hay que identificar al visitante con una cookie.
+- c) **Likes por publicación:** contador por `post_id`. Añade claves y upsert (insertar o actualizar en un solo paso).
+- d) Recomiéndame una
+
+**4. ¿Quién hace cada parte?** Opciones: **tú**, **tú con guía** o **yo**.
+
+| Parte | Propuesta |
+| --- | --- |
+| Crear el proyecto en Neon | tú con guía |
+| Conexión (`DATABASE_URL`, cliente) | tú con guía |
+| Esquema (tabla) | tú con guía |
+| Queries (sumar y leer) | tú con guía |
+| Ruta `/api/likes` en Hono | yo |
+| Botón (UI) | yo |
+| Tests | yo |
+
+Responde `propuesta` o indica solo los cambios.
+
+**Criterio de terminado:** haces clic, el contador sube y sigue igual al recargar. Dime si quieres cambiarlo.
+
+Con tus respuestas te paso el acuerdo final y el diagrama del flujo para que lo confirmes.
+RESULT_FINAL success 6 0.2912368

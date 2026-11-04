@@ -1,0 +1,64 @@
+TEXT: Te lo cuento siguiendo un solo like, sin términos técnicos de entrada.
+
+## Qué pasa hoy
+Imagina un post llamado `receta-tortilla`, que aún no tiene likes:
+
+1. Marta pulsa el botón y la pantalla muestra **1**.
+2. Marta recarga la página.
+3. La pantalla vuelve a **0**, porque ese 1 solo estaba en la página y al recargar se borra.
+
+Falta guardar el like fuera de la página, en un sitio que no se borre: tu base de datos en Neon.
+
+## Qué queremos
+Cada vez que alguien pulsa, apuntamos una línea en la base de datos. Solo apuntamos dos cosas: qué post y cuándo.
+
+**Marta pulsa a las 10:00:**
+
+| nº | post | cuándo |
+|---|---|---|
+| 1 | `receta-tortilla` | 10:00 |
+
+**Luis pulsa en el mismo post a las 10:05:**
+
+| nº | post | cuándo |
+|---|---|---|
+| 1 | `receta-tortilla` | 10:00 |
+| 2 | `receta-tortilla` | 10:05 |
+
+**Ana pulsa en otro post a las 10:07:**
+
+| nº | post | cuándo |
+|---|---|---|
+| 1 | `receta-tortilla` | 10:00 |
+| 2 | `receta-tortilla` | 10:05 |
+| 3 | `viaje-a-lisboa` | 10:07 |
+
+**Marta recarga la página:** miramos la lista y contamos las líneas de `receta-tortilla`. Hay 2, así que la pantalla muestra **2**. Ahora el número no se pierde, porque sale de la lista y no de la página.
+
+## Qué tienes que hacer ahora
+Esa lista es la **tabla**, y todavía no existe. En este paso solo la creas, vacía: le dices a la base de datos cómo se llama y qué apunta cada línea.
+
+Todavía no guardas likes ni los cuentas. Eso son los pasos 4 y 5.
+
+```
+Ahora (paso 3):  crear la lista vacía
+Paso 4:          añadir una línea en cada clic
+Paso 5:          contar las líneas de un post
+```
+
+## Lo que antes eran términos raros
+
+| En este ejemplo | Nombre técnico |
+|---|---|
+| La lista | tabla |
+| Cada línea | fila |
+| "nº", "post", "cuándo" | columnas (`id`, `post_id`, `created_at`) |
+
+El nº y la hora los pondrá la base de datos sola. En cada like solo le diremos el post.
+
+**¿Cómo lo ves ahora?**
+- **A.** Claro, empezamos.
+- **B.** Entiendo la lista, pero no por qué hay que crearla antes de usarla.
+- **C.** No entiendo por qué se apunta una línea por like en vez de guardar solo el total.
+- **D.** Me pierdo en otra parte: dime cuál.
+RESULT_FINAL success 1 0.5048109949999999
