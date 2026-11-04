@@ -2,7 +2,6 @@ export interface Version {
   hash: string;
   shortHash: string;
   date: Date;
-  author: string;
   subject: string;
   body: string;
 }

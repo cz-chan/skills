@@ -3,11 +3,11 @@ import type { Version } from "@domain/entities/Version";
 
 export const FIELD = "\x1f";
 export const RECORD = "\x1e";
-export const LOG_FORMAT = ["%H", "%h", "%aI", "%an", "%s", "%b"].join("%x1f") + "%x1e";
+export const LOG_FORMAT = ["%H", "%h", "%aI", "%s", "%b"].join("%x1f") + "%x1e";
 
 export function parseVersion(raw: string): Version {
-  const [hash, shortHash, date, author, subject, body = ""] = raw.split(FIELD);
-  return { hash, shortHash, date: new Date(date), author, subject, body: body.trim() };
+  const [hash, shortHash, date, subject, body = ""] = raw.split(FIELD);
+  return { hash, shortHash, date: new Date(date), subject, body: body.trim() };
 }
 
 export function parseLog(raw: string): Version[] {

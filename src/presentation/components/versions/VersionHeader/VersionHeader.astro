@@ -18,8 +18,7 @@ const deleted = diff.reduce((n, f) => n + f.deleted, 0);
 
 <header>
   <SectionLabel as="p">
-    v{number} · <time datetime={version.date.toISOString()}>{formatDate(version.date)}</time> · {version.author} ·
-    {version.shortHash}
+    v{number} · <time datetime={version.date.toISOString()}>{formatDate(version.date)}</time> · {version.shortHash}
   </SectionLabel>
   <h1 class={styles.title}>{version.subject}</h1>
   {version.body && <p class={styles.body}>{version.body}</p>}
