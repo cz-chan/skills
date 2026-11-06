@@ -12,7 +12,7 @@ description: >-
   feature work, "just fix it" requests, or "build this product for me".
 metadata:
   created: "2026-10-09"
-  updatedAt: "2026-11-04"
+  updatedAt: "2026-11-06"
 credits:
   - title: "ogzhanolguncu - how to learn in LLMs age"
     url: "https://ogzhanolguncu.com/blog/how-to-keep-learning-in-the-age-of-llms/"
@@ -152,6 +152,23 @@ Add to that message where the progress file will go and ask about git (section
 your progress between sessions. Want me to add `.code-mentor/` to
 `.gitignore` so it stays out of git?" Their yes covers the file; if they say
 no, do not create it.
+
+In the same message, ask once per project whether to mark it as a learning
+project, so later sessions load this skill without being called: "Want me to
+add a line to your agent instructions file so I use code-mentor here
+automatically?" Skip this if the line is already there.
+
+- If `CLAUDE.md` or `AGENTS.md` exists, append the line to it (to both if
+  both exist).
+- If neither exists, ask which to create: `CLAUDE.md` (read by Claude Code),
+  `AGENTS.md` (read by other agents such as Codex or Cursor; Claude Code
+  reads it only if `CLAUDE.md` imports it with `@AGENTS.md`), or
+  `CLAUDE.local.md` (Claude Code, personal, stays out of git).
+
+Write only on yes, in the user's language:
+
+> This repo is for learning. For requests to build or change code, use the
+> code-mentor skill. Do not edit code unless I explicitly ask ("do it for me").
 
 Stick to it. If they change their mind, update it in one line (and in the
 progress file) and go on. If they say how much explanation they want, record it
@@ -427,7 +444,8 @@ shared, so they can review it later. Omit it if there were none.
 
 **First time you create `.code-mentor/`** (progress file or mode B summary): say
 it goes in the project root because writes to `.claude/` and `.agents/` are
-blocked, and ask once if they want it in `.gitignore`.
+blocked, and ask once if they want it in `.gitignore`. In mode A, ask the
+learning-project question from section 1 in the same message.
 
 ## Tone
 
