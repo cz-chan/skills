@@ -8,10 +8,10 @@ description: >-
   the way they are — "document this app", "write down why we chose Postgres", "keep a
   record of our decisions", "agents keep losing context on this project", "what did we
   decide about auth" — and whenever `.wiki/` exists and a decision is being made
-  or changed. Not for planning a product that does not exist yet (use plan-builder),
-  planning a single task, API reference or end-user docs, or writing code.
+  or changed.
 metadata:
   created: "2026-11-08"
+  updatedAt: "2026-11-09"
 credits:
   - title: "ericrisco / rsc-harness"
     url: "https://github.com/ericrisco/rsc-harness"
