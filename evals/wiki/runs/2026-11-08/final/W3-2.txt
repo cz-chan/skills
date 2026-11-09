@@ -1,0 +1,83 @@
+USER: yes, write all of that
+TOOL Write {"file_path":".wiki/decisions/move-to-rds-20261108195245.md"}
+TOOL Edit {"file_path":".wiki/decisions/use-neon-20261001101000.md"}
+TOOL Edit {"file_path":".wiki/decisions/use-neon-20261001101000.md"}
+TOOL Edit {"file_path":".wiki/architecture/data.md"}
+TOOL Edit {"file_path":".wiki/architecture/data.md"}
+TOOL Edit {"file_path":".wiki/stack/README.md"}
+TOOL Edit {"file_path":".wiki/stack/README.md"}
+TEXT: Wiki updated with the approved text. Not committed.
+
+- Added `.wiki/decisions/move-to-rds-20261108195245.md`
+- `.wiki/decisions/use-neon-20261001101000.md`: marked superseded
+- `.wiki/architecture/data.md`, `.wiki/stack/README.md`: now say "moving to AWS RDS", linked to new decision
+
+All 4 waiting on your call to commit. Say so if you want it.
+
+Code still on Neon. Once migrated, layers need "moving" dropped.
+RESULT_FINAL repo state after the turn
+ M .wiki/architecture/data.md
+ M .wiki/decisions/use-neon-20261001101000.md
+ M .wiki/stack/README.md
+?? .wiki/decisions/move-to-rds-20261108195245.md
+## diff
+diff --git a/.wiki/architecture/data.md b/.wiki/architecture/data.md
+index 19a731c..bb841fb 100644
+--- a/.wiki/architecture/data.md
++++ b/.wiki/architecture/data.md
+@@ -1,5 +1,5 @@
+ ---
+-description: Recipes live in one Neon Postgres database, reached only through the API.
++description: Recipes live in one Neon Postgres database, moving to AWS RDS, reached only through the API.
+ created: 2026-10-01
+ code: [src/db/]
+ reviewed: 789144c
+@@ -7,6 +7,6 @@ reviewed: 789144c
+ 
+ # Data
+ 
+-Recipes live in one Postgres database on Neon ([why](../decisions/use-neon-20261001101000.md)).
++Recipes live in one Postgres database on Neon, moving to AWS RDS ([why](../decisions/move-to-rds-20261108195245.md)).
+ 
+ Serves: [save a recipe](../product/use-cases/save-recipe-20261001100500.md)
+diff --git a/.wiki/decisions/use-neon-20261001101000.md b/.wiki/decisions/use-neon-20261001101000.md
+index 67126c5..652e268 100644
+--- a/.wiki/decisions/use-neon-20261001101000.md
++++ b/.wiki/decisions/use-neon-20261001101000.md
+@@ -1,9 +1,9 @@
+ ---
+-status: current
+-description: Database is Neon Postgres, because there is one developer with no operations experience.
++status: superseded
++description: Database was Neon Postgres, because there was one developer with no operations experience.
+ created: 2026-10-01
+-closed:
+-superseded_by:
++closed: 2026-11-08
++superseded_by: move-to-rds-20261108195245.md
+ code: [src/db/]
+ ---
+ 
+@@ -22,3 +22,5 @@ One developer, no operations experience, and a usage-based bill while traffic is
+ - Self-hosted Postgres: nobody on the project wants to run backups.
+ 
+ ## Changes
++
++- 2026-11-08: superseded. Why: see the new decision.
+diff --git a/.wiki/stack/README.md b/.wiki/stack/README.md
+index d878e89..e7bd21c 100644
+--- a/.wiki/stack/README.md
++++ b/.wiki/stack/README.md
+@@ -1,5 +1,5 @@
+ ---
+-description: Hono for the API and Neon for the database.
++description: Hono for the API and Neon for the database, moving to AWS RDS.
+ created: 2026-10-01
+ code: [package.json]
+ reviewed: 789144c
+@@ -10,4 +10,4 @@ reviewed: 789144c
+ | Technology | Serves | Why |
+ | ---------- | ------ | --- |
+ | Hono | API | Small and fast ([why](../decisions/use-hono-20261001101500.md)) |
+-| Neon | [Data](../architecture/data.md) | No operations work ([why](../decisions/use-neon-20261001101000.md)) |
++| Neon, moving to AWS RDS | [Data](../architecture/data.md) | Customer contract requires the data to stay in our AWS account ([why](../decisions/move-to-rds-20261108195245.md)) |

@@ -1,0 +1,66 @@
+USER: write a getting started guide for people who use the recipe app
+TOOL Bash {"command":"git ls-files | head -200; echo; git ls-files | wc -l; ls -la"}
+TOOL Read {"file_path":"PLAN.md"}
+TOOL Read {"file_path":"README.md"}
+TOOL Read {"file_path":"package.json"}
+TOOL Read {"file_path":"src/api/recipes.ts"}
+TOOL Read {"file_path":"src/auth/providers.ts"}
+TOOL Read {"file_path":"src/db/index.ts"}
+TOOL Read {"file_path":"src/share/link.ts"}
+TOOL Write {"file_path":"docs/getting-started.md"}
+TEXT: Guide not saved: write to `docs/getting-started.md` wasn't permitted. Text below, nothing changed in repo.
+
+App mostly unbuilt, so steps = **TODO** rather than invented UI. Code has only: fetch recipe by ID, 30-day expiry helper, empty sign-in provider list. No UI, no save/search/create-link code.
+
+```markdown
+# Getting started with Recetario
+
+> **Draft.** Recetario is still being built. Items marked **TODO** can't be
+> written until that part of the app exists. Fill them in before publishing.
+
+Recetario keeps your recipes in one place, so they stop getting lost in
+screenshots and chats. Save a recipe, find it later, and share it with anyone
+through a link.
+
+## If someone sent you a link
+
+Open the link to read the recipe. You don't need an account.
+
+Shared links last 30 days. If a link has stopped working, ask the person who
+sent it for a new one.
+
+## If you want to save your own recipes
+
+### 1. Open Recetario and sign in
+
+**TODO:** app address, and the sign-in options available.
+
+### 2. Save a recipe
+
+**TODO:** where to add a recipe, and which details it asks for (for example
+title, ingredients, steps).
+
+### 3. Find it later
+
+**TODO:** how to browse or search your saved recipes.
+
+### 4. Share it
+
+Each shared link lets anyone who has it read that recipe, with or without an
+account, for 30 days. Only send it to people you're happy to have read the
+recipe.
+
+**TODO:** where to create the link.
+
+## Need help?
+
+**TODO:** support contact.
+```
+
+**Check before publishing:**
+- 30-day expiry not enforced: `expiresAt` (`src/share/link.ts:3`) never called. Guide states intended behavior.
+- `GET /:id` (`src/api/recipes.ts:6`) has no auth or expiry check, so anyone with a recipe ID can read it, indefinitely.
+
+Grant write access, or tell me another path, and I'll save it.
+RESULT_FINAL repo state after the turn
+## diff

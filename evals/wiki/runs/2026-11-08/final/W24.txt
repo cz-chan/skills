@@ -1,0 +1,21 @@
+USER: help me plan my app: a tool for yoga teachers to charge for their classes
+TOOL Skill {"skill":"plan-builder"}
+TOOL Read {"file_path":".claude/skills/plan-builder/references/PLAN-FORMAT.md"}
+TOOL Glob {"pattern":"**/*PLAN*.md"}
+TOOL Bash {"command":"git -C W18E ls-files | grep -v '^.claude/' | head -50; ls -A W18E"}
+TOOL Glob {"pattern":"*"}
+TEXT: No `PLAN.md`, no code: starting fresh. We build it together, section by section, saved as we go. You decide, I propose and push back.
+
+**Section 1: Why**. Idea's still broad, need your words:
+
+1. **Who exactly?** Solo teacher renting a room, teacher at studios, online-only, small studio owner? You one of them, or know some?
+2. **What goes wrong today?** Concrete recent example: chasing Venmo payments, no-shows, losing track of class packs?
+3. **How do they solve it now?** Cash, Venmo/Bizum, WhatsApp, spreadsheets, Mindbody, Momence, etc.? Why isn't that enough?
+4. **Why yours?** What would make a teacher switch: simpler, cheaper, something else?
+5. **What does "charge" mean?** Pick any:
+   - a) Pay per class (drop-in)
+   - b) Class packs (e.g. 10 classes)
+   - c) Monthly membership
+   - d) Payment link only, no booking
+RESULT_FINAL repo state after the turn
+## diff

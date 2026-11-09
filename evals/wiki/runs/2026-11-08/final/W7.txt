@@ -1,0 +1,18 @@
+USER: Before I change the share link expiry in src/share/link.ts, what has been decided about it?
+TOOL Skill {"skill":"wiki"}
+TOOL Read {"file_path":".wiki/index.md"}
+TOOL Grep {"pattern":"expir|ttl|share.?link"}
+TOOL Read {"file_path":"src/share/link.ts"}
+TOOL Read {"file_path":".wiki/decisions/share-links-expire-20261002090000.md"}
+TOOL Bash {"command":"ls .wiki/decisions | wc -l; grep -rE '^(status|description|code):' .wiki/decisions; echo ---; grep -rlE 'src/share|superseded|supersedes|share-links-expire' .wiki; echo ---; grep -rE '^(code|reviewed):' .wiki/architecture/README.md; echo ---; grep -rlE 'status: (in-progress|blocked)' .wiki/work; echo ---; git log --oneline -- src/share/link.ts"}
+TEXT: **Decision (current, 2026-10-02):** `.wiki/decisions/share-links-expire-20261002090000.md`, covers `src/share/`
+- Every share link stops working 30 days after creation.
+- **Why:** some shared recipes are private family recipes; link that never dies keeps circulating.
+- **Discarded:** never-expiring links, same reason.
+- No later changes, not superseded. Only decision touching `src/share/`.
+
+**Code matches:** `src/share/link.ts:1` = 30 days. `.wiki/architecture/README.md:15` also says 30 days; code unchanged since its review.
+
+**If you change it:** what new expiry? Decision needs updating, plus the architecture line and its `description`. I'll show exact text for your approval first. Longer or no expiry goes against the stated reason.
+RESULT_FINAL repo state after the turn
+## diff

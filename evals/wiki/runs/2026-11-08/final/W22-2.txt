@@ -1,0 +1,18 @@
+USER: yes, write it
+TOOL Write {"file_path":".wiki/decisions/use-redis-cache-20261108195235.md"}
+TEXT: Written: `.wiki/decisions/use-redis-cache-20261108195235.md`, exact approved text.
+
+Waiting to commit (your call): that file + TODO in `src/db/index.ts`. Nothing committed.
+RESULT_FINAL repo state after the turn
+ M src/db/index.ts
+?? .wiki/decisions/use-redis-cache-20261108195235.md
+## diff
+diff --git a/src/db/index.ts b/src/db/index.ts
+index f31700a..15ab1b0 100644
+--- a/src/db/index.ts
++++ b/src/db/index.ts
+@@ -1,3 +1,4 @@
+ import { neon } from "@neondatabase/serverless";
+ 
++// TODO: the cache is missing.
+ export const sql = neon(process.env.DATABASE_URL!);

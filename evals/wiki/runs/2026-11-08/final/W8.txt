@@ -1,0 +1,29 @@
+USER: How is the data layer organised? I'm about to change it.
+TOOL Read {"file_path":".wiki/index.md"}
+TOOL Bash {"command":"git ls-files && git show --stat HEAD"}
+TOOL Read {"file_path":".wiki/architecture/data.md"}
+TOOL Read {"file_path":".wiki/architecture/README.md"}
+TOOL Read {"file_path":"src/db/index.ts"}
+TOOL Bash {"command":"grep -rE '^(status|description|code|reviewed):' .wiki/decisions .wiki/architecture .wiki/stack; echo ---; grep -rlE 'status: (in-progress|blocked)' .wiki/work; echo ---; git log -p -3 --format='%h %s' -- src/db"}
+TOOL Read {"file_path":".wiki/decisions/use-neon-20261001101000.md"}
+TOOL Read {"file_path":".wiki/work/social-login-20261005120000.md"}
+TOOL Grep {"pattern":"POOL_SIZE|db/index|from \".*db|\\bsql`|DATABASE_URL"}
+TOOL Read {"file_path":"src/api/recipes.ts"}
+TEXT: **Data layer: one Neon Postgres DB, reached only through the API.**
+
+- **Code:** `src/db/index.ts:3` exports `sql`, a `neon()` client using `DATABASE_URL`.
+- **Only consumer:** `src/api/recipes.ts:7`, `GET /:id`, a raw SQL `select` on `recipes`.
+- **Not in repo:** schema, migrations, ORM, repository layer.
+
+**Current decision covering it:** `.wiki/decisions/use-neon-20261001101000.md`
+- Why Neon: one dev, no ops experience, usage-based bill while traffic is low.
+- Discarded: self-hosted Postgres (nobody wants to run backups).
+- SQLite decision is superseded, so ignore it.
+
+**Wiki may be stale:** `architecture/data.md` was reviewed at `ab54def`, and `src/db/` changed since. `e35235c` added `POOL_SIZE = 5` (`src/db/index.ts:5`).
+- Not in the wiki, and nothing uses it.
+- `neon()` is the HTTP client, so no pool for it to size. Looks dead or half-finished.
+
+**If your change moves off Neon or alters this shape:** it needs a wiki decision update, and I'd need your approval of the exact text first. What are you changing?
+RESULT_FINAL repo state after the turn
+## diff

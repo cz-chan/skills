@@ -1,0 +1,62 @@
+USER: add a TODO comment in src/db/index.ts saying the cache is missing. Also, we decided to use Redis for the cache because reads are slow; we discarded a CDN because private recipes cannot be cached there
+TOOL Skill {"skill":"wiki"}
+TOOL Read {"file_path":"src/db/index.ts"}
+TOOL Read {"file_path":".wiki/index.md"}
+TOOL Glob {"pattern":".wiki/**/*"}
+TOOL Grep {"pattern":"redis|cache|cdn"}
+TOOL Read {"file_path":".claude/skills/wiki/references/DECISION-FORMAT.md"}
+TOOL Read {"file_path":".claude/skills/wiki/references/LAYERS-FORMAT.md"}
+TOOL Bash {"command":"grep -rE '^(status|description|code|reviewed):' .wiki/decisions .wiki/architecture .wiki/stack"}
+TOOL Read {"file_path":".wiki/architecture/README.md"}
+TOOL Read {"file_path":".wiki/architecture/data.md"}
+TOOL Read {"file_path":".wiki/stack/README.md"}
+TOOL Read {"file_path":".wiki/decisions/use-neon-20261001101000.md"}
+TOOL Read {"file_path":".wiki/decisions/share-links-expire-20261002090000.md"}
+TOOL Edit {"file_path":"src/db/index.ts"}
+TOOL Bash {"command":"date -u +%Y%m%d%H%M%S; date -u +%Y-%m-%d"}
+TEXT: TODO added: `src/db/index.ts:3`. Not committed.
+
+Decision **not written yet**, needs your OK. Proposed file: `.wiki/decisions/use-redis-cache-20261108195235.md`
+
+```md
+---
+status: current
+description: Cache is Redis, because reads are slow; a CDN was discarded because private recipes cannot be cached there.
+created: 2026-11-08
+closed:
+superseded_by:
+code: [src/db/]
+---
+
+# Use Redis for the cache
+
+## Decision
+
+Add a cache using Redis.
+
+## Why
+
+Reads are slow.
+
+## Discarded
+
+- CDN: private recipes cannot be cached there.
+
+## Changes
+```
+
+Layers: no change proposed. They say how things are today, Redis not built yet. Will propose `architecture/` + `stack/` text once it exists.
+
+Save as is? Yes / edits.
+RESULT_FINAL repo state after the turn
+ M src/db/index.ts
+## diff
+diff --git a/src/db/index.ts b/src/db/index.ts
+index f31700a..15ab1b0 100644
+--- a/src/db/index.ts
++++ b/src/db/index.ts
+@@ -1,3 +1,4 @@
+ import { neon } from "@neondatabase/serverless";
+ 
++// TODO: the cache is missing.
+ export const sql = neon(process.env.DATABASE_URL!);

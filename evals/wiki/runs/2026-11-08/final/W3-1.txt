@@ -1,0 +1,82 @@
+USER: We're moving the database from Neon to AWS RDS because a customer contract requires the data to stay in our AWS account. Record it in the wiki.
+TOOL Skill {"skill":"wiki"}
+TOOL Read {"file_path":".wiki/index.md"}
+TOOL Grep {"pattern":"Neon|RDS|Postgres|database"}
+TOOL Read {"file_path":".claude/skills/wiki/references/DECISION-FORMAT.md"}
+TOOL Read {"file_path":".wiki/decisions/use-neon-20261001101000.md"}
+TOOL Read {"file_path":".wiki/stack/README.md"}
+TOOL Read {"file_path":".wiki/architecture/data.md"}
+TOOL Read {"file_path":".wiki/architecture/README.md"}
+TOOL Bash {"command":"cd \"W3\" && grep -rE '^(status|description|code):' .wiki/decisions; ls -R .wiki; date +%Y%m%d%H%M%S; grep -rlE 'status: (in-progress|blocked)' .wiki/work 2>/dev/null; grep -rnE 'use-neon|Neon|AWS|hosting|deploy' .wiki --include=*.md -il"}
+TOOL Bash {"command":"cd \"W3\" && date -u +%Y%m%d%H%M%S; date -u +%F; grep -rniE 'use-neon|neon|aws|rds|hosting|deploy' .wiki; echo ---; git log --oneline 789144c.. -- src/db package.json src/api src/share; echo ---; cat .wiki/decisions/use-sqlite-20260901100000.md; echo ---; git ls-files | grep -v '^.claude\\|^.wiki'"}
+TEXT: Nothing written yet: wiki needs your OK on exact text. Code still on Neon (`src/db/index.ts:1`), so layers say "moving", not "on RDS".
+
+**1. New: `.wiki/decisions/move-to-rds-20261108195245.md`**
+
+```md
+---
+status: current
+description: Database moves from Neon to Postgres on AWS RDS, because a customer contract requires the data to stay in our AWS account.
+created: 2026-11-08
+closed:
+superseded_by:
+code: [src/db/]
+---
+
+# Move the database to RDS
+
+## Decision
+
+Move recipes from Neon to Postgres on AWS RDS, in our AWS account.
+
+## Why
+
+A customer contract requires the data to stay in our AWS account. Replaces
+[Use Neon](use-neon-20261001101000.md), which cannot meet this requirement.
+
+## Discarded
+
+- Staying on Neon: it cannot meet the contract.
+
+## Changes
+```
+
+**2. `.wiki/decisions/use-neon-20261001101000.md`** (body unchanged)
+
+```md
+status: superseded
+description: Database was Neon Postgres, because there was one developer with no operations experience.
+closed: 2026-11-08
+superseded_by: move-to-rds-20261108195245.md
+```
+Under `## Changes`:
+```md
+- 2026-11-08: superseded. Why: see the new decision.
+```
+
+**3. `.wiki/architecture/data.md`**
+
+```md
+description: Recipes live in one Neon Postgres database, moving to AWS RDS, reached only through the API.
+```
+```md
+Recipes live in one Postgres database on Neon, moving to AWS RDS ([why](../decisions/move-to-rds-20261108195245.md)).
+```
+
+**4. `.wiki/stack/README.md`**
+
+```md
+description: Hono for the API and Neon for the database, moving to AWS RDS.
+```
+```md
+| Neon, moving to AWS RDS | [Data](../architecture/data.md) | Customer contract requires the data to stay in our AWS account ([why](../decisions/move-to-rds-20261108195245.md)) |
+```
+
+**Confirm:**
+- Engine stays Postgres? You only said RDS; I assumed it.
+- Any other options considered besides staying on Neon? If so, why rejected.
+- Approve as is, or what to change?
+
+Once migration ships, layers need a follow-up to drop "moving". No commit unless you ask.
+RESULT_FINAL repo state after the turn
+## diff

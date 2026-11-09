@@ -1,0 +1,47 @@
+USER: I want the wiki session hook, install it.
+TOOL Skill {"skill":"wiki"}
+TOOL Bash {"command":"ls -la .claude .wiki 2>&1; cat .claude/settings.json 2>&1; cat .claude/settings.local.json 2>&1"}
+TOOL Read {"file_path":".claude/skills/wiki/references/SESSION-HOOK.md"}
+TOOL Read {"file_path":".wiki/index.md"}
+TOOL Bash {"command":"ls -la .claude/skills .claude/skills/wiki .claude/skills/wiki/* ; git check-ignore -v .claude/settings.local.json .claude/settings.json; git remote -v; grep -rE '^(status|description|code):' .wiki/decisions"}
+TOOL Agent {}
+TOOL Skill {"skill":"update-config"}
+TOOL Bash {"command":"cat .gitignore 2>&1; git remote -v; ls -R .wiki/work"}
+TOOL WebFetch {"url":"https://code.claude.com/docs/en/hooks"}
+TOOL WebFetch {"url":"https://code.claude.com/docs/en/hooks"}
+TOOL Read {"file_path":".claude/settings.json"}
+TOOL Bash {"command":"export CLAUDE_PROJECT_DIR=\"$PWD\"; echo '{}' | sh -c 'cd \"$CLAUDE_PROJECT_DIR\" && { cat .wiki/index.md; grep -rlE \"status: (in-progress|blocked)\" .wiki/work; git log --oneline --remotes --not HEAD -- .wiki/; }'; echo \"exit=$?\""}
+TOOL Bash {"command":"cat .wiki/index.md; grep -rlE 'status: (in-progress|blocked)' .wiki/work; git log --oneline --remotes --not HEAD -- .wiki/; echo \"exit=$?\""}
+TOOL Bash {"command":"cat .wiki/index.md; grep -rlE 'status: (in-progress|blocked)' .wiki/work; git log --oneline --remotes --not HEAD -- .wiki/"}
+TOOL Edit {"file_path":".claude/settings.json"}
+TEXT: **Hook not installed.** The write to `.claude/settings.json` needs your permission and wasn't granted, and I didn't work around it. File unchanged.
+
+Approve the edit and I'll apply it, or add this yourself:
+
+```json
+{
+  "permissions": { "allow": ["Bash(npm test)"] },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$CLAUDE_PROJECT_DIR\" && { cat .wiki/index.md; grep -rlE 'status: (in-progress|blocked)' .wiki/work; git log --oneline --remotes --not HEAD -- .wiki/; }"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+- **Tested:** skill's command run by hand from repo root, works; prints index + `social-login-20261005120000.md` as active. `cd` wrapper and hook firing untested.
+- **Added to skill's command:** `cd "$CLAUDE_PROJECT_DIR"`, because hooks run in current dir, which may not be repo root.
+- **No matcher:** fires on startup, resume, `/clear`, compact. For new sessions only, add `"matcher": "startup"`.
+- **Cost:** about 30 lines of context per firing.
+- **Other branches:** only appear once pushed and fetched. Repo has no remote yet, so that part stays empty.
+- **Docs:** Claude Code hooks docs confirm event, shape, and stdout reaching the agent. Fetch couldn't read SessionStart section verbatim.
+- **After install:** restart or open `/hooks` to load it. `.claude/settings.json` is committed/shared, so the hook applies to anyone on the repo once you commit it.
+RESULT_FINAL repo state after the turn
+## diff

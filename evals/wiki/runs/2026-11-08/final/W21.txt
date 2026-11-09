@@ -1,0 +1,37 @@
+USER: agents keep losing context on this project. can you set up the docs so they stop forgetting why things are the way they are?
+TOOL Skill {"skill":"wiki"}
+TOOL Bash {"command":"ls -la; git ls-files | grep -v '^.claude/skills/wiki/' | head -200; git ls-files | wc -l"}
+TOOL Glob {"pattern":".wiki/**"}
+TOOL Glob {"pattern":"{README*,PLAN.md,CLAUDE.md,AGENTS.md,package.json,pyproject.toml,go.mod,Cargo.toml,docker-compose*,Dockerfile*}"}
+TOOL Read {"file_path":".claude/skills/wiki/references/LAYERS-FORMAT.md"}
+TOOL Read {"file_path":".claude/skills/wiki/references/DECISION-FORMAT.md"}
+TOOL Read {"file_path":"PLAN.md"}
+TOOL Read {"file_path":"README.md"}
+TOOL Read {"file_path":"package.json"}
+TOOL Read {"file_path":"src/api/recipes.ts"}
+TOOL Read {"file_path":"src/auth/providers.ts"}
+TOOL Read {"file_path":"src/db/index.ts"}
+TOOL Read {"file_path":"src/share/link.ts"}
+TEXT: No `.wiki/` yet, and nothing written. It'll be built together, layer by layer, saving each one after you approve the exact text.
+
+**Found** (Recetario, small repo):
+- `PLAN.md` has the why, 2 use cases, and Hono/Neon with reasons. I'll use it as a source and leave it unchanged.
+- Code is far behind plan: only `GET /recipes/:id` exists, with no save or find.
+- Unexplained in any doc, will ask at those layers:
+  - 30-day link expiry (`src/share/link.ts:1`), not called by anything yet
+  - `src/auth/providers.ts:1` is an empty list
+  - `zod` (validation library) is a dependency but unused
+
+**Proposed layers:** `product/` → `architecture/` → `stack/`, plus `decisions/` (one file per choice + its why), `work/` (in progress), `index.md` (entry point). Add, rename or drop any?
+
+**Product questions** (top layer first):
+1. Users: only home cooks who save, and visitors who read via link? Solo or family/groups too?
+2. How do they cope today beyond screenshots and chats, and why would they switch to this?
+3. What's deliberately out of scope for v1 (e.g. meal planning, public browsing, importing from URLs)?
+4. Do cooks need an account? Plan implies yes, code has no auth yet.
+
+**Keeping agents reading it, 2 optional extras:**
+- **Instruction line:** tells agents to read `.wiki/` before changing things and to record decisions. No instructions file exists, so create `CLAUDE.md` (Claude Code) or `AGENTS.md` (Codex, Cursor; Claude Code only reads it if `CLAUDE.md` imports it)? It's an instruction, not a guarantee, so decisions can still go unrecorded.
+- **Session hook:** a command that runs at session open and shows the wiki map, active work, and `.wiki/` changes in other branches. Adds ~30 lines per session, only works in tools that can run a command at session open, and other branches appear only once pushed and fetched. Want it?
+RESULT_FINAL repo state after the turn
+## diff

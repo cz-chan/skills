@@ -1,0 +1,35 @@
+USER: how would you add an endpoint to delete recipes in src/api/recipes.ts?
+TOOL Read {"file_path":"src/api/recipes.ts"}
+TOOL Glob {"pattern":"**/*"}
+TOOL Grep {"pattern":"recipes|delete|DELETE"}
+TOOL Read {"file_path":"PLAN.md"}
+TOOL Read {"file_path":"README.md"}
+TOOL Read {"file_path":"src/auth/providers.ts"}
+TOOL Read {"file_path":"src/share/link.ts"}
+TOOL Read {"file_path":"src/db/index.ts"}
+TOOL Read {"file_path":"package.json"}
+TEXT: Add this to `src/api/recipes.ts`, after the GET route:
+
+```ts
+recipes.delete("/:id", async (c) => {
+  const rows = await sql`
+    delete from recipes where id = ${c.req.param("id")} returning id`;
+  if (rows.length === 0) return c.json({ error: "not found" }, 404);
+  return c.body(null, 204);
+});
+```
+
+- `returning id`: gives 404 vs 204 in one query, no race from select-then-delete.
+- Tagged template: parameterized, no SQLi.
+
+**Blocker: no auth.** `providers` is empty (`src/auth/providers.ts:1`), no middleware, so anyone could delete any recipe. Don't ship before auth exists. Then scope it: `where id = ${id} and owner_id = ${userId}`. No owner column visible; no schema/migrations in repo.
+
+**Check first:**
+- `id` type: if uuid, malformed id → Postgres error → 500. Validate with zod (already a dep), return 400.
+- Share links: no table visible, only `expiresAt` (`src/share/link.ts:3`). Need FK `on delete cascade` or link cleanup, else dead links or FK error.
+- Hard vs soft delete: hard is simplest; `deleted_at` allows undo but GET must filter it.
+- Router mount: `recipes` not mounted anywhere in repo, so route unreachable until it is. Same for GET.
+
+Nothing edited. Want me to apply it?
+RESULT_FINAL repo state after the turn
+## diff
