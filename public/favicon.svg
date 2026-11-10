@@ -1,12 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <style>
-    rect { fill: #111; }
-    text { fill: #fff; }
-    @media (prefers-color-scheme: dark) {
-      rect { fill: #fff; }
-      text { fill: #111; }
-    }
-  </style>
-  <rect width="32" height="32" rx="6" />
-  <text x="16" y="24" text-anchor="middle" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="700">S</text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="143" height="143" fill="none" viewBox="0 0 143 143"><path fill="#f2f2f2" d="M0 0h143v143H0z"/><path fill="#0e0e0f" d="M86.96 107H39v-1.76l11-17.82h28.38L47.8 45.84l9.57-17.16h39.27v19.58H73.98l28.05 37.51z"/></svg>
