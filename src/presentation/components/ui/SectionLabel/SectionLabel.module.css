@@ -2,7 +2,7 @@
   margin: 0 0 1rem;
   font-size: 0.75rem;
   font-weight: 400;
-  letter-spacing: 0.02em;
+  letter-spacing: var(--display-tracking);
   color: var(--muted);
   overflow-wrap: anywhere;
 }
