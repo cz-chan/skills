@@ -19,6 +19,8 @@
 }
 
 .text a {
+  font-family: var(--display);
+  letter-spacing: var(--display-tracking);
   color: inherit;
 }
 

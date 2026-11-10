@@ -10,7 +10,7 @@
 
 .prose h1 {
   font-size: 2.25rem;
-  letter-spacing: -0.03em;
+  letter-spacing: var(--display-tracking);
   line-height: 1.1;
 }
 

@@ -10,7 +10,9 @@
 }
 
 .logo {
+  font-family: var(--display);
   font-weight: 700;
+  letter-spacing: var(--display-tracking);
 }
 
 .nav {
@@ -19,6 +21,8 @@
 }
 
 .nav a {
+  font-family: var(--display);
+  letter-spacing: var(--display-tracking);
   color: var(--muted);
 }
 

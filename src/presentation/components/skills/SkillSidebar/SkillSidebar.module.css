@@ -10,9 +10,10 @@
 
 .name {
   display: block;
+  font-family: var(--display);
   font-size: 2rem;
   font-weight: 700;
-  letter-spacing: -0.04em;
+  letter-spacing: var(--display-tracking);
   line-height: 1.05;
   overflow-wrap: anywhere;
 }

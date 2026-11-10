@@ -5,9 +5,10 @@
 }
 
 .title {
+  font-family: var(--display);
   margin: 0.5rem 0 1rem;
-  font-size: clamp(2rem, 7vw, 5rem);
-  letter-spacing: -0.045em;
+  font-size: clamp(1.6rem, 5.5vw, 3.75rem);
+  letter-spacing: var(--display-tracking);
   line-height: 1;
 }
 
