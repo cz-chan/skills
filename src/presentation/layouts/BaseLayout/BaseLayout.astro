@@ -4,6 +4,8 @@ import Footer from "@presentation/components/site/Footer/Footer.astro";
 import Header from "@presentation/components/site/Header/Header.astro";
 import styles from "./BaseLayout.module.css";
 import { ClientRouter } from "astro:transitions";
+// Misma URL con hash que genera el @font-face de global.css: el preload y el CSS comparten caché.
+import metalLordUrl from "../../../assets/fonts/MetalLord.woff2?url";
 
 interface Props {
 	title: string;
@@ -35,6 +37,14 @@ const canonical = new URL(
 		<meta
 			name="generator"
 			content={Astro.generator}
+		/>
+		<!-- Precarga la fuente de los títulos para que no haya salto al cargar la página. -->
+		<link
+			rel="preload"
+			href={metalLordUrl}
+			as="font"
+			type="font/woff2"
+			crossorigin
 		/>
 		<link
 			rel="icon"
