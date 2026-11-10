@@ -1,6 +1,12 @@
 /* Solo tokens y estilos base. Cada componente lleva su propio .module.css. */
 @import "./reset.css";
 
+@font-face {
+	font-family: "MetalLord";
+	src: url("../../assets/fonts/MetalLord.woff2") format("woff2");
+	font-display: swap;
+}
+
 :root {
 	--bg: #fff;
 	--fg: #111;
@@ -21,6 +27,8 @@
 	--measure: 70ch;
 	--page-max: calc(var(--aside) + var(--split-gap) + var(--measure));
 	--sans: "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+	--display: "MetalLord", var(--sans);
+	--display-tracking: 0.12em;
 	--mono: ui-monospace, "SF Mono", Menlo, monospace;
 	color-scheme: light dark;
 }
@@ -59,6 +67,16 @@ body {
 
 a:hover {
 	color: var(--accent);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: var(--display);
+	letter-spacing: var(--display-tracking);
 }
 
 code,
