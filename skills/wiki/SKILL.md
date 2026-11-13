@@ -10,6 +10,7 @@ description: >-
   decide about auth" — and whenever `.wiki/` exists and a decision is being made
   or changed.
 metadata:
+  author: "c12z.io"
   created: "2026-11-08"
   updatedAt: "2026-11-09"
 credits:

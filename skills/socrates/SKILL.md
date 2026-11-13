@@ -2,6 +2,7 @@
 name: socrates
 description: "Socratic method teaching skill that guides users to discover answers themselves through scaffolded, concrete questions instead of giving direct answers. TRIGGER when: user's message mentions Socrates or the Socratic method in any language (socratic, Socrates, socrático, socrática, Sócrates, socratique…). Works with any subject (code, math, languages or anything else...), from the user's own material (codebases, documents, PDFs, exercises) or starting from zero. Respond in the user's language."
 metadata:
+  author: "c12z.io"
   created: "2026-10-09"
   updatedAt: "2026-10-15"
 credits:

@@ -11,6 +11,7 @@ description: >-
   learning session ("seguimos", "where did we leave off?"). Not for normal
   feature work, "just fix it" requests, or "build this product for me".
 metadata:
+  author: "c12z.io"
   created: "2026-10-09"
   updatedAt: "2026-11-06"
 credits:
