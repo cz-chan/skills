@@ -15,6 +15,8 @@ export interface Skill {
   id: string;
   name: string;
   description: string;
+  /** metadata.author del SKILL.md, si lo tiene. */
+  author?: string;
   createdAt: Date;
   /** metadata.updatedAt del SKILL.md, si lo tiene. */
   updatedAt?: Date;

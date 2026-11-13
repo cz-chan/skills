@@ -8,6 +8,7 @@ const toSkill = (entry: CollectionEntry<"skills">, files: SkillFile[]): Skill =>
   id: entry.id,
   name: entry.data.name,
   description: entry.data.description,
+  author: entry.data.metadata.author,
   createdAt: entry.data.metadata.created,
   updatedAt: entry.data.metadata.updatedAt,
   credits: entry.data.credits,
