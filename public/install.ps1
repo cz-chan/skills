@@ -28,6 +28,20 @@ try {
 	$src = Join-Path $tmp $name
 	if ($LASTEXITCODE -or -not (Test-Path (Join-Path $src "SKILL.md"))) { throw "skill no encontrada: $Skill" }
 
+	# Quita credits y links del frontmatter (son para la web); metadata y el resto se quedan.
+	$md = Join-Path $src "SKILL.md"
+	$out = New-Object System.Collections.Generic.List[string]
+	$fm = $false; $skip = $false; $i = 0
+	foreach ($line in [IO.File]::ReadAllLines($md)) {
+		$i++
+		if ($i -eq 1 -and $line -eq '---') { $fm = $true; $out.Add($line); continue }
+		if ($fm -and $line -eq '---') { $fm = $false; $skip = $false; $out.Add($line); continue }
+		if ($fm -and $line -match '^(credits|links):') { $skip = $true; continue }
+		if ($fm -and $skip -and $line -match '^[\s-]') { continue }
+		$skip = $false; $out.Add($line)
+	}
+	[IO.File]::WriteAllText($md, ($out -join "`n") + "`n", (New-Object Text.UTF8Encoding $false))
+
 	New-Item -ItemType Directory -Force $Dir | Out-Null
 	$dest = Join-Path $Dir $name
 	if (Test-Path $dest) { Remove-Item -Recurse -Force $dest }

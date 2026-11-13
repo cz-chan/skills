@@ -19,6 +19,6 @@ const created = new Date().toISOString().slice(0, 10);
 mkdirSync(dir, { recursive: true });
 writeFileSync(
 	`${dir}/SKILL.md`,
-	`---\nname: ${name}\ndescription: TODO\nmetadata:\n  created: "${created}"\n---\n\n# ${name}\n`,
+	`---\nname: ${name}\ndescription: TODO\nmetadata:\n  author: "c12z.io"\n  created: "${created}"\n---\n\n# ${name}\n`,
 );
 console.log(`Creada ${dir}/SKILL.md`);

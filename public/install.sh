@@ -27,6 +27,16 @@ curl -fsSL "https://codeload.github.com/$REPO/tar.gz/$BRANCH" |
 	{ echo "skill no encontrada: $skill" >&2; exit 1; }
 [ -f "$tmp/$name/SKILL.md" ] || { echo "skill no encontrada: $skill" >&2; exit 1; }
 
+# Quita credits y links del frontmatter (son para la web); metadata y el resto se quedan.
+md="$tmp/$name/SKILL.md"
+awk '
+	NR == 1 && /^---$/ { fm = 1; print; next }
+	fm && /^---$/ { fm = 0; skip = 0; print; next }
+	fm && /^(credits|links):/ { skip = 1; next }
+	fm && skip && /^[[:space:]-]/ { next }
+	{ skip = 0; print }
+' "$md" >"$md.tmp" && mv "$md.tmp" "$md"
+
 mkdir -p "$dir"
 rm -rf "${dir:?}/$name"
 mv "$tmp/$name" "$dir/"
